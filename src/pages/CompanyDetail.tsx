@@ -3,19 +3,7 @@ import { useCompanyDetails } from '../hooks/useApi';
 import { ArrowUpIcon, ArrowDownIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import type { FundYield } from '../types/api';
 import EmptyState from '../components/EmptyState';
-
-const formatPercentage = (value: number | null | undefined): string => {
-    if (value == null) return '-';
-    return `%${value.toLocaleString('tr-TR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })}`;
-};
-
-const formatNumber = (value: number | null | undefined): string => {
-    if (value == null) return '-';
-    return value.toLocaleString('tr-TR');
-};
+import { formatPercent, formatNumber } from '../utils/format';
 
 export default function CompanyDetail() {
     const { code } = useParams<{ code: string }>();
@@ -114,7 +102,7 @@ export default function CompanyDetail() {
                                         <dd className={`text-lg font-semibold ${
                                             stat.value && stat.value >= 0 ? 'text-green-600' : 'text-red-600'
                                         }`}>
-                                            {formatPercentage(stat.value)}
+                                            {formatPercent(stat.value)}
                                         </dd>
                                     </dl>
                                 </div>
@@ -142,7 +130,7 @@ export default function CompanyDetail() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-lg font-semibold text-green-600">
-                                            {formatPercentage(fund.yield_1y)}
+                                            {formatPercent(fund.yield_1y)}
                                         </p>
                                         <p className="text-sm text-gray-500">Yıllık Getiri</p>
                                     </div>
@@ -209,8 +197,10 @@ export default function CompanyDetail() {
                                                     {fund.code}
                                                 </Link>
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                                {fund.title}
+                                            <td className="px-3 py-4 text-sm text-gray-500">
+                                                <div className="truncate max-w-md" title={fund.title}>
+                                                    {fund.title}
+                                                </div>
                                             </td>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                                 {fund.type}
@@ -223,7 +213,7 @@ export default function CompanyDetail() {
                                                             : 'text-red-600'
                                                     }
                                                 >
-                                                    {formatPercentage(fund.yield_1m)}
+                                                    {formatPercent(fund.yield_1m)}
                                                 </span>
                                             </td>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
@@ -234,7 +224,7 @@ export default function CompanyDetail() {
                                                             : 'text-red-600'
                                                     }
                                                 >
-                                                    {formatPercentage(fund.yield_6m)}
+                                                    {formatPercent(fund.yield_6m)}
                                                 </span>
                                             </td>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
@@ -245,7 +235,7 @@ export default function CompanyDetail() {
                                                             : 'text-red-600'
                                                     }
                                                 >
-                                                    {formatPercentage(fund.yield_1y)}
+                                                    {formatPercent(fund.yield_1y)}
                                                 </span>
                                             </td>
                                         </tr>

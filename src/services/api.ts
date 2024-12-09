@@ -94,6 +94,7 @@ export const getFundHistory = async (
         interval?: 'daily' | 'weekly' | 'monthly';
         sort?: 'date' | 'value';
         order?: 'ASC' | 'DESC';
+        limit?: number;
     }
 ) => {
     const { data } = await api.get<FundHistoricalValue[]>(`/funds/${code}/historical`, { params });

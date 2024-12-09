@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useTopPerformingFunds } from '../hooks/useApi';
 import { ChartBarIcon, BuildingOfficeIcon, ArrowTrendingUpIcon } from '@heroicons/react/24/outline';
+import { formatPercent } from '../utils/format';
 
 export default function Home() {
     const { data: topFunds, isLoading } = useTopPerformingFunds();
@@ -98,7 +99,7 @@ export default function Home() {
                                     </div>
                                     <div className="text-right">
                                         <p className="text-lg font-semibold text-green-600">
-                                            %{fund.yield_1y?.toFixed(2)}
+                                            {formatPercent(fund.yield_1y)}
                                         </p>
                                         <p className="text-sm text-gray-500">Yıllık Getiri</p>
                                     </div>

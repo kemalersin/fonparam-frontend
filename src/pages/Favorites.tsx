@@ -9,22 +9,15 @@ import { useFundDetails } from '../hooks/useApi';
 import type { FavoriteFund } from '../services/favorites';
 import Toast from '../components/Toast';
 import ComparisonButton from '../components/ComparisonButton';
+import { formatPercent } from '../utils/format';
 
-const formatNumber = (value: number | undefined | null): string => {
-    if (value == null) return '-';
-    return `%${new Intl.NumberFormat('tr-TR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    }).format(value)}`;
-};
-
-const SortHeader = ({ 
-    label, 
-    field, 
-    currentSort, 
-    currentOrder, 
-    onSort 
-}: { 
+const SortHeader = ({
+    label,
+    field,
+    currentSort,
+    currentOrder,
+    onSort
+}: {
     label: string;
     field: string;
     currentSort: string;
@@ -35,11 +28,10 @@ const SortHeader = ({
     return (
         <th
             scope="col"
-            className={`px-3 py-3.5 text-sm font-semibold text-gray-900 cursor-pointer group ${
-                field === 'code' ? 'w-24' : 
-                field === 'title' ? 'w-48' : 
-                'w-20'
-            } ${isTextColumn ? 'text-left' : 'text-right'}`}
+            className={`px-3 py-3.5 text-sm font-semibold text-gray-900 cursor-pointer group ${field === 'code' ? 'w-24' :
+                    field === 'title' ? 'w-48' :
+                        'w-20'
+                } ${isTextColumn ? 'text-left' : 'text-right'}`}
             onClick={() => onSort(field)}
         >
             <div className={`flex items-center gap-1 ${isTextColumn ? 'justify-start' : 'justify-end'}`}>
@@ -62,10 +54,10 @@ const SortHeader = ({
     );
 };
 
-const FavoriteRow = ({ 
-    fund, 
-    onRemove 
-}: { 
+const FavoriteRow = ({
+    fund,
+    onRemove
+}: {
     fund: FavoriteFund;
     onRemove: (event: React.MouseEvent, code: string) => void;
 }) => {
@@ -95,7 +87,7 @@ const FavoriteRow = ({
 
     const handleComparisonClick = async (event: React.MouseEvent) => {
         event.stopPropagation();
-        
+
         setCheckingComparison(true);
         try {
             if (isInComparisonList) {
@@ -212,7 +204,7 @@ const FavoriteRow = ({
                                 value >= 0 ? 'text-green-600' : 'text-red-600'
                             ) : 'text-gray-500'}
                         >
-                            {formatNumber(value)}
+                            {formatPercent(value)}
                         </span>
                     </td>
                 ))}
@@ -227,6 +219,11 @@ export default function Favorites() {
     const [search, setSearch] = useState('');
     const [sort, setSort] = useState('added_at');
     const [order, setOrder] = useState<'ASC' | 'DESC'>('DESC');
+    const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'warning' | 'info'; message: string }>({
+        show: false,
+        type: 'info',
+        message: ''
+    });
 
     useEffect(() => {
         loadFavorites();
@@ -268,7 +265,7 @@ export default function Favorites() {
         setSearch(value);
     };
 
-    const filteredFavorites = favorites.filter(fund => 
+    const filteredFavorites = favorites.filter(fund =>
         fund.code.toLowerCase().includes(search.toLowerCase()) ||
         fund.title.toLowerCase().includes(search.toLowerCase())
     );
@@ -279,7 +276,7 @@ export default function Favorites() {
             const details = fund.details;
             return details ? details[field] : null;
         };
-        
+
         if (sort === 'added_at') {
             comparison = new Date(b.added_at).getTime() - new Date(a.added_at).getTime();
         } else if (sort === 'code') {
@@ -296,7 +293,14 @@ export default function Favorites() {
     });
 
     return (
-        <div className="space-y-6">
+        <div>
+            <Toast
+                show={toast.show}
+                type={toast.type}
+                message={toast.message}
+                onClose={() => setToast(prev => ({ ...prev, show: false }))}
+            />
+
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -307,131 +311,134 @@ export default function Favorites() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            {/* Content */}
+            <div className="mt-6 space-y-6">
+                {/* Search */}
+                <div className="relative">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    </div>
+                    <input
+                        type="text"
+                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        placeholder="Fon kodu veya adı ile arayın..."
+                        value={search}
+                        onChange={(e) => handleSearch(e.target.value)}
+                    />
                 </div>
-                <input
-                    type="text"
-                    className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="Fon kodu veya adı ile arayın..."
-                    value={search}
-                    onChange={(e) => handleSearch(e.target.value)}
-                />
-            </div>
 
-            {/* Table */}
-            <div className="mt-8 flow-root">
-                <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                            <table className="min-w-full divide-y divide-gray-300">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <SortHeader
-                                            label="Fon Kodu"
-                                            field="code"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="Fon Adı"
-                                            field="title"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="1 Ay"
-                                            field="yield_1m"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="3 Ay"
-                                            field="yield_3m"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="6 Ay"
-                                            field="yield_6m"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="YTD"
-                                            field="yield_ytd"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="1 Yıl"
-                                            field="yield_1y"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="3 Yıl"
-                                            field="yield_3y"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                        <SortHeader
-                                            label="5 Yıl"
-                                            field="yield_5y"
-                                            currentSort={sort}
-                                            currentOrder={order}
-                                            onSort={handleSort}
-                                        />
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-200 bg-white">
-                                    {isLoading ? (
+                {/* Table */}
+                <div className="flow-root">
+                    <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                                <table className="min-w-full divide-y divide-gray-300">
+                                    <thead className="bg-gray-50">
                                         <tr>
-                                            <td colSpan={9} className="text-center py-4">
-                                                <div className="flex items-center justify-center">
-                                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                                                    <span className="ml-2 text-sm text-gray-500">Favoriler yükleniyor...</span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : sortedFavorites.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={9} className="text-center py-8">
-                                                <div className="text-sm text-gray-500">
-                                                    {search ? (
-                                                        <>Aramanızla eşleşen favori fon bulunamadı.</>
-                                                    ) : (
-                                                        <>
-                                                            Henüz favori fon eklemediniz.{' '}
-                                                            <Link to="/funds" className="text-indigo-600 hover:text-indigo-500">
-                                                                Fon listesine göz atın
-                                                            </Link>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ) : (
-                                        sortedFavorites.map((fund) => (
-                                            <FavoriteRow 
-                                                key={fund.code} 
-                                                fund={fund} 
-                                                onRemove={handleRemoveFavorite}
+                                            <SortHeader
+                                                label="Fon Kodu"
+                                                field="code"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
                                             />
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                            <SortHeader
+                                                label="Fon Adı"
+                                                field="title"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="1 Ay"
+                                                field="yield_1m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="3 Ay"
+                                                field="yield_3m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="6 Ay"
+                                                field="yield_6m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="YTD"
+                                                field="yield_ytd"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="1 Yıl"
+                                                field="yield_1y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="3 Yıl"
+                                                field="yield_3y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="5 Yıl"
+                                                field="yield_5y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                        {isLoading ? (
+                                            <tr>
+                                                <td colSpan={9} className="text-center py-4">
+                                                    <div className="flex items-center justify-center">
+                                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                                                        <span className="ml-2 text-sm text-gray-500">Favoriler yükleniyor...</span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : sortedFavorites.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={9} className="text-center py-8">
+                                                    <div className="text-sm text-gray-500">
+                                                        {search ? (
+                                                            <>Aramanızla eşleşen favori fon bulunamadı.</>
+                                                        ) : (
+                                                            <>
+                                                                Henüz favori fon eklemediniz.{' '}
+                                                                <Link to="/funds" className="text-indigo-600 hover:text-indigo-500">
+                                                                    Fon listesine göz atın
+                                                                </Link>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : (
+                                            sortedFavorites.map((fund) => (
+                                                <FavoriteRow
+                                                    key={fund.code}
+                                                    fund={fund}
+                                                    onRemove={handleRemoveFavorite}
+                                                />
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

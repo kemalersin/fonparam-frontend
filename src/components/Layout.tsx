@@ -86,8 +86,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 )}
             </Disclosure>
 
-            <main className="flex-1 py-6">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <main className="flex-1">
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-12">
                     {children}
                 </div>
             </main>

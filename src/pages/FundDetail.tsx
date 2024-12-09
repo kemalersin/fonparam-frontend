@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { ArrowUpIcon, ArrowDownIcon, BuildingOfficeIcon, CalendarIcon, BanknotesIcon, InformationCircleIcon, StarIcon } from '@heroicons/react/24/outline';
+import { ArrowUpIcon, ArrowDownIcon, BuildingOfficeIcon, CalendarIcon, BanknotesIcon, InformationCircleIcon, StarIcon, ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { Combobox } from '@headlessui/react';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import ComparisonButton from '../components/ComparisonButton';
+import { formatPercent, formatCurrency, formatNumber, formatDate } from '../utils/format';
 
 const PERIODS = [
     { label: 'Son 1 Ay', value: 'last_1_month' },
@@ -16,14 +18,6 @@ const PERIODS = [
     { label: 'Son 3 Yıl', value: 'last_3_years' },
     { label: 'Son 5 Yıl', value: 'last_5_years' },
 ];
-
-const formatPercentage = (value: number | undefined | null): string => {
-    if (value == null) return '-';
-    return `%${value.toLocaleString('tr-TR', { 
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })}`;
-};
 
 const getStartDate = (period: string): string => {
     const today = new Date();
@@ -47,18 +41,18 @@ const getStartDate = (period: string): string => {
     }
 };
 
-const formatCurrency = (value: number | undefined | null): string => {
-    if (value == null) return '-';
-    return `₺${value.toLocaleString('tr-TR', { 
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })}`;
-};
+const INCREASE_TYPES = [
+    { id: 'percentage', name: 'Yüzde', symbol: '%' },
+    { id: 'amount', name: 'Tutar', symbol: '₺' }
+];
 
 export default function FundDetail() {
     const { code } = useParams<{ code: string }>();
     const [selectedPeriod, setSelectedPeriod] = useState('last_1_year');
-    const [showMonthlyDetails, setShowMonthlyDetails] = useState(true);
+    const [showMonthlyDetails, setShowMonthlyDetails] = useState(() => {
+        const saved = localStorage.getItem('showMonthlyDetails');
+        return saved ? JSON.parse(saved) : false;
+    });
     const [isFavorited, setIsFavorited] = useState(false);
     const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
     const [analysisParams, setAnalysisParams] = useState({
@@ -78,6 +72,12 @@ export default function FundDetail() {
         sort: 'date',
         order: 'ASC',
         start_date: getStartDate(selectedPeriod)
+    });
+    const { data: lastValue } = useFundHistory(code ?? '', {
+        interval: 'daily',
+        sort: 'date',
+        order: 'DESC',
+        limit: 1
     });
     const { data: analysis } = useAnalyzeFund(code ?? '', analysisParams);
 
@@ -118,6 +118,11 @@ export default function FundDetail() {
         } catch (error) {
             console.error('Favori işlemi başarısız:', error);
         }
+    };
+
+    const handleMonthlyDetailsToggle = (checked: boolean) => {
+        setShowMonthlyDetails(checked);
+        localStorage.setItem('showMonthlyDetails', JSON.stringify(checked));
     };
 
     if (isLoadingFund) {
@@ -219,6 +224,17 @@ export default function FundDetail() {
                                             </span>
                                         </>
                                     )}
+                                    {lastValue?.[0] && (
+                                        <>
+                                            <span className="hidden sm:inline">•</span>
+                                            <div className="flex items-center">
+                                                <BanknotesIcon className="h-4 w-4 mr-1" />
+                                                <span className="font-medium">{formatCurrency(lastValue[0].value)}</span>
+                                                <span className="mx-1">•</span>
+                                                <span>{formatDate(lastValue[0].date)}</span>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -229,7 +245,7 @@ export default function FundDetail() {
                                 <span
                                     className={currentFund.yield_1y >= 0 ? 'text-green-600' : 'text-red-600'}
                                 >
-                                    {formatPercentage(currentFund.yield_1y)}
+                                    {formatPercent(currentFund.yield_1y)}
                                 </span>
                             ) : (
                                 '-'
@@ -271,7 +287,7 @@ export default function FundDetail() {
                                                         : 'text-red-600'
                                                 }`}
                                             >
-                                                {formatPercentage(item.value)}
+                                                {formatPercent(item.value)}
                                             </div>
                                         </dd>
                                     </dl>
@@ -349,7 +365,24 @@ export default function FundDetail() {
 
             {/* Investment Analysis */}
             <div className="bg-white shadow-sm rounded-lg p-4 sm:p-6">
-                <h2 className="text-lg font-medium text-gray-900 mb-6">Yatırım Analizi</h2>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg font-medium text-gray-900">Yatırım Analizi</h2>
+                    <div className="flex items-center gap-2">
+                        <label className="flex items-center gap-2">
+                            <div className="relative inline-block w-10 align-middle select-none">
+                                <input
+                                    type="checkbox"
+                                    checked={showMonthlyDetails}
+                                    onChange={(e) => handleMonthlyDetailsToggle(e.target.checked)}
+                                    className="peer sr-only"
+                                />
+                                <div className="h-6 w-11 cursor-pointer rounded-full bg-gray-200 transition-colors duration-200 ease-in-out peer-checked:bg-indigo-600"></div>
+                                <div className="absolute left-0.5 top-0.5 h-5 w-5 transform cursor-pointer rounded-full bg-white shadow transition duration-200 ease-in-out peer-checked:translate-x-5"></div>
+                            </div>
+                            <span className="text-sm font-medium text-gray-700">Aylık Detaylar</span>
+                        </label>
+                    </div>
+                </div>
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     <div className="space-y-6">
                         <div>
@@ -357,7 +390,7 @@ export default function FundDetail() {
                                 Başlangıç Yatırımı
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <span className="text-gray-500 sm:text-sm">₺</span>
                                 </div>
                                 <input
@@ -369,17 +402,18 @@ export default function FundDetail() {
                                             initialInvestment: Number(e.target.value),
                                         })
                                     }
-                                    className="block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="0.00"
+                                    className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="0"
                                 />
                             </div>
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700">
                                 Aylık Yatırım
                             </label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                                     <span className="text-gray-500 sm:text-sm">₺</span>
                                 </div>
                                 <input
@@ -391,39 +425,63 @@ export default function FundDetail() {
                                             monthlyInvestment: Number(e.target.value),
                                         })
                                     }
-                                    className="block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
-                                    placeholder="0.00"
+                                    className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                    placeholder="0"
                                 />
                             </div>
                         </div>
+
                         <div>
                             <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
                                 Yıllık Artış
                                 <div className="group relative">
                                     <InformationCircleIcon className="h-4 w-4 text-gray-400 hover:text-gray-500" />
                                     <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-60 rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
-                                        Aylık yatırım tutarına her yıl uygulanacak artış miktarı. Yüzde veya sabit tutar olarak belirlenebilir.
+                                        Aylık yatırım tutarına yılda bir kez uygulanacak artış miktarı. Yüzde veya sabit tutar olarak belirlenebilir.
                                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-2 h-2 bg-gray-900 rotate-45"></div>
                                     </div>
                                 </div>
                             </label>
                             <div className="mt-1 grid grid-cols-2 gap-2">
-                                <select
-                                    value={analysisParams.yearlyIncrease.type}
-                                    onChange={(e) =>
+                                <Combobox
+                                    as="div"
+                                    value={INCREASE_TYPES.find(type => type.id === analysisParams.yearlyIncrease.type)}
+                                    onChange={(type) =>
                                         setAnalysisParams({
                                             ...analysisParams,
                                             yearlyIncrease: {
                                                 ...analysisParams.yearlyIncrease,
-                                                type: e.target.value as 'percentage' | 'amount'
+                                                type: type?.id as 'percentage' | 'amount'
                                             }
                                         })
                                     }
-                                    className="block w-full sm:text-sm border-gray-300 rounded-md"
                                 >
-                                    <option value="percentage">Yüzde</option>
-                                    <option value="amount">Tutar</option>
-                                </select>
+                                    <div className="relative">
+                                        <Combobox.Button className="relative w-full cursor-default rounded-md bg-white py-2.5 pl-3 pr-10 text-left text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                            <span className="block truncate">
+                                                {INCREASE_TYPES.find(type => type.id === analysisParams.yearlyIncrease.type)?.name}
+                                            </span>
+                                            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                                <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                            </span>
+                                        </Combobox.Button>
+                                        <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                            {INCREASE_TYPES.map((type) => (
+                                                <Combobox.Option
+                                                    key={type.id}
+                                                    value={type}
+                                                    className={({ active }) =>
+                                                        `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                                                            active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                                                        }`
+                                                    }
+                                                >
+                                                    {type.name}
+                                                </Combobox.Option>
+                                            ))}
+                                        </Combobox.Options>
+                                    </div>
+                                </Combobox>
                                 <div className="relative rounded-md shadow-sm">
                                     <input
                                         type="number"
@@ -437,76 +495,52 @@ export default function FundDetail() {
                                                 }
                                             })
                                         }
-                                        className="block w-full pr-8 sm:text-sm border-gray-300 rounded-md"
+                                        className="block w-full rounded-md border-0 py-2.5 pl-3 pr-8 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                         placeholder="0"
                                     />
-                                    <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                                         <span className="text-gray-500 sm:text-sm">
-                                            {analysisParams.yearlyIncrease.type === 'percentage' ? '%' : '₺'}
+                                            {INCREASE_TYPES.find(type => type.id === analysisParams.yearlyIncrease.type)?.symbol}
                                         </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div>
-                            <label className="flex items-center gap-2">
-                                <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={showMonthlyDetails}
-                                        onChange={(e) => setShowMonthlyDetails(e.target.checked)}
-                                        className="peer sr-only"
-                                    />
-                                    <div className="h-6 w-11 cursor-pointer rounded-full bg-gray-200 transition-colors duration-200 ease-in-out peer-checked:bg-indigo-600"></div>
-                                    <div className="absolute left-0.5 top-0.5 h-5 w-5 transform cursor-pointer rounded-full bg-white shadow transition duration-200 ease-in-out peer-checked:translate-x-5"></div>
-                                </div>
-                                <span className="text-sm font-medium text-gray-700">Aylık Detaylar</span>
-                            </label>
-                        </div>
                     </div>
 
                     {analysis && (
                         <div className="lg:col-span-2">
-                            <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg">
+                            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                     <dt className="text-sm font-medium text-gray-500">
                                         Toplam Yatırım
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-900">
-                                        ₺{analysis.summary.totalInvestment.toLocaleString('tr-TR', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        })}
+                                        {formatCurrency(analysis.summary.totalInvestment)}
                                     </dd>
                                 </div>
-                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg">
+                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                     <dt className="text-sm font-medium text-gray-500">
                                         Güncel Değer
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-900">
-                                        ₺{analysis.summary.currentValue.toLocaleString('tr-TR', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        })}
+                                        {formatCurrency(analysis.summary.currentValue)}
                                     </dd>
                                 </div>
-                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg">
+                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                     <dt className="text-sm font-medium text-gray-500">
-                                        Toplam Getiri
+                                        Toplam Kazanç
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600">
-                                        ₺{analysis.summary.totalYield.toLocaleString('tr-TR', {
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2
-                                        })}
+                                        {formatCurrency(analysis.summary.totalYield)}
                                     </dd>
                                 </div>
-                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg">
+                                <div className="bg-gray-50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                     <dt className="text-sm font-medium text-gray-500">
                                         Getiri Oranı
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600">
-                                        {formatPercentage(analysis.summary.totalYieldPercentage)}
+                                        {formatPercent(analysis.summary.totalYieldPercentage)}
                                     </dd>
                                 </div>
                             </dl>
@@ -515,7 +549,6 @@ export default function FundDetail() {
                 </div>
             </div>
 
-            {/* Monthly Details */}
             {analysis && showMonthlyDetails && analysis.monthlyDetails && (
                 <div className="bg-white shadow-sm rounded-lg p-4 sm:p-6">
                     <h2 className="text-lg font-medium text-gray-900 mb-6">Aylık Detaylar</h2>
@@ -559,10 +592,7 @@ export default function FundDetail() {
                                 {analysis.monthlyDetails.map((detail, index) => (
                                     <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900">
-                                            {new Date(detail.date).toLocaleDateString('tr-TR', {
-                                                year: 'numeric',
-                                                month: 'long'
-                                            })}
+                                            {formatDate(detail.date)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900">
                                             {formatCurrency(detail.investment)}
@@ -574,16 +604,10 @@ export default function FundDetail() {
                                             {formatCurrency(detail.unitPrice)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900">
-                                            {detail.units.toLocaleString('tr-TR', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            })}
+                                            {formatNumber(detail.units)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900">
-                                            {detail.totalUnits.toLocaleString('tr-TR', {
-                                                minimumFractionDigits: 2,
-                                                maximumFractionDigits: 2
-                                            })}
+                                            {formatNumber(detail.totalUnits)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900">
                                             {formatCurrency(detail.value)}
@@ -595,12 +619,12 @@ export default function FundDetail() {
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                                             <span className={detail.monthlyChangePercentage >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                                {formatPercentage(detail.monthlyChangePercentage)}
+                                                {formatPercent(detail.monthlyChangePercentage)}
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                                             <span className={detail.totalYieldPercentage >= 0 ? 'text-green-600' : 'text-red-600'}>
-                                                {formatPercentage(detail.totalYieldPercentage)}
+                                                {formatPercent(detail.totalYieldPercentage)}
                                             </span>
                                         </td>
                                     </tr>
