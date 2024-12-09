@@ -48,7 +48,10 @@ const INCREASE_TYPES = [
 
 export default function FundDetail() {
     const { code } = useParams<{ code: string }>();
-    const [selectedPeriod, setSelectedPeriod] = useState('last_1_year');
+    const [selectedPeriod, setSelectedPeriod] = useState(() => {
+        const saved = localStorage.getItem('selectedPeriod');
+        return saved || 'last_1_year';
+    });
     const [showMonthlyDetails, setShowMonthlyDetails] = useState(() => {
         const saved = localStorage.getItem('showMonthlyDetails');
         return saved ? JSON.parse(saved) : false;
@@ -73,13 +76,15 @@ export default function FundDetail() {
         order: 'ASC',
         start_date: getStartDate(selectedPeriod)
     });
-    const { data: lastValue } = useFundHistory(code ?? '', {
-        interval: 'daily',
-        sort: 'date',
-        order: 'DESC',
-        limit: 1
-    });
+
+    // Son değeri history'den al
+    const lastValue = history?.length ? [history[history.length - 1]] : undefined;
+
     const { data: analysis } = useAnalyzeFund(code ?? '', analysisParams);
+
+    useEffect(() => {
+        localStorage.setItem('selectedPeriod', selectedPeriod);
+    }, [selectedPeriod]);
 
     useEffect(() => {
         setAnalysisParams(prev => ({
@@ -123,6 +128,17 @@ export default function FundDetail() {
     const handleMonthlyDetailsToggle = (checked: boolean) => {
         setShowMonthlyDetails(checked);
         localStorage.setItem('showMonthlyDetails', JSON.stringify(checked));
+
+        if (checked) {
+            setTimeout(() => {
+                const element = document.getElementById('monthly-details-table');
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    const absoluteTop = window.pageYOffset + rect.top - 24;
+                    window.scrollTo({ top: absoluteTop, behavior: 'smooth' });
+                }
+            }, 100);
+        }
     };
 
     if (isLoadingFund) {
@@ -157,10 +173,10 @@ export default function FundDetail() {
             <div className="bg-white shadow-sm rounded-lg p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                             <Link
                                 to={`/companies/${currentFund.management_company_id}`}
-                                className="flex-shrink-0 hover:opacity-75 self-center"
+                                className="flex-shrink-0 hover:opacity-75 order-first"
                             >
                                 {currentFund.management_company?.logo ? (
                                     <img
@@ -169,7 +185,7 @@ export default function FundDetail() {
                                         className="h-12 w-12 object-contain"
                                     />
                                 ) : (
-                                    <div className="h-12 w-12 rounded bg-gray-100 flex items-center justify-center text-xl font-medium text-gray-500">
+                                    <div className="h-12 w-12 rounded bg-gray-100 flex items-center justify-center text-lg font-medium text-gray-500">
                                         {currentFund.management_company?.title.charAt(0)}
                                     </div>
                                 )}
@@ -550,7 +566,10 @@ export default function FundDetail() {
             </div>
 
             {analysis && showMonthlyDetails && analysis.monthlyDetails && (
-                <div className="bg-white shadow-sm rounded-lg p-4 sm:p-6">
+                <div 
+                    id="monthly-details-table" 
+                    className="bg-white shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32"
+                >
                     <h2 className="text-lg font-medium text-gray-900 mb-6">Aylık Detaylar</h2>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-300">

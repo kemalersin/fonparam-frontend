@@ -25,6 +25,7 @@ export const useFunds = (params?: Parameters<typeof api.getFunds>[0]) => {
         queryKey: ['funds', params],
         queryFn: () => api.getFunds(params),
         staleTime: 5 * 60 * 1000, // 5 dakika
+        enabled: !!params
     });
 };
 

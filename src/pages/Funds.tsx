@@ -164,12 +164,6 @@ export default function Funds() {
                 await removeFavorite(fundCode);
                 setFavoriteStates(prev => ({ ...prev, [fundCode]: false }));
             } else {
-                console.log('Favori eklenecek fon:', {
-                    code: fund.code,
-                    management_company: fund.management_company,
-                    logo: fund.management_company?.logo
-                });
-
                 await addFavorite({
                     code: fund.code,
                     title: fund.title,
@@ -200,7 +194,7 @@ export default function Funds() {
                 setToast({
                     show: true,
                     type: 'info',
-                    message: 'Fon karşılaştırma listesinden kaldırıldı.'
+                    message: 'Fon karşılaştırma listesinden kald��rıldı.'
                 });
             } else {
                 await addToComparison({
@@ -319,7 +313,7 @@ export default function Funds() {
                                                 label="1 Ay"
                                                 field="yield_1m"
                                                 currentSort={sort}
-                                                currentOrder={order}
+                                                currentOrder={order}                                                
                                                 onSort={handleSort}
                                             />
                                             <SortHeader

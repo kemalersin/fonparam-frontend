@@ -39,11 +39,13 @@ export default function Compare() {
         message: ''
     });
 
-    const { data: searchResults, isLoading: isSearching } = useFunds({
-        search,
-        limit: 20,
-        page: 1,
-    });
+    const { data: searchResults, isLoading: isSearching } = useFunds(
+        search ? {
+            search,
+            limit: 20,
+            page: 1,
+        } : undefined
+    );
 
     const { data: comparisonData, isLoading: isComparing } = useCompareFunds(
         selectedCodes.length >= 2 ? selectedCodes : []
@@ -112,7 +114,7 @@ export default function Compare() {
                         message: error.message
                     });
                 } else {
-                    console.error('Fon karşılaştırma listesine eklenirken hata:', error);
+                    console.error('Fon karşıla��tırma listesine eklenirken hata:', error);
                     setToast({
                         show: true,
                         type: 'error',
@@ -217,9 +219,9 @@ export default function Compare() {
                                 {selectedFunds.map((fund) => (
                                     <div
                                         key={fund.code}
-                                        className="inline-flex items-center rounded-full bg-gray-100 py-1 pl-2.5 pr-1"
+                                        className="inline-flex items-center rounded-full bg-gray-100 py-1 pl-2.5 pr-1 truncate max-w-md"
                                     >
-                                        <span className="text-sm font-medium text-gray-900 truncate max-w-md">
+                                        <span className="text-sm font-medium text-gray-900 truncate">
                                             {fund.code} - {fund.title}
                                         </span>
                                         <button
@@ -305,25 +307,25 @@ export default function Compare() {
                                             <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
                                                 Fon
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 1 Aylık
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 3 Aylık
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 6 Aylık
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 YTD
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 1 Yıllık
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 3 Yıllık
                                             </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
                                                 5 Yıllık
                                             </th>
                                         </tr>
