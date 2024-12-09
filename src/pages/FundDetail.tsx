@@ -69,6 +69,16 @@ export default function FundDetail() {
         }
     });
 
+    const [debouncedAnalysisParams, setDebouncedAnalysisParams] = useState(analysisParams);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedAnalysisParams(analysisParams);
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [analysisParams]);
+
     const { data: currentFund, isLoading: isLoadingFund } = useFundDetails(code ?? '');
     const { data: history } = useFundHistory(code ?? '', {
         interval: 'daily',
@@ -80,7 +90,7 @@ export default function FundDetail() {
     // Son değeri history'den al
     const lastValue = history?.length ? [history[history.length - 1]] : undefined;
 
-    const { data: analysis } = useAnalyzeFund(code ?? '', analysisParams);
+    const { data: analysis } = useAnalyzeFund(code ?? '', debouncedAnalysisParams);
 
     useEffect(() => {
         localStorage.setItem('selectedPeriod', selectedPeriod);

@@ -66,19 +66,21 @@ export default function Home() {
                         ))}
                     </div>
                 ) : (
-                    <div className="space-y-4">
+                    <div className="space-y-6 sm:space-y-4">
                         {topFunds?.map((fund) => (
                             <Link
                                 key={fund.code}
                                 to={`/funds/${fund.code}`}
-                                className="block p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="block p-0 sm:p-4 rounded-lg hover:bg-gray-50 transition-colors"
                             >
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Link
-                                            to={`/companies/${fund.management_company_id}`}
-                                            className="flex-shrink-0 hover:opacity-75"
-                                            onClick={(e) => e.stopPropagation()}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex items-start sm:items-center gap-3">
+                                        <div
+                                            className="flex-shrink-0 hover:opacity-75 cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                window.location.href = `/companies/${fund.management_company_id}`;
+                                            }}
                                         >
                                             {fund.management_company?.logo ? (
                                                 <img
@@ -91,9 +93,9 @@ export default function Home() {
                                                     {fund.management_company?.title.charAt(0)}
                                                 </div>
                                             )}
-                                        </Link>
-                                        <div className="flex flex-col justify-center">
-                                            <h3 className="font-medium text-gray-900">{fund.title}</h3>
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <h3 className="font-medium text-gray-900 leading-tight">{fund.title}</h3>
                                             <p className="text-sm text-gray-500">{fund.type}</p>
                                         </div>
                                     </div>

@@ -8,6 +8,10 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  margin-left: calc(100vw - 100%);
+}
+
 body {
   margin: 0;
   min-width: 320px;

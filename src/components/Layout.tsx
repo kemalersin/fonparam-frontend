@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             />
                                         </Link>
                                     </div>
-                                    <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                                    <div className="hidden sm:ml-12 sm:flex sm:space-x-8">
                                         {navigation.map((item) => (
                                             <Link
                                                 key={item.href}
