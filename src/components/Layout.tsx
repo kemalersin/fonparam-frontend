@@ -1,8 +1,10 @@
+import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Disclosure } from '@headlessui/react';
+import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import ScrollToTopButton from './ScrollToTopButton';
+import { useTheme } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
+import ScrollToTopButton from './ScrollToTopButton';
 
 const navigation = [
     { name: 'Fonlar', href: '/funds' },
@@ -16,6 +18,8 @@ function classNames(...classes: string[]) {
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+    const { theme } = useTheme();
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     const location = useLocation();
 
     return (
@@ -31,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             <span className="sr-only">FonParam</span>
                                             <img
                                                 className="h-6 w-auto"
-                                                src="/logo.png"
+                                                src={isDark ? '/logo-dark.png' : '/logo-light.png'}
                                                 alt="FonParam"
                                             />
                                         </Link>
