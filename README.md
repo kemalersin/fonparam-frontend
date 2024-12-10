@@ -1,4 +1,5 @@
-# 📊 FonParam - Yatırım Fonu Karşılaştırma ve Analiz Platformu
+# FonParam
+## 📊 Yatırım Fonu Karşılaştırma ve Analiz Platformu
 
 Türkiye'nin en kapsamlı yatırım fonu karşılaştırma ve analiz platformu.
 
@@ -95,3 +96,7 @@ npm run dev
 - ✅ Firefox
 - ✅ Safari
 - ✅ Edge
+
+## 📝 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır.
