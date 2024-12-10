@@ -9,7 +9,7 @@
 }
 
 html {
-  margin-left: calc(100vw - 100%);
+  margin-right: calc(100% - 100vw);
   overflow: inherit !important;
   padding-right: inherit !important;  
 }

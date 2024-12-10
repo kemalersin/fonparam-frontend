@@ -76,6 +76,7 @@ export default function Funds() {
             const pageFromUrl = searchParams.get('page');
             const sortFromUrl = searchParams.get('sort');
             const orderFromUrl = searchParams.get('order') as 'ASC' | 'DESC';
+            const companyFromUrl = searchParams.get('company');
 
             if (searchFromUrl) {
                 setSearchInput(searchFromUrl);
@@ -101,6 +102,8 @@ export default function Funds() {
             if (page > 1) params.set('page', page.toString());
             if (sort !== 'code') params.set('sort', sort);
             if (order !== 'ASC') params.set('order', order);
+            const company = searchParams.get('company');
+            if (company) params.set('company', company);
             setSearchParams(params, { replace: true });
             return;
         }
@@ -112,6 +115,8 @@ export default function Funds() {
             if (page > 1) params.set('page', page.toString());
             if (sort !== 'code') params.set('sort', sort);
             if (order !== 'ASC') params.set('order', order);
+            const company = searchParams.get('company');
+            if (company) params.set('company', company);
             setSearchParams(params, { replace: true });
         }, 300);
 
@@ -131,6 +136,7 @@ export default function Funds() {
         search: debouncedSearch,
         sort,
         order,
+        management_company: searchParams.get('company') || undefined
     });
 
     const handleSearch = (value: string) => {
@@ -194,7 +200,7 @@ export default function Funds() {
                 setToast({
                     show: true,
                     type: 'info',
-                    message: 'Fon karşılaştırma listesinden kald��rıldı.'
+                    message: 'Fon karşılaştırma listesinden kaldırıldı.'
                 });
             } else {
                 await addToComparison({
