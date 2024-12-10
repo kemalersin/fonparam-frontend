@@ -1,7 +1,7 @@
 # FonParam
 ## 📊 Yatırım Fonu Karşılaştırma ve Analiz Platformu
 
-Türkiye'nin en kapsamlı yatırım fonu karşılaştırma ve analiz platformu.
+Yatırım fonlarını karşılaştırmanızı ve analiz etmenizi sağlayan modern bir web uygulaması.
 
 ## 🚀 Özellikler
 
@@ -24,8 +24,8 @@ Türkiye'nin en kapsamlı yatırım fonu karşılaştırma ve analiz platformu.
 
 ```
 src/
-├── components/        # Yeniden kullanılabilir bileşenler
-├── contexts/         # React context'leri
+├── components/      # Yeniden kullanılabilir bileşenler
+├── contexts/        # React context'leri
 ├── pages/           # Sayfa bileşenleri
 ├── services/        # API ve yerel veri yönetimi
 ├── hooks/           # Özel React hook'ları
