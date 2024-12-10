@@ -1,56 +1,97 @@
-# FonParam Frontend
+# 📊 FonParam - Yatırım Fonu Karşılaştırma ve Analiz Platformu
 
-FonParam, Türkiye'deki yatırım fonlarını karşılaştırmanızı ve analiz etmenizi sağlayan bir web uygulamasıdır.
+Türkiye'nin en kapsamlı yatırım fonu karşılaştırma ve analiz platformu.
 
-## Özellikler
+## 🚀 Özellikler
 
-- Yatırım fonlarını detaylı arama ve filtreleme
-- Portföy yönetim şirketleri hakkında kapsamlı bilgiler
-- Fonların karşılaştırmalı analizi
-- Favori fonları kaydetme ve takip etme
-- Özelleştirilebilir yatırım senaryoları ile getiri hesaplama
-- Aylık bazda detaylı performans analizi
+- 📈 Yatırım fonlarını listeleme ve filtreleme
+- 🔍 Fon detaylarını görüntüleme
+- ⭐️ Favori fonları yönetme
+- 🔄 Fon karşılaştırma
+- 🌓 Karanlık/Aydınlık tema desteği
+- 📱 Responsive tasarım
 
-## Kurulum
+## 🛠 Teknolojiler
 
-1. Repoyu klonlayın:
+- ⚛️ React (TypeScript)
+- 🎨 Tailwind CSS
+- ⚡️ Vite
+- 💾 IndexedDB
+- 📦 Heroicons
+
+## 🏗 Proje Yapısı
+
+```
+src/
+├── components/        # Yeniden kullanılabilir bileşenler
+├── contexts/         # React context'leri
+├── pages/           # Sayfa bileşenleri
+├── services/        # API ve yerel veri yönetimi
+├── hooks/           # Özel React hook'ları
+└── utils/           # Yardımcı fonksiyonlar
+```
+
+## 💻 Veri Yönetimi
+
+### API Entegrasyonu
+- 🔄 Özel hook'lar ile API çağrıları
+- 📊 Veri dönüşümleri ve formatlama
+- ⚡️ Optimizasyon ve önbelleğe alma
+
+### Yerel Veri Depolama
+- 💾 IndexedDB ile favori fonları saklama
+- 🔄 Otomatik senkronizasyon
+- 🏷 Etiketleme ve kategorilendirme
+
+## ⚡️ Performans Özellikleri
+
+- 🔍 Debounced arama ile anlık filtreleme
+- 📄 Sayfalama ile optimize veri yükleme
+- 🚀 Lazy loading ile gecikmeli yükleme
+- 💾 IndexedDB ile yerel önbelleğe alma
+
+## 🎨 UX/UI Özellikleri
+
+### Tema Desteği
+- 🌞 Aydınlık tema
+- 🌚 Karanlık tema
+- 🔄 Sistem teması ile otomatik senkronizasyon
+
+### Bildirimler ve Geri Bildirim
+- 📬 Toast bildirimleri
+- ⏳ Yükleme durumu göstergeleri
+- ❌ Hata mesajları
+
+### Responsive Tasarım
+- 📱 Mobil uyumlu arayüz
+- 💻 Masaüstü optimizasyonu
+- 📊 Responsive tablolar
+
+## 🚀 Başlangıç
+
+### Gereksinimler
+- Node.js 18 veya üzeri
+- npm veya yarn
+
+### Kurulum
+
 ```bash
-git clone git@github.com:kemalersin/fonparam-frontend.git
+# Depoyu klonla
+git clone https://github.com/kemalersin/fonparam-frontend.git
+
+# Proje dizinine git
 cd fonparam-frontend
-```
 
-2. Bağımlılıkları yükleyin:
-```bash
+# Bağımlılıkları yükle
 npm install
-```
 
-3. Örnek env dosyasını kopyalayıp düzenleyin:
-```bash
-cp .env.development .env.local
-```
-
-4. Uygulamayı başlatın:
-```bash
-# Geliştirme modu
+# Geliştirme sunucusunu başlat
 npm run dev
-
-# Prodüksiyon modu
-npm run build
-npm run preview
 ```
 
-## Teknolojiler
+## 🌐 Tarayıcı Desteği
 
-- React 18
-- TypeScript
-- Tailwind CSS
-- Vite
-- React Router
-- React Query
-- Axios
-- Headless UI
-- Heroicons
-
-## Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
+- ✅ Chrome
+- ✅ Firefox
+- ✅ Safari
+- ✅ Edge
