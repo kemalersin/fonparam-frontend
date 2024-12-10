@@ -114,7 +114,7 @@ export default function Compare() {
                         message: error.message
                     });
                 } else {
-                    console.error('Fon karşıla��tırma listesine eklenirken hata:', error);
+                    console.error('Fon karşılaştırma listesine eklenirken hata:', error);
                     setToast({
                         show: true,
                         type: 'error',
@@ -163,8 +163,8 @@ export default function Compare() {
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Fon Karşılaştırma</h1>
-                    <p className="mt-2 text-sm text-gray-700">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Fon Karşılaştırma</h1>
+                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                         Seçtiğiniz fonların performanslarını karşılaştırın
                     </p>
                 </div>
@@ -173,16 +173,16 @@ export default function Compare() {
             {/* Content */}
             <div className="mt-6 space-y-6">
                 {/* Fund Selector */}
-                <div className="bg-white shadow-sm rounded-lg p-6">
+                <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                     <div>
                         {/* Search Input and Results */}
                         <div className="relative" ref={searchRef}>
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                             </div>
                             <input
                                 type="text"
-                                className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 bg-white dark:bg-gray-800 sm:text-sm sm:leading-6"
                                 placeholder="Fon kodu veya adı ile arayın..."
                                 value={search}
                                 onChange={(e) => handleSearch(e.target.value)}
@@ -191,20 +191,20 @@ export default function Compare() {
 
                             {/* Search Results */}
                             {showResults && search && searchResults && (
-                                <div className="absolute z-10 mt-1 w-full rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                    <div className="max-h-[400px] overflow-y-auto">
+                                <div className="absolute z-10 mt-1 w-full rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    <div className="max-h-[400px] overflow-y-auto scrollbar">
                                         {searchResults.data.map((fund) => (
                                             <button
                                                 key={fund.code}
-                                                className={`relative cursor-pointer select-none py-2 pl-3 pr-3 w-full text-left hover:bg-gray-50 ${
+                                                className={`relative cursor-pointer select-none py-2 pl-3 pr-3 w-full text-left hover:bg-gray-50 dark:hover:bg-gray-700 ${
                                                     selectedCodes.includes(fund.code) ? 'opacity-50 cursor-not-allowed' : ''
                                                 }`}
                                                 onClick={() => handleAddFund(fund)}
                                                 disabled={selectedCodes.includes(fund.code)}
                                             >
                                                 <div className="flex items-center">
-                                                    <span className="flex-shrink-0 font-semibold text-gray-900 w-20">{fund.code}</span>
-                                                    <span className="ml-2 truncate text-gray-500">{fund.title}</span>
+                                                    <span className="flex-shrink-0 font-semibold text-gray-900 dark:text-gray-100 w-20">{fund.code}</span>
+                                                    <span className="ml-2 truncate text-gray-500 dark:text-gray-400">{fund.title}</span>
                                                 </div>
                                             </button>
                                         ))}
@@ -219,15 +219,15 @@ export default function Compare() {
                                 {selectedFunds.map((fund) => (
                                     <div
                                         key={fund.code}
-                                        className="inline-flex items-center rounded-full bg-gray-100 py-1 pl-2.5 pr-1 truncate max-w-md"
+                                        className="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 py-1 pl-2.5 pr-1 truncate max-w-md"
                                     >
-                                        <span className="text-sm font-medium text-gray-900 truncate">
+                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                             {fund.code} - {fund.title}
                                         </span>
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveFund(fund.code)}
-                                            className="ml-1 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-500"
+                                            className="ml-1 inline-flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-gray-500 dark:hover:text-gray-400"
                                         >
                                             <XMarkIcon className="h-3 w-3" />
                                         </button>
@@ -240,28 +240,30 @@ export default function Compare() {
 
                 {isLoading ? (
                     <div className="animate-pulse space-y-8">
-                        <div className="h-32 bg-gray-200 rounded-lg"></div>
-                        <div className="h-96 bg-gray-200 rounded-lg"></div>
+                        <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                        <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                     </div>
                 ) : comparisonData && comparisonData.length > 0 ? (
                     <div className="space-y-6">
                         {/* Performance Chart */}
-                        <div className="bg-white shadow-sm rounded-lg p-6">
-                            <h2 className="text-lg font-medium text-gray-900 mb-6">Performans Karşılaştırması</h2>
+                        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Performans Karşılaştırması</h2>
                             <div className="h-96">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <LineChart>
-                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <CartesianGrid strokeDasharray="3 3" className="text-gray-200 dark:text-gray-700" />
                                         <XAxis
                                             dataKey="date"
                                             type="category"
                                             allowDuplicatedCategory={false}
+                                            tick={{ fill: 'var(--foreground)' }}
                                         />
                                         <YAxis 
                                             width={65}
                                             tickFormatter={(value) => `%${value}`}
                                             padding={{ top: 20, bottom: 20 }}
                                             domain={['auto', 'auto']}
+                                            tick={{ fill: 'var(--foreground)' }}
                                         />
                                         <Tooltip 
                                             formatter={(value: number) => [
@@ -271,6 +273,11 @@ export default function Compare() {
                                                 }) + '%',
                                                 'Getiri'
                                             ]}
+                                            contentStyle={{
+                                                backgroundColor: 'var(--background)',
+                                                borderColor: 'var(--foreground)',
+                                                color: 'var(--foreground)'
+                                            }}
                                         />
                                         <Legend />
                                         {comparisonData.map((fund, index) => (
@@ -298,39 +305,39 @@ export default function Compare() {
                         </div>
 
                         {/* Comparison Table */}
-                        <div className="bg-white shadow-sm rounded-lg p-6">
-                            <h2 className="text-lg font-medium text-gray-900 mb-6">Detaylı Karşılaştırma</h2>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-300">
+                        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Detaylı Karşılaştırma</h2>
+                            <div className="overflow-x-auto scrollbar">
+                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                                     <thead>
                                         <tr>
-                                            <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
+                                            <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 Fon
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 1 Aylık
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 3 Aylık
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 6 Aylık
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 YTD
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 1 Yıllık
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 3 Yıllık
                                             </th>
-                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                            <th className="whitespace-nowrap px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                                 5 Yıllık
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-200">
+                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                         {comparisonData.map((fund) => (
                                             <tr key={fund.code}>
                                                 <td className="py-4 pl-4 pr-3 text-sm">
@@ -348,14 +355,14 @@ export default function Compare() {
                                                                 />
                                                             )}
                                                             {!fund.management_company?.logo && (
-                                                                <div className="h-6 w-6 rounded bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+                                                                <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
                                                                     {fund.management_company?.title?.charAt(0)}
                                                                 </div>
                                                             )}
                                                         </Link>
                                                         <div>
-                                                            <div className="font-medium text-gray-900">{fund.code}</div>
-                                                            <div className="text-gray-500 line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
+                                                            <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
+                                                            <div className="text-gray-500 dark:text-gray-400 line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -375,8 +382,8 @@ export default function Compare() {
                                                         <span
                                                             className={
                                                                 value != null ? (
-                                                                    value >= 0 ? 'text-green-600' : 'text-red-600'
-                                                                ) : 'text-gray-500'
+                                                                    value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                                ) : 'text-gray-500 dark:text-gray-400'
                                                             }
                                                         >
                                                             {formatPercent(value)}
@@ -391,11 +398,11 @@ export default function Compare() {
                         </div>
                     </div>
                 ) : (
-                    <div className="bg-white shadow-sm rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
                         <EmptyState
                             title="Karşılaştırma Listesi Boş"
                             description="Karşılaştırmak istediğiniz fonları listeden ekleyin."
-                            icon={<ArrowsRightLeftIcon className="mx-auto h-12 w-12 text-gray-400" />}
+                            icon={<ArrowsRightLeftIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />}
                         />
                     </div>
                 )}

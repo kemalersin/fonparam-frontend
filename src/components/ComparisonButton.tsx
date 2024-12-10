@@ -92,14 +92,14 @@ export default function ComparisonButton({ fund, className }: ComparisonButtonPr
             <button
                 onClick={handleClick}
                 disabled={isChecking}
-                className={`p-1 rounded-full hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center ${className || ''}`}
+                className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center ${className || ''}`}
             >
                 {isChecking ? (
-                    <div className="w-4 h-4 animate-pulse bg-gray-200 rounded-full" />
+                    <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
                 ) : isInList ? (
-                    <ArrowsRightLeftIconSolid className="h-4 w-4 text-indigo-600" />
+                    <ArrowsRightLeftIconSolid className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 ) : (
-                    <ArrowsRightLeftIcon className="h-4 w-4 text-gray-400 hover:text-indigo-600" />
+                    <ArrowsRightLeftIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" />
                 )}
             </button>
             <Toast

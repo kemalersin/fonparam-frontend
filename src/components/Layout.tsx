@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import ScrollToTopButton from './ScrollToTopButton';
+import ThemeToggle from './ThemeToggle';
 
 const navigation = [
     { name: 'Fonlar', href: '/funds' },
@@ -19,7 +20,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
     return (
         <div className="min-h-screen flex flex-col">
-            <Disclosure as="nav" className="bg-white shadow-sm">
+            <Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-sm">
                 {({ open }) => (
                     <>
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -42,8 +43,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                 to={item.href}
                                                 className={classNames(
                                                     location.pathname === item.href
-                                                        ? 'border-indigo-500 text-gray-900'
-                                                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                                                        ? 'border-indigo-500 text-gray-900 dark:text-gray-100'
+                                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:border-gray-300 hover:text-gray-700 dark:hover:text-gray-300',
                                                     'inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium'
                                                 )}
                                             >
@@ -52,15 +53,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="-mr-2 flex items-center sm:hidden">
-                                    <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                                        <span className="sr-only">Ana menüyü aç</span>
-                                        {open ? (
-                                            <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                                        ) : (
-                                            <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                                        )}
-                                    </Disclosure.Button>
+                                <div className="flex items-center space-x-4">
+                                    <ThemeToggle />
+                                    <div className="-mr-2 flex items-center sm:hidden">
+                                        <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white dark:bg-gray-800 p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                            <span className="sr-only">Ana menüyü aç</span>
+                                            {open ? (
+                                                <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                                            ) : (
+                                                <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                                            )}
+                                        </Disclosure.Button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -74,8 +78,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         to={item.href}
                                         className={classNames(
                                             location.pathname === item.href
-                                                ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                                                : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800',
+                                                ? 'bg-indigo-50 dark:bg-indigo-900/50 border-indigo-500 text-indigo-700 dark:text-indigo-300'
+                                                : 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 hover:text-gray-800 dark:hover:text-gray-100',
                                             'block pl-3 pr-4 py-2 border-l-4 text-base font-medium'
                                         )}
                                     >

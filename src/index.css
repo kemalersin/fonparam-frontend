@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: #f3f4f6;
+    --foreground: #111827;
+    --scrollbar-track: #e5e7eb;
+    --scrollbar-thumb: #9ca3af;
+  }
+
+  :root[class~="dark"] {
+    --background: #111827;
+    --foreground: #f3f4f6;
+    --scrollbar-track: #374151;
+    --scrollbar-thumb: #4b5563;
+  }
+}
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -14,11 +30,60 @@ html {
   padding-right: inherit !important;  
 }
 
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+html.dark::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+html.dark::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f3f4f6;
-  color: #111827;
+  background-color: var(--background);
+  color: var(--foreground);
+  overflow-x: hidden;
+}
+
+.scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar::-webkit-scrollbar-track {
+  background: #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.dark .scrollbar::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark .scrollbar::-webkit-scrollbar-thumb {
+  background: #4b5563;
 }
 

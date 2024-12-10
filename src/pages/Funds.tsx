@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useFunds } from '../hooks/useApi';
-import { MagnifyingGlassIcon, ChevronUpIcon, ChevronDownIcon, StarIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, ChevronUpIcon, ChevronDownIcon, StarIcon, ArrowsRightLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid, ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
@@ -10,12 +10,12 @@ import ComparisonButton from '../components/ComparisonButton';
 import { formatPercent } from '../utils/format';
 
 const SortHeader = ({ 
-    label, 
-    field, 
-    currentSort, 
-    currentOrder, 
-    onSort 
-}: { 
+    label,
+    field,
+    currentSort,
+    currentOrder,
+    onSort
+}: {
     label: string;
     field: string;
     currentSort: string;
@@ -26,7 +26,7 @@ const SortHeader = ({
     return (
         <th
             scope="col"
-            className={`px-3 py-3.5 text-sm font-semibold text-gray-900 cursor-pointer group ${
+            className={`px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer group ${
                 field === 'code' ? 'w-24' : 
                 field === 'title' ? 'w-48' : 
                 'w-20'
@@ -38,13 +38,13 @@ const SortHeader = ({
                 <span className="inline-flex flex-col">
                     {currentSort === field ? (
                         currentOrder === 'ASC' ? (
-                            <ChevronUpIcon className="h-4 w-4 text-indigo-600" />
+                            <ChevronUpIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                         ) : (
-                            <ChevronDownIcon className="h-4 w-4 text-indigo-600" />
+                            <ChevronDownIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                         )
                     ) : (
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ChevronUpIcon className="h-4 w-4 text-gray-400" />
+                            <ChevronUpIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                         </span>
                     )}
                 </span>
@@ -270,8 +270,8 @@ export default function Funds() {
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Yatırım Fonları</h1>
-                    <p className="mt-2 text-sm text-gray-700">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Yatırım Fonları</h1>
+                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                         Tüm yatırım fonlarını görüntüleyin ve performanslarını karşılaştırın
                     </p>
                 </div>
@@ -286,7 +286,7 @@ export default function Funds() {
                     </div>
                     <input
                         type="text"
-                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                         placeholder="Fon kodu veya adı ile arayın..."
                         value={searchInput}
                         onChange={(e) => handleSearch(e.target.value)}
@@ -295,11 +295,11 @@ export default function Funds() {
 
                 {/* Table */}
                 <div className="flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
                             <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-300">
-                                    <thead className="bg-gray-50">
+                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
                                         <tr>
                                             <SortHeader
                                                 label="Fon Kodu"
@@ -319,7 +319,7 @@ export default function Funds() {
                                                 label="1 Ay"
                                                 field="yield_1m"
                                                 currentSort={sort}
-                                                currentOrder={order}                                                
+                                                currentOrder={order}
                                                 onSort={handleSort}
                                             />
                                             <SortHeader
@@ -366,10 +366,10 @@ export default function Funds() {
                                             />
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
                                         {isLoading ? (
                                             <tr>
-                                                <td colSpan={9} className="text-center py-4">
+                                                <td colSpan={9} className="text-center py-4 text-gray-500 dark:text-gray-400">
                                                     Yükleniyor...
                                                 </td>
                                             </tr>
@@ -378,9 +378,9 @@ export default function Funds() {
                                                 <tr
                                                     key={fund.code}
                                                     onClick={(e) => handleRowClick(e, fund.code)}
-                                                    className="cursor-pointer hover:bg-gray-50"
+                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 >
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
                                                         <div className="flex items-center gap-3">
                                                             <Link
                                                                 to={`/companies/${fund.management_company_id}`}
@@ -395,7 +395,7 @@ export default function Funds() {
                                                                     />
                                                                 )}
                                                                 {!fund.management_company?.logo && (
-                                                                    <div className="h-6 w-6 rounded bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
                                                                         {fund.management_company?.title.charAt(0)}
                                                                     </div>
                                                                 )}
@@ -403,23 +403,26 @@ export default function Funds() {
                                                             <span>{fund.code}</span>
                                                             <div className="flex gap-1">
                                                                 <button
-                                                                    onClick={(e) => handleFavoriteClick(e, fund)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleFavoriteClick(e, fund);
+                                                                    }}
                                                                     disabled={checkingFavorites[fund.code]}
-                                                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                                    className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                                                                 >
                                                                     {checkingFavorites[fund.code] ? (
-                                                                        <div className="w-4 h-4 animate-pulse bg-gray-200 rounded-full" />
+                                                                        <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
                                                                     ) : favoriteStates[fund.code] ? (
                                                                         <StarIconSolid className="h-4 w-4 text-yellow-400" />
                                                                     ) : (
-                                                                        <StarIcon className="h-4 w-4 text-gray-400 hover:text-yellow-400" />
+                                                                        <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-yellow-400" />
                                                                     )}
                                                                 </button>
                                                                 <ComparisonButton fund={fund} />
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-3 py-4 text-sm text-gray-500">
+                                                    <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                         <div className="line-clamp-2">
                                                             {fund.title}
                                                         </div>
@@ -439,8 +442,8 @@ export default function Funds() {
                                                         >
                                                             <span
                                                                 className={value != null ? (
-                                                                    value >= 0 ? 'text-green-600' : 'text-red-600'
-                                                                ) : 'text-gray-500'}
+                                                                    value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                                ) : 'text-gray-500 dark:text-gray-400'}
                                                             >
                                                                 {formatPercent(value)}
                                                             </span>
@@ -458,26 +461,34 @@ export default function Funds() {
 
                 {/* Pagination */}
                 {data && (
-                    <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+                    <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 sm:px-6">
                         <div className="flex flex-1 justify-between sm:hidden">
                             <button
-                                onClick={() => setPage(page - 1)}
+                                onClick={() => setPage(Math.max(1, page - 1))}
                                 disabled={page === 1}
-                                className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium ${
+                                    page === 1 
+                                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
+                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                }`}
                             >
                                 Önceki
                             </button>
                             <button
                                 onClick={() => setPage(page + 1)}
                                 disabled={page * 20 >= data.total}
-                                className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium ${
+                                    page * 20 >= data.total
+                                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                        : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                                }`}
                             >
                                 Sonraki
                             </button>
                         </div>
                         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                             <div>
-                                <p className="text-sm text-gray-700">
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                     Toplam <span className="font-medium">{data.total}</span> fondan{' '}
                                     <span className="font-medium">{(page - 1) * 20 + 1}</span>-
                                     <span className="font-medium">
@@ -492,42 +503,28 @@ export default function Funds() {
                                     aria-label="Pagination"
                                 >
                                     <button
-                                        onClick={() => setPage(page - 1)}
+                                        onClick={() => setPage(Math.max(1, page - 1))}
                                         disabled={page === 1}
-                                        className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-20 focus:outline-offset-0 ${
+                                            page === 1
+                                                ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                                : 'text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                        }`}
                                     >
                                         <span className="sr-only">Önceki</span>
-                                        <svg
-                                            className="h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                                     </button>
                                     <button
-                                        onClick={() => setPage(page + 1)}
-                                        disabled={page * 20 >= data.total}
-                                        className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+                                        onClick={() => setPage(Math.min(Math.ceil(data?.total / 20), page + 1))}
+                                        disabled={!data?.total || page >= Math.ceil(data.total / 20)}
+                                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-20 focus:outline-offset-0 ${
+                                            !data?.total || page >= Math.ceil(data.total / 20)
+                                                ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                                : 'text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                        }`}
                                     >
                                         <span className="sr-only">Sonraki</span>
-                                        <svg
-                                            className="h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
                                     </button>
                                 </nav>
                             </div>

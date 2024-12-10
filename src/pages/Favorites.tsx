@@ -26,7 +26,7 @@ const SortHeader = ({
     return (
         <th
             scope="col"
-            className={`whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-gray-900 cursor-pointer group ${
+            className={`whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer group ${
                 field === 'code' ? 'w-24' : 
                 field === 'title' ? 'w-48' : 
                 'w-20'
@@ -38,13 +38,13 @@ const SortHeader = ({
                 <span className="inline-flex flex-col">
                     {currentSort === field ? (
                         currentOrder === 'ASC' ? (
-                            <ChevronUpIcon className="h-4 w-4 text-indigo-600" />
+                            <ChevronUpIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                         ) : (
-                            <ChevronDownIcon className="h-4 w-4 text-indigo-600" />
+                            <ChevronDownIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                         )
                     ) : (
                         <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ChevronUpIcon className="h-4 w-4 text-gray-400" />
+                            <ChevronUpIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                         </span>
                     )}
                 </span>
@@ -206,8 +206,8 @@ export default function Favorites() {
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Favori Fonlarım</h1>
-                    <p className="mt-2 text-sm text-gray-700">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Favori Fonlarım</h1>
+                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                         Favori fonlarınızı görüntüleyin ve performanslarını takip edin
                     </p>
                 </div>
@@ -222,7 +222,7 @@ export default function Favorites() {
                     </div>
                     <input
                         type="text"
-                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800"
                         placeholder="Fon kodu veya adı ile arayın..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -231,11 +231,11 @@ export default function Favorites() {
 
                 {/* Table */}
                 <div className="flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                    <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
                         <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-300">
-                                    <thead className="bg-gray-50">
+                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-opacity-10 sm:rounded-lg">
+                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-800">
                                         <tr>
                                             <SortHeader
                                                 label="Fon Kodu"
@@ -302,10 +302,10 @@ export default function Favorites() {
                                             />
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-200 bg-white">
+                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
                                         {isLoading ? (
                                             <tr>
-                                                <td colSpan={9} className="text-center py-4">
+                                                <td colSpan={9} className="text-center py-4 text-gray-500 dark:text-gray-400">
                                                     Yükleniyor...
                                                 </td>
                                             </tr>
@@ -323,9 +323,9 @@ export default function Favorites() {
                                                 <tr
                                                     key={fund.code}
                                                     onClick={(e) => handleRowClick(e, fund.code)}
-                                                    className="cursor-pointer hover:bg-gray-50"
+                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 >
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
                                                         <div className="flex items-center gap-3">
                                                             <Link
                                                                 to={`/companies/${fund.management_company_id}`}
@@ -339,7 +339,7 @@ export default function Favorites() {
                                                                         className="h-6 w-6 object-contain"
                                                                     />
                                                                 ) : (
-                                                                    <div className="h-6 w-6 rounded bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-500">
+                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
                                                                         {fund.management_company_title.charAt(0)}
                                                                     </div>
                                                                 )}
@@ -351,7 +351,7 @@ export default function Favorites() {
                                                                         e.stopPropagation();
                                                                         toggleFavorite(fund.code);
                                                                     }}
-                                                                    className="p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                                                                    className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
                                                                 >
                                                                     <StarIconSolid className="h-4 w-4 text-yellow-400" />
                                                                 </button>
@@ -359,7 +359,7 @@ export default function Favorites() {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td className="px-3 py-4 text-sm text-gray-500">
+                                                    <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                         <div className="line-clamp-2">
                                                             {fund.title}
                                                         </div>
@@ -379,8 +379,8 @@ export default function Favorites() {
                                                         >
                                                             <span
                                                                 className={value != null ? (
-                                                                    value >= 0 ? 'text-green-600' : 'text-red-600'
-                                                                ) : 'text-gray-500'}
+                                                                    value >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'
+                                                                ) : 'text-gray-500 dark:text-gray-400'}
                                                             >
                                                                 {formatPercent(value)}
                                                             </span>

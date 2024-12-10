@@ -21,24 +21,24 @@ const icons = {
 
 const colors = {
     success: {
-        text: 'text-green-600',
-        bg: 'bg-green-50',
-        ring: 'ring-green-600/10'
+        text: 'text-green-600 dark:text-green-400',
+        bg: 'bg-green-50 dark:bg-green-900/30',
+        ring: 'ring-green-600/10 dark:ring-green-400/20'
     },
     error: {
-        text: 'text-red-600',
-        bg: 'bg-red-50',
-        ring: 'ring-red-600/10'
+        text: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-50 dark:bg-red-900/30',
+        ring: 'ring-red-600/10 dark:ring-red-400/20'
     },
     warning: {
-        text: 'text-yellow-600',
-        bg: 'bg-yellow-50',
-        ring: 'ring-yellow-600/10'
+        text: 'text-yellow-600 dark:text-yellow-400',
+        bg: 'bg-yellow-50 dark:bg-yellow-900/30',
+        ring: 'ring-yellow-600/10 dark:ring-yellow-400/20'
     },
     info: {
-        text: 'text-blue-600',
-        bg: 'bg-blue-50',
-        ring: 'ring-blue-600/10'
+        text: 'text-blue-600 dark:text-blue-400',
+        bg: 'bg-blue-50 dark:bg-blue-900/30',
+        ring: 'ring-blue-600/10 dark:ring-blue-400/20'
     }
 };
 

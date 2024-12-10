@@ -12,13 +12,13 @@ export default function CompanyDetail() {
     if (isLoading) {
         return (
             <div className="animate-pulse space-y-8">
-                <div className="h-32 bg-gray-200 rounded-lg"></div>
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {[...Array(4)].map((_, i) => (
-                        <div key={i} className="h-24 bg-gray-200 rounded-lg"></div>
+                        <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                     ))}
                 </div>
-                <div className="h-96 bg-gray-200 rounded-lg"></div>
+                <div className="h-96 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
             </div>
         );
     }
@@ -26,11 +26,11 @@ export default function CompanyDetail() {
     if (!data) {
         return (
             <div className="text-center py-12">
-                <h2 className="text-base font-semibold text-indigo-600">404</h2>
-                <p className="mt-2 text-3xl font-bold text-gray-900">Şirket Bulunamadı</p>
-                <p className="mt-2 text-sm text-gray-500">Belirtilen şirket koduna sahip bir şirket bulunamadı.</p>
+                <h2 className="text-base font-semibold text-indigo-600 dark:text-indigo-500">404</h2>
+                <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-gray-100">Şirket Bulunamadı</p>
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Belirtilen şirket koduna sahip bir şirket bulunamadı.</p>
                 <div className="mt-6">
-                    <Link to="/companies" className="text-base font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link to="/companies" className="text-base font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400">
                         Şirket Listesine Dön <span aria-hidden="true">&rarr;</span>
                     </Link>
                 </div>
@@ -41,11 +41,11 @@ export default function CompanyDetail() {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="bg-white shadow-sm rounded-lg p-6">
+            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">{data.company.title}</h1>
-                        <p className="text-sm text-gray-500">{data.company.code}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{data.company.title}</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{data.company.code}</p>
                     </div>
                     {data.company.logo && (
                         <img
@@ -59,18 +59,18 @@ export default function CompanyDetail() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="bg-white overflow-hidden shadow-sm rounded-lg">
+                <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                     <div className="p-5">
                         <div className="flex items-center">
                             <div className="flex-shrink-0">
-                                <ChartBarIcon className="h-6 w-6 text-indigo-600" />
+                                <ChartBarIcon className="h-6 w-6 text-indigo-600 dark:text-indigo-500" />
                             </div>
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt className="text-sm font-medium text-gray-500 truncate">
+                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                                         Toplam Fon Sayısı
                                     </dt>
-                                    <dd className="text-lg font-semibold text-gray-900">
+                                    <dd className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                                         {formatNumber(data.stats.total_funds)}
                                     </dd>
                                 </dl>
@@ -84,23 +84,23 @@ export default function CompanyDetail() {
                     { label: '6 Aylık', value: data.stats.avg_yield_6m },
                     { label: 'Yıllık', value: data.stats.avg_yield_1y },
                 ].map((stat) => (
-                    <div key={stat.label} className="bg-white overflow-hidden shadow-sm rounded-lg">
+                    <div key={stat.label} className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                         <div className="p-5">
                             <div className="flex items-center">
                                 <div className="flex-shrink-0">
                                     {stat.value && stat.value >= 0 ? (
-                                        <ArrowUpIcon className="h-6 w-6 text-green-500" />
+                                        <ArrowUpIcon className="h-6 w-6 text-green-500 dark:text-green-400" />
                                     ) : (
-                                        <ArrowDownIcon className="h-6 w-6 text-red-500" />
+                                        <ArrowDownIcon className="h-6 w-6 text-red-500 dark:text-red-400" />
                                     )}
                                 </div>
                                 <div className="ml-5 w-0 flex-1">
                                     <dl>
-                                        <dt className="text-sm font-medium text-gray-500 truncate">
+                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                                             {stat.label} Getiri
                                         </dt>
                                         <dd className={`text-lg font-semibold ${
-                                            stat.value && stat.value >= 0 ? 'text-green-600' : 'text-red-600'
+                                            stat.value && stat.value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                                         }`}>
                                             {formatPercent(stat.value)}
                                         </dd>
@@ -114,25 +114,25 @@ export default function CompanyDetail() {
 
             {/* Best Performing Funds */}
             {data.stats.best_performing_funds && data.stats.best_performing_funds.length > 0 && (
-                <div className="bg-white shadow-sm rounded-lg p-6">
-                    <h2 className="text-lg font-medium text-gray-900 mb-6">En İyi Performans Gösteren Fonlar</h2>
+                <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">En İyi Performans Gösteren Fonlar</h2>
                     <div className="space-y-4">
                         {data.stats.best_performing_funds.map((fund) => (
                             <Link
                                 key={fund.code}
                                 to={`/funds/${fund.code}`}
-                                className="block p-4 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="block p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                             >
                                 <div className="flex justify-between items-center">
                                     <div>
-                                        <h3 className="font-medium text-gray-900">{fund.title}</h3>
-                                        <p className="text-sm text-gray-500">{fund.type}</p>
+                                        <h3 className="font-medium text-gray-900 dark:text-gray-100">{fund.title}</h3>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">{fund.type}</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-lg font-semibold text-green-600">
+                                        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
                                             {formatPercent(fund.yield_1y)}
                                         </p>
-                                        <p className="text-sm text-gray-500">Yıllık Getiri</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Yıllık Getiri</p>
                                     </div>
                                 </div>
                             </Link>
@@ -142,75 +142,75 @@ export default function CompanyDetail() {
             )}
 
             {/* All Funds */}
-            <div className="bg-white shadow-sm rounded-lg p-6">
+            <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-lg font-medium text-gray-900">Tüm Fonlar</h2>
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tüm Fonlar</h2>
                     {data.funds && data.funds.length > 0 && (
                         <Link
                             to={`/funds?company=${data.company.code}`}
-                            className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+                            className="text-sm font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400"
                         >
                             Tümünü Gör →
                         </Link>
                     )}
                 </div>
                 {data.funds && data.funds.length > 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-300">
+                    <div className="overflow-x-auto scrollbar">
+                        <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                             <thead>
                                 <tr>
-                                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900">
+                                    <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         Kod
                                     </th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         Fon Adı
                                     </th>
-                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         Tip
                                     </th>
-                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         1 Aylık
                                     </th>
-                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         6 Aylık
                                     </th>
-                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">
+                                    <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
                                         1 Yıllık
                                     </th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-200">
+                            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                                 {(data.funds as FundYield[])
                                     ?.sort(() => 0.5 - Math.random())
                                     .slice(0, 20)
                                     .map((fund) => (
-                                        <tr 
+                                        <tr
                                             key={fund.code}
+                                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
                                             onClick={() => window.location.href = `/funds/${fund.code}`}
-                                            className="cursor-pointer hover:bg-gray-50"
                                         >
-                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                                 <Link
                                                     to={`/funds/${fund.code}`}
-                                                    className="text-indigo-600 hover:text-indigo-900"
+                                                    className="text-indigo-600 dark:text-indigo-500 hover:text-indigo-900 dark:hover:text-indigo-400"
                                                 >
                                                     {fund.code}
                                                 </Link>
                                             </td>
-                                            <td className="px-3 py-4 text-sm text-gray-500">
+                                            <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                 <div className="truncate max-w-md" title={fund.title}>
                                                     {fund.title}
                                                 </div>
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                 {fund.type}
                                             </td>
                                             <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                                                 <span
                                                     className={
                                                         fund.yield_1m && fund.yield_1m >= 0
-                                                            ? 'text-green-600'
-                                                            : 'text-red-600'
+                                                            ? 'text-green-600 dark:text-green-400'
+                                                            : 'text-red-600 dark:text-red-400'
                                                     }
                                                 >
                                                     {formatPercent(fund.yield_1m)}
@@ -220,8 +220,8 @@ export default function CompanyDetail() {
                                                 <span
                                                     className={
                                                         fund.yield_6m && fund.yield_6m >= 0
-                                                            ? 'text-green-600'
-                                                            : 'text-red-600'
+                                                            ? 'text-green-600 dark:text-green-400'
+                                                            : 'text-red-600 dark:text-red-400'
                                                     }
                                                 >
                                                     {formatPercent(fund.yield_6m)}
@@ -231,8 +231,8 @@ export default function CompanyDetail() {
                                                 <span
                                                     className={
                                                         fund.yield_1y && fund.yield_1y >= 0
-                                                            ? 'text-green-600'
-                                                            : 'text-red-600'
+                                                            ? 'text-green-600 dark:text-green-400'
+                                                            : 'text-red-600 dark:text-red-400'
                                                     }
                                                 >
                                                     {formatPercent(fund.yield_1y)}

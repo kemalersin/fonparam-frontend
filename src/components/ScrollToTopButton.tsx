@@ -42,7 +42,7 @@ export default function ScrollToTopButton() {
         >
             <button
                 onClick={scrollToTop}
-                className="fixed bottom-6 right-6 p-3 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 hover:scale-110 transform transition-all duration-300 z-50"
+                className="fixed bottom-6 right-6 p-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-full shadow-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 hover:scale-110 transform transition-all duration-300 z-50"
                 aria-label="Yukarı çık"
             >
                 <ChevronUpIcon className="h-6 w-6" />
