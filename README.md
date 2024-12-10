@@ -97,6 +97,6 @@ npm run dev
 - ✅ Safari
 - ✅ Edge
 
-## 📝 Lisans
+## 📜 Lisans
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakınız.
