@@ -10,6 +10,8 @@
 
 html {
   margin-left: calc(100vw - 100%);
+  overflow: inherit !important;
+  padding-right: inherit !important;  
 }
 
 body {
@@ -19,3 +21,4 @@ body {
   background-color: #f3f4f6;
   color: #111827;
 }
+
