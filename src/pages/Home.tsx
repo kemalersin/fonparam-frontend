@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useTopPerformingFunds } from '../hooks/useApi';
-import { ChartBarIcon, BuildingOfficeIcon, ArrowTrendingUpIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { 
+    ChartBarIcon, 
+    BuildingOfficeIcon, 
+    ArrowTrendingUpIcon, 
+    MagnifyingGlassIcon,
+    AcademicCapIcon,
+    ChartPieIcon,
+    ScaleIcon,
+    ClockIcon,
+    ArrowUpIcon,
+    ArrowDownIcon
+} from '@heroicons/react/24/outline';
 import { formatPercent } from '../utils/format';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +21,38 @@ const stats = [
     { name: 'Toplam Büyüklük', value: '874.3 M₺', description: 'Portföy Değeri' },
     { name: 'Ortalama Getiri', value: '%32.4', description: 'Yıllık Ortalama' },
     { name: 'Portföy Şirketi', value: '48', description: 'Aktif Şirket' },
+];
+
+const guides = [
+    {
+        title: 'Yatırım Fonu Nedir?',
+        description: 'Yatırım fonları, birçok yatırımcının birikimlerini bir araya getirerek oluşturduğu portföylerdir.',
+        icon: AcademicCapIcon,
+    },
+    {
+        title: 'Fon Türleri',
+        description: 'Hisse senedi, borçlanma araçları, karma ve serbest fonlar hakkında bilgi edinin.',
+        icon: ChartPieIcon,
+    },
+    {
+        title: 'Nasıl Fon Seçilir?',
+        description: 'Fon seçerken dikkat edilmesi gereken kriterler ve analiz yöntemleri.',
+        icon: ScaleIcon,
+    },
+    {
+        title: 'Yatırım Stratejileri',
+        description: 'Düzenli yatırım, portföy çeşitlendirme ve risk yönetimi hakkında ipuçları.',
+        icon: ClockIcon,
+    },
+];
+
+const marketSummary = [
+    { type: 'Hisse Senedi Fonları', value: 42.5, trend: 'up' },
+    { type: 'Borçlanma Araçları Fonları', value: 28.3, trend: 'down' },
+    { type: 'Karma Fonlar', value: 35.7, trend: 'up' },
+    { type: 'Para Piyasası Fonları', value: 22.1, trend: 'down' },
+    { type: 'Katılım Fonları', value: 31.2, trend: 'up' },
+    { type: 'Serbest Fonlar', value: 38.9, trend: 'up' },
 ];
 
 export default function Home() {
@@ -111,6 +154,38 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* Education Section */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <div className="mx-auto max-w-7xl px-6 py-8">
+                    <div className="text-center mb-8">
+                        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Yatırım Fonu Rehberi</h2>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            Yatırım fonları hakkında temel bilgiler ve yatırım stratejileri
+                        </p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+                        {guides.map((guide) => (
+                            <div
+                                key={guide.title}
+                                className="relative flex flex-col gap-6 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group"
+                            >
+                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-500 dark:bg-indigo-600 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 transition-colors">
+                                    <guide.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                        {guide.title}
+                                    </h3>
+                                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                        {guide.description}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
             {/* Top Performing Funds */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                 <div className="flex justify-between items-center mb-6">
@@ -171,6 +246,47 @@ export default function Home() {
                         ))}
                     </div>
                 )}
+            </div>
+
+            {/* Market Summary */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+                <div className="mx-auto max-w-7xl px-6 py-8">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Piyasa Özeti</h2>
+                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                Fon türlerine göre yıllık ortalama getiriler
+                            </p>
+                        </div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                            Son güncelleme: {new Date().toLocaleDateString('tr-TR')}
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {marketSummary.map((item) => (
+                            <div
+                                key={item.type}
+                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                            >
+                                <div>
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.type}</h3>
+                                    <p className={`text-2xl font-semibold mt-1 ${
+                                        item.trend === 'up' 
+                                            ? 'text-green-600 dark:text-green-400' 
+                                            : 'text-red-600 dark:text-red-400'
+                                    }`}>
+                                        %{item.value}
+                                    </p>
+                                </div>
+                                {item.trend === 'up' ? (
+                                    <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                ) : (
+                                    <ArrowDownIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
