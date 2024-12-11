@@ -75,6 +75,7 @@ const marketSummary = [
 export default function Home() {
     const { data: topFunds, isLoading } = useTopPerformingFunds();
     const [search, setSearch] = useState('');
+    const [activeSlide, setActiveSlide] = useState(0);
     const navigate = useNavigate();
 
     const handleSearch = (e: React.FormEvent) => {
@@ -92,75 +93,75 @@ export default function Home() {
         ];
     };
 
+    useEffect(() => {
+        if (!isLoading && topFunds?.length) {
+            const timer = setInterval(() => {
+                setActiveSlide(current => (current + 1) % 2);
+            }, 5000); // Her 5 saniyede bir geçiş yap
+
+            return () => clearInterval(timer);
+        }
+    }, [isLoading, topFunds]);
+
     return (
         <div className="space-y-8">
             {/* Hero Section */}
-            <div className="relative isolate">
-                <div className="absolute inset-x-0 top-0 -z-10 transform-gpu overflow-hidden blur-3xl" aria-hidden="true">
-                    <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-200 to-indigo-400 opacity-30 dark:from-indigo-700 dark:to-indigo-900 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
-                </div>
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center animate-fade-in">
+                <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 animate-slide-down">
+                    Türkiye'nin Yatırım Fonu Verileri
+                </h1>
+                <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
+                    Tüm yatırım fonlarının güncel ve geçmiş verilerine erişin, karşılaştırmalar yapın, yatırımlarınızı analiz edin
+                </p>
 
-                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center">
-                    <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                        Türkiye'nin Yatırım Fonu Verileri
-                    </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-                        Tüm yatırım fonlarının güncel ve geçmiş verilerine erişin, karşılaştırmalar yapın, yatırımlarınızı analiz edin
-                    </p>
-
-                    {/* Search */}
-                    <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8">
-                        <div className="relative">
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                            </div>
-                            <input
-                                type="text"
-                                className="block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                placeholder="Fon kodu veya adı ile arayın..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
+                {/* Search */}
+                <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                    <div className="relative">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
-                    </form>
-
-                    {/* Quick Links */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Link
-                            to="/funds"
-                            className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-                        >
-                            <ChartBarIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
-                            <div className="text-left">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Fon Listesi</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Tüm fonları inceleyin</p>
-                            </div>
-                        </Link>
-                        <Link
-                            to="/companies"
-                            className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-                        >
-                            <BuildingOfficeIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
-                            <div className="text-left">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Portföy Şirketleri</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Şirketleri karşılaştırın</p>
-                            </div>
-                        </Link>
-                        <Link
-                            to="/compare"
-                            className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors shadow-sm"
-                        >
-                            <ArrowTrendingUpIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3" />
-                            <div className="text-left">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Fon Karşılaştırma</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Detaylı analiz yapın</p>
-                            </div>
-                        </Link>
+                        <input
+                            type="text"
+                            className="block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                            placeholder="Fon kodu veya adı ile arayın..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
                     </div>
-                </div>
+                </form>
 
-                <div className="absolute inset-x-0 bottom-0 -z-10 transform-gpu overflow-hidden blur-3xl" aria-hidden="true">
-                    <div className="relative left-[calc(50%+11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-indigo-200 to-indigo-400 opacity-30 dark:from-indigo-700 dark:to-indigo-900 sm:left-[calc(50%+30rem)] sm:w-[72.1875rem]"></div>
+                {/* Quick Links */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '400ms' }}>
+                    <Link
+                        to="/funds"
+                        className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:scale-105"
+                    >
+                        <ChartBarIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3 transition-transform duration-200 group-hover:rotate-6" />
+                        <div className="text-left">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Fon Listesi</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Tüm fonları inceleyin</p>
+                        </div>
+                    </Link>
+                    <Link
+                        to="/companies"
+                        className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:scale-105"
+                    >
+                        <BuildingOfficeIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3 transition-transform duration-200 group-hover:rotate-6" />
+                        <div className="text-left">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Portföy Şirketleri</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Şirketleri karşılaştırın</p>
+                        </div>
+                    </Link>
+                    <Link
+                        to="/compare"
+                        className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:scale-105"
+                    >
+                        <ArrowTrendingUpIcon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mr-3 transition-transform duration-200 group-hover:rotate-6" />
+                        <div className="text-left">
+                            <h3 className="font-semibold text-gray-900 dark:text-gray-100">Fon Karşılaştırma</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Detaylı analiz yapın</p>
+                        </div>
+                    </Link>
                 </div>
             </div>
 
@@ -168,10 +169,16 @@ export default function Home() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                 <div className="mx-auto max-w-7xl">
                     <dl className="grid grid-cols-1 gap-x-8 gap-y-8 sm:gap-y-0 sm:grid-cols-2 lg:grid-cols-4 p-8">
-                        {stats.map((stat) => (
-                            <div key={stat.name} className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8">
+                        {stats.map((stat, index) => (
+                            <div 
+                                key={stat.name} 
+                                className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8 animate-fade-in"
+                                style={{ animationDelay: `${index * 100}ms` }}
+                            >
                                 <dt className="text-sm leading-6 text-gray-600 dark:text-gray-400">{stat.name}</dt>
-                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">{stat.value}</dd>
+                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 animate-count">
+                                    {stat.value}
+                                </dd>
                                 <p className="text-xs text-gray-500 dark:text-gray-500">{stat.description}</p>
                             </div>
                         ))}
@@ -195,13 +202,16 @@ export default function Home() {
                         ))}
                     </div>
                 ) : (
-                    <Tab.Group>
-                        <div className="relative">
-                            <Tab.Panels className="overflow-hidden">
-                                {getFundGroups().map((group, idx) => (
-                                    <Tab.Panel
-                                        key={idx}
-                                        className={`space-y-6 sm:space-y-4`}
+                    <div className="relative">
+                        <div className="relative overflow-hidden">
+                            <div 
+                                className="flex transition-transform duration-500 ease-in-out" 
+                                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                            >
+                                {getFundGroups().map((group, groupIdx) => (
+                                    <div 
+                                        key={groupIdx}
+                                        className="w-full flex-shrink-0 space-y-6 sm:space-y-4"
                                     >
                                         {group.map((fund) => (
                                             <Link
@@ -244,25 +254,24 @@ export default function Home() {
                                                 </div>
                                             </Link>
                                         ))}
-                                    </Tab.Panel>
+                                    </div>
                                 ))}
-                            </Tab.Panels>
-                            <Tab.List className="flex justify-center gap-2 mt-6">
-                                {getFundGroups().map((_, idx) => (
-                                    <Tab
-                                        key={idx}
-                                        className={({ selected }) =>
-                                            `w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                                                selected
-                                                    ? 'bg-indigo-600 dark:bg-indigo-500'
-                                                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                                            }`
-                                        }
-                                    />
-                                ))}
-                            </Tab.List>
+                            </div>
                         </div>
-                    </Tab.Group>
+                        <div className="flex justify-center gap-2 mt-6">
+                            {getFundGroups().map((_, idx) => (
+                                <button
+                                    key={idx}
+                                    onClick={() => setActiveSlide(idx)}
+                                    className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
+                                        activeSlide === idx
+                                            ? 'bg-indigo-600 dark:bg-indigo-500'
+                                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    </div>
                 )}
             </div>
 
@@ -313,10 +322,11 @@ export default function Home() {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {marketSummary.map((item) => (
+                        {marketSummary.map((item, index) => (
                             <div
                                 key={item.type}
-                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg transform transition-all duration-200 hover:scale-102 hover:-translate-y-1"
+                                style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 <div>
                                     <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.type}</h3>
@@ -328,11 +338,13 @@ export default function Home() {
                                         %{item.value}
                                     </p>
                                 </div>
-                                {item.trend === 'up' ? (
-                                    <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
-                                ) : (
-                                    <ArrowDownIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
-                                )}
+                                <div className="animate-pulse-slow">
+                                    {item.trend === 'up' ? (
+                                        <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                    ) : (
+                                        <ArrowDownIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -340,10 +352,7 @@ export default function Home() {
             </div>
 
             {/* Recently Viewed Funds */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Son Görüntülenen Fonlar</h2>
-                <RecentlyViewedFunds />
-            </div>
+            <RecentlyViewedFunds />
         </div>
     );
 } 
