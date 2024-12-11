@@ -1,57 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useFunds } from '../hooks/useApi';
-import { MagnifyingGlassIcon, ChevronUpIcon, ChevronDownIcon, StarIcon, ArrowsRightLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, StarIcon, ArrowsRightLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid, ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
 import ComparisonButton from '../components/ComparisonButton';
+import SortHeader from '../components/SortHeader';
 import { formatPercent } from '../utils/format';
-
-const SortHeader = ({ 
-    label,
-    field,
-    currentSort,
-    currentOrder,
-    onSort
-}: {
-    label: string;
-    field: string;
-    currentSort: string;
-    currentOrder: 'ASC' | 'DESC';
-    onSort: (field: string) => void;
-}) => {
-    const isTextColumn = field === 'code' || field === 'title';
-    return (
-        <th
-            scope="col"
-            className={`px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer group ${
-                field === 'code' ? 'w-24' : 
-                field === 'title' ? 'w-48' : 
-                'w-20'
-            } ${isTextColumn ? 'text-left' : 'text-right'}`}
-            onClick={() => onSort(field)}
-        >
-            <div className={`flex items-center gap-1 ${isTextColumn ? 'justify-start' : 'justify-end'}`}>
-                <span>{label}</span>
-                <span className="inline-flex flex-col">
-                    {currentSort === field ? (
-                        currentOrder === 'ASC' ? (
-                            <ChevronUpIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                        ) : (
-                            <ChevronDownIcon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                        )
-                    ) : (
-                        <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                            <ChevronUpIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                        </span>
-                    )}
-                </span>
-            </div>
-        </th>
-    );
-};
 
 export default function Funds() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -96,8 +53,6 @@ export default function Funds() {
             const params = new URLSearchParams(searchParams);
             params.delete('search');
             if (page > 1) params.set('page', page.toString());
-            if (sort !== 'code') params.set('sort', sort);
-            if (order !== 'ASC') params.set('order', order);
             const company = searchParams.get('company');
             if (company) params.set('company', company);
             setSearchParams(params, { replace: true });
@@ -109,15 +64,13 @@ export default function Funds() {
             const params = new URLSearchParams(searchParams);
             params.set('search', searchInput);
             if (page > 1) params.set('page', page.toString());
-            if (sort !== 'code') params.set('sort', sort);
-            if (order !== 'ASC') params.set('order', order);
             const company = searchParams.get('company');
             if (company) params.set('company', company);
             setSearchParams(params, { replace: true });
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchInput, page, sort, order, isInitialized]);
+    }, [searchInput, page, isInitialized]);
 
     // Arama değiştiğinde sayfa numarasını sıfırla
     useEffect(() => {
@@ -140,12 +93,24 @@ export default function Funds() {
     };
 
     const handleSort = (field: string) => {
-        if (sort === field) {
-            setOrder(order === 'ASC' ? 'DESC' : 'ASC');
-        } else {
-            setSort(field);
-            setOrder('ASC');
-        }
+        const newOrder = sort === field ? (order === 'ASC' ? 'DESC' : 'ASC') : 'ASC';
+        const newSort = field;
+
+        // State'leri güncelle
+        setSort(newSort);
+        setOrder(newOrder);
+
+        // URL parametrelerini güncelle
+        const params = new URLSearchParams(searchParams);
+        if (newSort !== 'code') params.set('sort', newSort);
+        else params.delete('sort');
+        if (newOrder !== 'ASC') params.set('order', newOrder);
+        else params.delete('order');
+        if (page > 1) params.set('page', page.toString());
+        if (searchInput) params.set('search', searchInput);
+        const company = searchParams.get('company');
+        if (company) params.set('company', company);
+        setSearchParams(params, { replace: true });
     };
 
     const handleRowClick = (event: React.MouseEvent, fundCode: string) => {
