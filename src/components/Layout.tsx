@@ -35,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                             <span className="sr-only">FonParam</span>
                                             <img
                                                 className="h-6 w-auto"
-                                                src={isDark ? '/logo-dark.png' : '/logo-light.png'}
+                                                src={isDark ? '/logo-dark.svg' : '/logo-light.svg'}
                                                 alt="FonParam"
                                             />
                                         </Link>
