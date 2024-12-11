@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ArrowUpIcon, ArrowDownIcon, BuildingOfficeIcon, CalendarIcon, BanknotesIcon, InformationCircleIcon, StarIcon, ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
@@ -46,37 +46,46 @@ const INCREASE_TYPES = [
     { id: 'amount', name: 'Tutar', symbol: '₺' }
 ];
 
+const DEFAULT_VALUES = {
+    PERIOD: 'last_1_year',
+    INITIAL_INVESTMENT: 10000,
+    MONTHLY_INVESTMENT: 1000,
+    YEARLY_INCREASE_TYPE: 'percentage' as const,
+    YEARLY_INCREASE_VALUE: 10
+};
+
 export default function FundDetail() {
-    const { code } = useParams<{ code: string }>();
-    const [selectedPeriod, setSelectedPeriod] = useState(() => {
-        const saved = localStorage.getItem('selectedPeriod');
-        return saved || 'last_1_year';
-    });
+    const { code } = useParams();
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    const [selectedPeriod, setSelectedPeriod] = useState(() => 
+        searchParams.get('period') || localStorage.getItem('selectedPeriod') || DEFAULT_VALUES.PERIOD
+    );
+    
     const [showMonthlyDetails, setShowMonthlyDetails] = useState(() => {
         const saved = localStorage.getItem('showMonthlyDetails');
         return saved ? JSON.parse(saved) : false;
     });
     const [isFavorited, setIsFavorited] = useState(false);
     const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
-    const [analysisParams, setAnalysisParams] = useState({
-        startDate: selectedPeriod,
-        initialInvestment: 10000,
-        monthlyInvestment: 1000,
-        includeMonthlyDetails: true,
+    const [analysisParams, setAnalysisParams] = useState<AnalysisParams>(() => ({
+        initialInvestment: Number(searchParams.get('initial')) || DEFAULT_VALUES.INITIAL_INVESTMENT,
+        monthlyInvestment: Number(searchParams.get('monthly')) || DEFAULT_VALUES.MONTHLY_INVESTMENT,
         yearlyIncrease: {
-            type: 'percentage' as 'percentage' | 'amount',
-            value: 10 as number
-        }
-    });
+            type: (searchParams.get('increaseType') as 'percentage' | 'amount') || DEFAULT_VALUES.YEARLY_INCREASE_TYPE,
+            value: Number(searchParams.get('increaseValue')) || DEFAULT_VALUES.YEARLY_INCREASE_VALUE
+        },
+        startDate: selectedPeriod
+    }));
 
     const [debouncedAnalysisParams, setDebouncedAnalysisParams] = useState(analysisParams);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
+        const timeoutId = setTimeout(() => {
             setDebouncedAnalysisParams(analysisParams);
-        }, 300);
+        }, 500);
 
-        return () => clearTimeout(timer);
+        return () => clearTimeout(timeoutId);
     }, [analysisParams]);
 
     const { data: currentFund, isLoading: isLoadingFund } = useFundDetails(code ?? '');
@@ -90,7 +99,17 @@ export default function FundDetail() {
     // Son değeri history'den al
     const lastValue = history?.length ? [history[history.length - 1]] : undefined;
 
-    const { data: analysis } = useAnalyzeFund(code ?? '', debouncedAnalysisParams);
+    const [analysisData, setAnalysisData] = useState<typeof analysis>(null);
+    const { data: analysis, isLoading: isAnalysisLoading } = useAnalyzeFund(code ?? '', {
+        ...debouncedAnalysisParams,
+        includeMonthlyDetails: true
+    });
+
+    useEffect(() => {
+        if (analysis) {
+            setAnalysisData(analysis);
+        }
+    }, [analysis]);
 
     useEffect(() => {
         localStorage.setItem('selectedPeriod', selectedPeriod);
@@ -147,6 +166,43 @@ export default function FundDetail() {
             }, 100);
         }
     };
+
+    // URL'i güncelle
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams);
+        
+        if (selectedPeriod !== DEFAULT_VALUES.PERIOD) {
+            params.set('period', selectedPeriod);
+        } else {
+            params.delete('period');
+        }
+        
+        if (analysisParams.initialInvestment !== DEFAULT_VALUES.INITIAL_INVESTMENT) {
+            params.set('initial', analysisParams.initialInvestment.toString());
+        } else {
+            params.delete('initial');
+        }
+        
+        if (analysisParams.monthlyInvestment !== DEFAULT_VALUES.MONTHLY_INVESTMENT) {
+            params.set('monthly', analysisParams.monthlyInvestment.toString());
+        } else {
+            params.delete('monthly');
+        }
+        
+        if (analysisParams.yearlyIncrease.type !== DEFAULT_VALUES.YEARLY_INCREASE_TYPE) {
+            params.set('increaseType', analysisParams.yearlyIncrease.type);
+        } else {
+            params.delete('increaseType');
+        }
+
+        if (analysisParams.yearlyIncrease.value !== DEFAULT_VALUES.YEARLY_INCREASE_VALUE) {
+            params.set('increaseValue', analysisParams.yearlyIncrease.value.toString());
+        } else {
+            params.delete('increaseValue');
+        }
+        
+        setSearchParams(params, { replace: true });
+    }, [selectedPeriod, analysisParams]);
 
     if (isLoadingFund) {
         return (
@@ -335,18 +391,40 @@ export default function FundDetail() {
                                     className="text-gray-600 dark:text-gray-300"
                                 />
                                 <Tooltip
-                                    formatter={(value: number) => [formatCurrency(value), 'Değer']}
-                                    labelFormatter={(date) =>
-                                        new Date(date).toLocaleDateString('tr-TR', {
+                                    formatter={(value: number, name: string, props: any) => {
+                                        const previousValue = props.payload.length > 1 ? props.payload[0].value : value;
+                                        const isProfit = value >= previousValue;
+                                        const textColor = isProfit ? 'var(--green-600)' : 'var(--red-600)';
+                                        return [
+                                            <span style={{ color: textColor }}>
+                                                {formatCurrency(value)}
+                                            </span>, 
+                                            <span style={{ color: textColor }}>Değer</span>
+                                        ];
+                                    }}
+                                    labelFormatter={(date) => {
+                                        const formattedDate = new Date(date).toLocaleDateString('tr-TR', {
                                             year: 'numeric',
                                             month: 'long',
                                             day: 'numeric',
-                                        })
-                                    }
+                                        });
+                                        return formattedDate;
+                                    }}
                                     contentStyle={{
-                                        backgroundColor: 'rgb(var(--background))',
-                                        borderColor: 'rgb(var(--border))',
-                                        color: 'rgb(var(--foreground))'
+                                        backgroundColor: 'var(--background)',
+                                        borderColor: 'var(--gray-200)',
+                                        borderRadius: '0.5rem',
+                                        padding: '0.75rem',
+                                        color: 'var(--foreground)'
+                                    }}
+                                    itemStyle={{
+                                        color: 'var(--foreground)'
+                                    }}
+                                    labelStyle={{
+                                        color: 'var(--foreground)'
+                                    }}
+                                    wrapperStyle={{
+                                        outline: 'none',
                                     }}
                                 />
                                 <Line
@@ -401,8 +479,8 @@ export default function FundDetail() {
                                             initialInvestment: Number(e.target.value),
                                         })
                                     }
+                                    placeholder={DEFAULT_VALUES.INITIAL_INVESTMENT.toString()}
                                     className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                    placeholder="0"
                                 />
                             </div>
                         </div>
@@ -424,8 +502,8 @@ export default function FundDetail() {
                                             monthlyInvestment: Number(e.target.value),
                                         })
                                     }
+                                    placeholder={DEFAULT_VALUES.MONTHLY_INVESTMENT.toString()}
                                     className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                    placeholder="0"
                                 />
                             </div>
                         </div>
@@ -516,23 +594,23 @@ export default function FundDetail() {
                                                 }
                                             })
                                         }
+                                        placeholder={DEFAULT_VALUES.YEARLY_INCREASE_VALUE.toString()}
                                         className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                                        placeholder="0"
                                     />
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {analysis && (
+                    {analysisData && (
                         <div className="lg:col-span-2">
-                            <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                            <dl className={`grid grid-cols-1 gap-6 sm:grid-cols-2 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
                                 <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                         Toplam Yatırım
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-100">
-                                        {formatCurrency(analysis.summary.totalInvestment)}
+                                        {formatCurrency(analysisData.summary.totalInvestment)}
                                     </dd>
                                 </div>
                                 <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
@@ -540,7 +618,7 @@ export default function FundDetail() {
                                         Güncel Değer
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-gray-900 dark:text-gray-100">
-                                        {formatCurrency(analysis.summary.currentValue)}
+                                        {formatCurrency(analysisData.summary.currentValue)}
                                     </dd>
                                 </div>
                                 <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
@@ -548,7 +626,7 @@ export default function FundDetail() {
                                         Toplam Kazanç
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600 dark:text-green-400">
-                                        {formatCurrency(analysis.summary.totalYield)}
+                                        {formatCurrency(analysisData.summary.totalYield)}
                                     </dd>
                                 </div>
                                 <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
@@ -556,7 +634,7 @@ export default function FundDetail() {
                                         Getiri Oranı
                                     </dt>
                                     <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600 dark:text-green-400">
-                                        {formatPercent(analysis.summary.totalYieldPercentage)}
+                                        {formatPercent(analysisData.summary.totalYieldPercentage)}
                                     </dd>
                                 </div>
                             </dl>
@@ -565,10 +643,10 @@ export default function FundDetail() {
                 </div>
             </div>
 
-            {analysis && showMonthlyDetails && analysis.monthlyDetails && (
+            {analysisData && showMonthlyDetails && analysisData.monthlyDetails && (
                 <div 
                     id="monthly-details-table" 
-                    className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32"
+                    className={`bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32 ${isAnalysisLoading ? 'opacity-50' : ''}`}
                 >
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Aylık Detaylar</h2>
                     <div className="overflow-x-auto">
@@ -608,7 +686,7 @@ export default function FundDetail() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {analysis.monthlyDetails.map((detail, index) => (
+                                {analysisData.monthlyDetails.map((detail, index) => (
                                     <tr key={index} className={index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800'}>
                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-gray-900 dark:text-gray-100">
                                             {formatDate(detail.date)}
