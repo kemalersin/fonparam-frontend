@@ -18,6 +18,7 @@ import {
     DEFAULT_INCREASE_TYPE,
     DEFAULT_INCREASE_VALUE
 } from '../constants';
+import { addToRecentlyViewed } from '../services/recentlyViewed';
 
 const PERIODS = [
     { label: 'Son 1 Ay', value: 'last_1_month' },
@@ -88,7 +89,7 @@ export default function FundDetail() {
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedAnalysisParams(analysisParams);
-        }, 500);
+        }, 0);
 
         return () => clearTimeout(timeoutId);
     }, [analysisParams]);
@@ -243,6 +244,18 @@ export default function FundDetail() {
         }
     };
 
+    useEffect(() => {
+        if (currentFund) {
+            addToRecentlyViewed({
+                code: currentFund.code,
+                title: currentFund.title,
+                management_company_id: currentFund.management_company_id,
+                management_company_title: currentFund.management_company?.title || '',
+                management_company_logo: currentFund.management_company?.logo
+            }).catch(console.error);
+        }
+    }, [currentFund]);
+
     if (isLoadingFund) {
         return (
             <div className="flex items-center justify-center py-12">
@@ -262,7 +275,7 @@ export default function FundDetail() {
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Belirtilen fon koduna sahip bir fon bulunamadı.</p>
                 <div className="mt-6">
                     <Link to="/funds" className="text-base font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400">
-                        Fon Listesine D��n <span aria-hidden="true">&rarr;</span>
+                        Fon Listesine Dön <span aria-hidden="true">&rarr;</span>
                     </Link>
                 </div>
             </div>

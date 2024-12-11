@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     <>
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="flex h-16 justify-between">
-                                <div className="flex">
+                                <div className="flex z-10">
                                     <div className="flex flex-shrink-0 items-center">
                                         <Link to="/" className="-m-1.5 p-1.5">
                                             <span className="sr-only">FonParam</span>
@@ -58,7 +58,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                         ))}
                                     </div>
                                 </div>
-                                <div className="flex items-center space-x-4">
+                                <div className="flex items-center space-x-4 z-10">
                                     <ThemeToggle />
                                     <div className="-mr-2 flex items-center sm:hidden">
                                         <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white dark:bg-gray-800 p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">

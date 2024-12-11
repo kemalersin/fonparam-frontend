@@ -1,5 +1,9 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTopPerformingFunds } from '../hooks/useApi';
+import { formatPercent } from '../utils/format';
+import RecentlyViewedFunds from '../components/RecentlyViewedFunds';
+import { Tab } from '@headlessui/react';
 import { 
     ChartBarIcon, 
     BuildingOfficeIcon, 
@@ -12,15 +16,28 @@ import {
     ArrowUpIcon,
     ArrowDownIcon
 } from '@heroicons/react/24/outline';
-import { formatPercent } from '../utils/format';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const stats = [
-    { name: 'Toplam Fon', value: '1,247', description: 'Aktif Yatırım Fonu' },
-    { name: 'Toplam Büyüklük', value: '874.3 M₺', description: 'Portföy Değeri' },
-    { name: 'Ortalama Getiri', value: '%32.4', description: 'Yıllık Ortalama' },
-    { name: 'Portföy Şirketi', value: '48', description: 'Aktif Şirket' },
+    {
+        name: 'Toplam Fon',
+        value: '500+',
+        description: 'Aktif olarak işlem gören'
+    },
+    {
+        name: 'Portföy Yönetim Şirketi',
+        value: '50+',
+        description: 'Türkiye genelinde'
+    },
+    {
+        name: 'Günlük İşlem Hacmi',
+        value: '₺1.2B+',
+        description: 'Ortalama'
+    },
+    {
+        name: 'Toplam Portföy Büyüklüğü',
+        value: '₺450B+',
+        description: 'Yönetilen varlık'
+    }
 ];
 
 const guides = [
@@ -47,12 +64,12 @@ const guides = [
 ];
 
 const marketSummary = [
-    { type: 'Hisse Senedi Fonları', value: 42.5, trend: 'up' },
-    { type: 'Borçlanma Araçları Fonları', value: 28.3, trend: 'down' },
-    { type: 'Karma Fonlar', value: 35.7, trend: 'up' },
-    { type: 'Para Piyasası Fonları', value: 22.1, trend: 'down' },
-    { type: 'Katılım Fonları', value: 31.2, trend: 'up' },
-    { type: 'Serbest Fonlar', value: 38.9, trend: 'up' },
+    { type: 'Hisse Senedi Fonları', value: 112.4, trend: 'up' },
+    { type: 'Borçlanma Araçları Fonları', value: 42.8, trend: 'up' },
+    { type: 'Karma Fonlar', value: 28.5, trend: 'down' },
+    { type: 'Para Piyasas Fonları', value: 35.2, trend: 'up' },
+    { type: 'Katılım Fonları', value: 45.6, trend: 'up' },
+    { type: 'Serbest Fonlar', value: 65.3, trend: 'down' }
 ];
 
 export default function Home() {
@@ -65,6 +82,14 @@ export default function Home() {
         if (search.trim()) {
             navigate(`/funds?search=${encodeURIComponent(search.trim())}`);
         }
+    };
+
+    const getFundGroups = () => {
+        if (!topFunds) return [[], []];
+        return [
+            topFunds.slice(0, 5),
+            topFunds.slice(5, 10)
+        ];
     };
 
     return (
@@ -154,6 +179,93 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* Top Performing Funds */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">En İyi Performans Gösteren Fonlar</h2>
+                    <Link to="/funds" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
+                        Tümünü Gör →
+                    </Link>
+                </div>
+
+                {isLoading ? (
+                    <div className="animate-pulse space-y-4">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="h-16 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                        ))}
+                    </div>
+                ) : (
+                    <Tab.Group>
+                        <div className="relative">
+                            <Tab.Panels className="overflow-hidden">
+                                {getFundGroups().map((group, idx) => (
+                                    <Tab.Panel
+                                        key={idx}
+                                        className={`space-y-6 sm:space-y-4`}
+                                    >
+                                        {group.map((fund) => (
+                                            <Link
+                                                key={fund.code}
+                                                to={`/funds/${fund.code}`}
+                                                className="block p-0 sm:p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                            >
+                                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                                    <div className="flex items-start sm:items-center gap-3">
+                                                        <div
+                                                            className="flex-shrink-0 hover:opacity-75 cursor-pointer"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                window.location.href = `/companies/${fund.management_company_id}`;
+                                                            }}
+                                                        >
+                                                            {fund.management_company?.logo ? (
+                                                                <img
+                                                                    src={fund.management_company.logo}
+                                                                    alt={fund.management_company.title}
+                                                                    className="h-9 w-9 object-contain"
+                                                                />
+                                                            ) : (
+                                                                <div className="h-9 w-9 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
+                                                                    {fund.management_company?.title.charAt(0)}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex flex-col">
+                                                            <h3 className="font-medium text-gray-900 dark:text-gray-100 leading-tight">{fund.title}</h3>
+                                                            <p className="text-sm text-gray-500 dark:text-gray-400">{fund.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
+                                                            {formatPercent(fund.yield_1y)}
+                                                        </p>
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">Yıllık Getiri</p>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </Tab.Panel>
+                                ))}
+                            </Tab.Panels>
+                            <Tab.List className="flex justify-center gap-2 mt-6">
+                                {getFundGroups().map((_, idx) => (
+                                    <Tab
+                                        key={idx}
+                                        className={({ selected }) =>
+                                            `w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
+                                                selected
+                                                    ? 'bg-indigo-600 dark:bg-indigo-500'
+                                                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                                            }`
+                                        }
+                                    />
+                                ))}
+                            </Tab.List>
+                        </div>
+                    </Tab.Group>
+                )}
+            </div>
+
             {/* Education Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
                 <div className="mx-auto max-w-7xl px-6 py-8">
@@ -184,68 +296,6 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
-            </div>
-
-            {/* Top Performing Funds */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">En İyi Performans Gösteren Fonlar</h2>
-                    <Link to="/funds" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
-                        Tümünü Gör →
-                    </Link>
-                </div>
-
-                {isLoading ? (
-                    <div className="animate-pulse space-y-4">
-                        {[...Array(5)].map((_, i) => (
-                            <div key={i} className="h-16 bg-gray-100 dark:bg-gray-700 rounded"></div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="space-y-6 sm:space-y-4">
-                        {topFunds?.map((fund) => (
-                            <Link
-                                key={fund.code}
-                                to={`/funds/${fund.code}`}
-                                className="block p-0 sm:p-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
-                            >
-                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                                    <div className="flex items-start sm:items-center gap-3">
-                                        <div
-                                            className="flex-shrink-0 hover:opacity-75 cursor-pointer"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                window.location.href = `/companies/${fund.management_company_id}`;
-                                            }}
-                                        >
-                                            {fund.management_company?.logo ? (
-                                                <img
-                                                    src={fund.management_company.logo}
-                                                    alt={fund.management_company.title}
-                                                    className="h-9 w-9 object-contain"
-                                                />
-                                            ) : (
-                                                <div className="h-9 w-9 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
-                                                    {fund.management_company?.title.charAt(0)}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <h3 className="font-medium text-gray-900 dark:text-gray-100 leading-tight">{fund.title}</h3>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{fund.type}</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-lg font-semibold text-green-600 dark:text-green-400">
-                                            {formatPercent(fund.yield_1y)}
-                                        </p>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">Yıllık Getiri</p>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                )}
             </div>
 
             {/* Market Summary */}
@@ -287,6 +337,12 @@ export default function Home() {
                         ))}
                     </div>
                 </div>
+            </div>
+
+            {/* Recently Viewed Funds */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">Son Görüntülenen Fonlar</h2>
+                <RecentlyViewedFunds />
             </div>
         </div>
     );
