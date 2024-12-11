@@ -112,18 +112,15 @@ export default function FundDetail() {
         }
     }, [code, currentFund]);
 
-    const handleFavoriteClick = async () => {
-        if (!currentFund) return;
-
+    const toggleFavorite = async (code: string) => {
         try {
             if (isFavorited) {
-                await removeFavorite(code ?? '');
+                await removeFavorite(code);
                 setIsFavorited(false);
             } else {
                 await addFavorite({
                     code: currentFund.code,
                     title: currentFund.title,
-                    type: currentFund.type,
                     management_company_id: currentFund.management_company_id,
                     management_company_title: currentFund.management_company?.title ?? '',
                     management_company_logo: currentFund.management_company?.logo
@@ -188,45 +185,65 @@ export default function FundDetail() {
                                 to={`/companies/${currentFund.management_company_id}`}
                                 className="flex-shrink-0 hover:opacity-75"
                             >
-                                {currentFund.management_company?.logo ? (
+                                {currentFund.management_company_logo ? (
                                     <img
-                                        src={currentFund.management_company.logo}
-                                        alt={currentFund.management_company.title}
-                                        className="h-12 w-12 object-contain"
+                                        src={currentFund.management_company_logo}
+                                        alt={currentFund.management_company_title}
+                                        className="h-12 w-12 rounded-full bg-gray-50 dark:bg-gray-700 object-contain p-1"
                                     />
                                 ) : (
-                                    <div className="h-12 w-12 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
-                                        {currentFund.management_company?.title.charAt(0)}
+                                    <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
+                                        {currentFund.management_company_title?.charAt(0)}
                                     </div>
                                 )}
                             </Link>
                             <div className="min-w-0">
-                                <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
-                                    {currentFund.title}
-                                </h1>
+                                <div className="flex items-center gap-4">
+                                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
+                                        {currentFund.title}
+                                    </h1>
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={() => toggleFavorite(currentFund.code)}
+                                            disabled={isCheckingFavorite}
+                                            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                                        >
+                                            {isCheckingFavorite ? (
+                                                <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
+                                            ) : isFavorited ? (
+                                                <StarIconSolid className="h-4 w-4 text-yellow-400" />
+                                            ) : (
+                                                <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-yellow-400" />
+                                            )}
+                                        </button>
+                                        <ComparisonButton fund={currentFund} />
+                                    </div>
+                                </div>
                                 <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                     <span>{currentFund.code}</span>
-                                    <span className="hidden sm:inline">•</span>
-                                    <span>{currentFund.type}</span>
-                                    {currentFund.tefas && (
-                                        <>
-                                            <span className="hidden sm:inline">•</span>
-                                            <span className="inline-flex items-center rounded-full bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/30">
-                                                TEFAS
-                                            </span>
-                                        </>
-                                    )}
-                                    {lastValue?.[0] && (
-                                        <>
-                                            <span className="hidden sm:inline">•</span>
-                                            <div className="flex items-center">
-                                                <BanknotesIcon className="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" />
-                                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(lastValue[0].value)}</span>
-                                                <span className="mx-1">•</span>
-                                                <span>{formatDate(lastValue[0].date)}</span>
+                                    <span className="mx-1">•</span>
+                                    <Link
+                                        to={`/companies/${currentFund.management_company?.code}`}
+                                        className="flex-shrink-0 hover:opacity-75"
+                                    >
+                                        {currentFund.management_company?.logo ? (
+                                            <img
+                                                src={currentFund.management_company.logo}
+                                                alt={currentFund.management_company.title}
+                                                className="h-12 w-12 object-contain"
+                                            />
+                                        ) : (
+                                            <div className="h-12 w-12 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
+                                                {currentFund.management_company?.title.charAt(0)}
                                             </div>
-                                        </>
-                                    )}
+                                        )}
+                                    </Link>
+                                    <Link
+                                        to={`/companies/${currentFund.management_company?.code}`}
+                                        className="hover:text-gray-700 dark:hover:text-gray-300"
+                                    >
+                                        {currentFund.management_company?.title}
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -608,13 +625,13 @@ export default function FundDetail() {
                                             {formatCurrency(detail.unitPrice)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
-                                            {formatNumber(detail.unitsBought)}
+                                            {formatNumber(detail.units)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
                                             {formatNumber(detail.totalUnits)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
-                                            {formatCurrency(detail.portfolioValue)}
+                                            {formatCurrency(detail.value)}
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                                             <span className={detail.monthlyChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
@@ -622,13 +639,13 @@ export default function FundDetail() {
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
-                                            <span className={detail.monthlyYield >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                                {formatPercent(detail.monthlyYield)}
+                                            <span className={detail.monthlyChangePercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                                                {formatPercent(detail.monthlyChangePercentage)}
                                             </span>
                                         </td>
                                         <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
-                                            <span className={detail.totalYield >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                                {formatPercent(detail.totalYield)}
+                                            <span className={detail.totalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                                                {formatPercent(detail.totalYieldPercentage)}
                                             </span>
                                         </td>
                                     </tr>
