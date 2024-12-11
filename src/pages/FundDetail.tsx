@@ -185,15 +185,15 @@ export default function FundDetail() {
                                 to={`/companies/${currentFund.management_company_id}`}
                                 className="flex-shrink-0 hover:opacity-75"
                             >
-                                {currentFund.management_company_logo ? (
+                                {currentFund.management_company?.logo ? (
                                     <img
-                                        src={currentFund.management_company_logo}
-                                        alt={currentFund.management_company_title}
-                                        className="h-12 w-12 rounded-full bg-gray-50 dark:bg-gray-700 object-contain p-1"
+                                        src={currentFund.management_company.logo}
+                                        alt={currentFund.management_company.title}
+                                        className="h-12 w-12 object-contain"
                                     />
                                 ) : (
-                                    <div className="h-12 w-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
-                                        {currentFund.management_company_title?.charAt(0)}
+                                    <div className="h-12 w-12 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
+                                        {currentFund.management_company?.title.charAt(0)}
                                     </div>
                                 )}
                             </Link>
@@ -221,29 +221,27 @@ export default function FundDetail() {
                                 </div>
                                 <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                     <span>{currentFund.code}</span>
-                                    <span className="mx-1">•</span>
-                                    <Link
-                                        to={`/companies/${currentFund.management_company?.code}`}
-                                        className="flex-shrink-0 hover:opacity-75"
-                                    >
-                                        {currentFund.management_company?.logo ? (
-                                            <img
-                                                src={currentFund.management_company.logo}
-                                                alt={currentFund.management_company.title}
-                                                className="h-12 w-12 object-contain"
-                                            />
-                                        ) : (
-                                            <div className="h-12 w-12 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-base font-medium text-gray-500 dark:text-gray-400">
-                                                {currentFund.management_company?.title.charAt(0)}
+                                    <span className="hidden sm:inline">•</span>
+                                    <span>{currentFund.type}</span>
+                                    {currentFund.tefas && (
+                                        <>
+                                            <span className="hidden sm:inline">•</span>
+                                            <span className="inline-flex items-center rounded-full bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300 ring-1 ring-inset ring-green-600/20 dark:ring-green-500/30">
+                                                TEFAS
+                                            </span>
+                                        </>
+                                    )}
+                                    {lastValue?.[0] && (
+                                        <>
+                                            <span className="hidden sm:inline">•</span>
+                                            <div className="flex items-center">
+                                                <BanknotesIcon className="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" />
+                                                <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(lastValue[0].value)}</span>
+                                                <span className="mx-1">•</span>
+                                                <span>{formatDate(lastValue[0].date)}</span>
                                             </div>
-                                        )}
-                                    </Link>
-                                    <Link
-                                        to={`/companies/${currentFund.management_company?.code}`}
-                                        className="hover:text-gray-700 dark:hover:text-gray-300"
-                                    >
-                                        {currentFund.management_company?.title}
-                                    </Link>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
