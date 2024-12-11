@@ -50,9 +50,20 @@ const isSameAnalysis = (a: AnalysisRecord, b: Omit<AnalysisRecord, 'id' | 'date'
 };
 
 const isInSameTimeSlot = (date1: Date, date2: Date) => {
-    const hour1 = date1.getHours();
-    const hour2 = date2.getHours();
-    return (hour1 < 18 && hour2 < 18) || (hour1 >= 18 && hour2 >= 18);
+    // Tarihleri yerel saat dilimine çevir
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+
+    // Her iki tarih için de saat 18:00'i referans al
+    const ref1 = new Date(d1.getFullYear(), d1.getMonth(), d1.getDate(), 18, 0, 0);
+    const ref2 = new Date(d2.getFullYear(), d2.getMonth(), d2.getDate(), 18, 0, 0);
+
+    // Eğer saat 18:00'den küçükse bir önceki günün 18:00'ini al
+    const slot1 = d1.getHours() < 18 ? new Date(ref1.getTime() - 24 * 60 * 60 * 1000) : ref1;
+    const slot2 = d2.getHours() < 18 ? new Date(ref2.getTime() - 24 * 60 * 60 * 1000) : ref2;
+
+    // İki slot aynı ise aynı zaman diliminde demektir
+    return slot1.getTime() === slot2.getTime();
 };
 
 export const saveAnalysis = async (analysis: Omit<AnalysisRecord, 'id' | 'date'>): Promise<void> => {
