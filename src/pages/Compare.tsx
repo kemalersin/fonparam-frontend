@@ -3,10 +3,10 @@ import { useCompareFunds, useFunds } from '../hooks/useApi';
 import { MagnifyingGlassIcon, XMarkIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { addToComparison, removeFromComparison, getComparisonList } from '../services/comparison';
-import Toast from '../components/Toast';
+import { useToast } from '../contexts/ToastContext';
 import { Link } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
-import { formatPercent } from '../utils/format';
+import { formatPercent, formatCurrency } from '../utils/format';
 
 const COLORS = [
     '#4f46e5', // indigo-600
@@ -33,11 +33,7 @@ export default function Compare() {
     const [isLoading, setIsLoading] = useState(true);
     const [showResults, setShowResults] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
-    const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'warning' | 'info'; message: string }>({
-        show: false,
-        type: 'info',
-        message: ''
-    });
+    const { showToast } = useToast();
 
     const { data: searchResults, isLoading: isSearching } = useFunds(
         search ? {
@@ -50,6 +46,27 @@ export default function Compare() {
     const { data: comparisonData, isLoading: isComparing } = useCompareFunds(
         selectedCodes.length >= 2 ? selectedCodes : []
     );
+
+    const chartPoints = comparisonData?.map((fund) => ({
+        code: fund.code,
+        data: [
+            { period: '1A', value: fund.yield_1m },
+            { period: '3A', value: fund.yield_3m },
+            { period: '6A', value: fund.yield_6m },
+            { period: 'YTD', value: fund.yield_ytd },
+            { period: '1Y', value: fund.yield_1y },
+            { period: '3Y', value: fund.yield_3y },
+            { period: '5Y', value: fund.yield_5y },
+        ]
+    })) || [];
+
+    const chartData = chartPoints[0]?.data.map((item, i) => {
+        const point: any = { period: item.period };
+        chartPoints.forEach(fund => {
+            point[fund.code] = fund.data[i].value;
+        });
+        return point;
+    }) || [];
 
     useEffect(() => {
         const loadComparisonList = async () => {
@@ -101,25 +118,13 @@ export default function Compare() {
                 });
                 setSelectedCodes([...selectedCodes, fund.code]);
                 setSelectedFunds([...selectedFunds, { code: fund.code, title: fund.title }]);
-                setToast({
-                    show: true,
-                    type: 'success',
-                    message: 'Fon karşılaştırma listesine eklendi.'
-                });
+                showToast('Fon karşılaştırma listesine eklendi.', 'success');
             } catch (error) {
                 if (error instanceof Error) {
-                    setToast({
-                        show: true,
-                        type: 'warning',
-                        message: error.message
-                    });
+                    showToast(error.message, 'warning');
                 } else {
                     console.error('Fon karşılaştırma listesine eklenirken hata:', error);
-                    setToast({
-                        show: true,
-                        type: 'error',
-                        message: 'Fon karşılaştırma listesine eklenirken bir hata oluştu.'
-                    });
+                    showToast('Fon karşılaştırma listesine eklenirken bir hata oluştu.', 'error');
                 }
             }
         }
@@ -131,18 +136,10 @@ export default function Compare() {
             await removeFromComparison(code);
             setSelectedCodes(selectedCodes.filter((c) => c !== code));
             setSelectedFunds(selectedFunds.filter((f) => f.code !== code));
-            setToast({
-                show: true,
-                type: 'info',
-                message: 'Fon karşılaştırma listesinden kaldırıldı.'
-            });
+            showToast('Fon karşılaştırma listesinden kaldırıldı.', 'info');
         } catch (error) {
             console.error('Fon karşılaştırma listesinden kaldırılırken hata:', error);
-            setToast({
-                show: true,
-                type: 'error',
-                message: 'Fon karşılaştırma listesinden kaldırılırken bir hata oluştu.'
-            });
+            showToast('Fon karşılaştırma listesinden kaldırılırken bir hata oluştu.', 'error');
         }
     };
 
@@ -153,13 +150,6 @@ export default function Compare() {
 
     return (
         <div>
-            <Toast
-                show={toast.show}
-                type={toast.type}
-                message={toast.message}
-                onClose={() => setToast(prev => ({ ...prev, show: false }))}
-            />
-
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -250,53 +240,52 @@ export default function Compare() {
                             <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Performans Karşılaştırması</h2>
                             <div className="h-96">
                                 <ResponsiveContainer width="100%" height="100%">
-                                    <LineChart>
+                                    <LineChart data={chartData}>
                                         <CartesianGrid strokeDasharray="3 3" className="text-gray-200 dark:text-gray-700" />
-                                        <XAxis
-                                            dataKey="date"
-                                            type="category"
-                                            allowDuplicatedCategory={false}
-                                            tick={{ fill: 'var(--foreground)' }}
-                                        />
+                                        <XAxis dataKey="period" className="text-gray-600 dark:text-gray-300" />
                                         <YAxis 
-                                            width={65}
-                                            tickFormatter={(value) => `%${value}`}
-                                            padding={{ top: 20, bottom: 20 }}
-                                            domain={['auto', 'auto']}
-                                            tick={{ fill: 'var(--foreground)' }}
+                                            tickFormatter={(value) => value.toFixed(0) + '%'} 
+                                            className="text-gray-600 dark:text-gray-300"
                                         />
-                                        <Tooltip 
-                                            formatter={(value: number) => [
-                                                value.toLocaleString('tr-TR', {
-                                                    minimumFractionDigits: 2,
-                                                    maximumFractionDigits: 2
-                                                }) + '%',
-                                                'Getiri'
-                                            ]}
+                                        <Tooltip
+                                            formatter={(value: number, name: string) => {
+                                                const fundIndex = selectedFunds.findIndex(f => f.code === name);
+                                                return [
+                                                    <span style={{ color: COLORS[fundIndex % COLORS.length] }}>
+                                                        {"Getiri: " + formatCurrency(value)}
+                                                    </span>, 
+                                                    <span style={{ color: COLORS[fundIndex % COLORS.length] }}>
+                                                        {name}
+                                                    </span>
+                                                ];
+                                            }}
+                                            labelFormatter={(value) => value}
                                             contentStyle={{
                                                 backgroundColor: 'var(--background)',
-                                                borderColor: 'var(--foreground)',
+                                                borderColor: 'var(--gray-200)',
+                                                borderRadius: '0.5rem',
+                                                padding: '0.75rem',
                                                 color: 'var(--foreground)'
+                                            }}
+                                            itemStyle={{
+                                                color: 'var(--foreground)'
+                                            }}
+                                            labelStyle={{
+                                                color: 'var(--foreground)'
+                                            }}
+                                            wrapperStyle={{
+                                                outline: 'none',
                                             }}
                                         />
                                         <Legend />
-                                        {comparisonData.map((fund, index) => (
+                                        {selectedFunds.map((fund, index) => (
                                             <Line
                                                 key={fund.code}
                                                 type="monotone"
-                                                data={[
-                                                    { date: '1A', value: fund.yield_1m },
-                                                    { date: '3A', value: fund.yield_3m },
-                                                    { date: '6A', value: fund.yield_6m },
-                                                    { date: 'YTD', value: fund.yield_ytd },
-                                                    { date: '1Y', value: fund.yield_1y },
-                                                    { date: '3Y', value: fund.yield_3y },
-                                                    { date: '5Y', value: fund.yield_5y },
-                                                ]}
-                                                name={fund.code}
-                                                dataKey="value"
-                                                stroke={COLORS[index]}
-                                                dot={true}
+                                                dataKey={fund.code}
+                                                stroke={COLORS[index % COLORS.length]}
+                                                strokeWidth={2}
+                                                dot={false}
                                             />
                                         ))}
                                     </LineChart>

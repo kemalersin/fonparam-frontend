@@ -10,7 +10,8 @@ const navigation = [
     { name: 'Fonlar', href: '/funds' },
     { name: 'Şirketler', href: '/companies' },
     { name: 'Karşılaştır', href: '/compare' },
-    { name: 'Favoriler', href: '/favorites' },    
+    { name: 'Favoriler', href: '/favorites' },
+    { name: 'Analizler', href: '/analyses' },
 ];
 
 function classNames(...classes: string[]) {

@@ -1,4 +1,6 @@
-import { openDB, IDBPDatabase } from 'idb';
+import { getDB } from './db';
+
+const STORE_NAME = 'comparison';
 
 export interface ComparisonFund {
     code: string;
@@ -7,42 +9,6 @@ export interface ComparisonFund {
     management_company_title: string;
     management_company_logo?: string;
     added_at: Date;
-}
-
-const DB_NAME = 'fonparam';
-const STORE_NAME = 'comparison';
-const DB_VERSION = 3;
-
-let dbPromise: Promise<IDBPDatabase> | null = null;
-
-async function getDB(): Promise<IDBPDatabase> {
-    if (!dbPromise) {
-        dbPromise = openDB(DB_NAME, DB_VERSION, {
-            upgrade(db, oldVersion, newVersion) {
-                if (!db.objectStoreNames.contains('favorites')) {
-                    const favoritesStore = db.createObjectStore('favorites', { keyPath: 'code' });
-                    favoritesStore.createIndex('added_at', 'added_at');
-                    favoritesStore.createIndex('management_company_id', 'management_company_id');
-                }
-                
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    const comparisonStore = db.createObjectStore(STORE_NAME, { keyPath: 'code' });
-                    comparisonStore.createIndex('added_at', 'added_at');
-                }
-            },
-            blocked() {
-                console.warn('Veritabanı güncellemesi engellendi. Lütfen tüm sekmeleri kapatıp tekrar deneyin.');
-            },
-            blocking() {
-                console.warn('Bu sekme veritabanı güncellemesini engelliyor.');
-            },
-            terminated() {
-                console.error('Veritabanı bağlantısı beklenmedik şekilde sonlandı.');
-                dbPromise = null;
-            }
-        });
-    }
-    return dbPromise;
 }
 
 export const addToComparison = async (fund: Omit<ComparisonFund, 'added_at'>): Promise<void> => {

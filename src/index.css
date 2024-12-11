@@ -8,6 +8,9 @@
     --foreground: #111827;
     --scrollbar-track: #e5e7eb;
     --scrollbar-thumb: #9ca3af;
+    --gray-200: #e5e7eb;
+    --green-600: #16a34a;
+    --red-600: #dc2626;
   }
 
   :root[class~="dark"] {
@@ -15,6 +18,9 @@
     --foreground: #f3f4f6;
     --scrollbar-track: #374151;
     --scrollbar-thumb: #4b5563;
+    --gray-200: #374151;
+    --green-600: #22c55e;
+    --red-600: #ef4444;
   }
 }
 

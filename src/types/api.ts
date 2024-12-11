@@ -83,4 +83,16 @@ export interface FundAnalysis {
         totalYield: number;
         totalYieldPercentage: number;
     }[];
+}
+
+export type YearlyIncreaseType = 'percentage' | 'amount';
+
+export interface AnalysisParams {
+    startDate: string;
+    initialInvestment: number;
+    monthlyInvestment: number;
+    yearlyIncrease: {
+        type: YearlyIncreaseType;
+        value: number;
+    };
 } 

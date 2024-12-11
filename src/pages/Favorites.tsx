@@ -5,7 +5,7 @@ import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { removeFavorite, getFavorites } from '../services/favorites';
 import { useFunds } from '../hooks/useApi';
 import ComparisonButton from '../components/ComparisonButton';
-import Toast from '../components/Toast';
+import { useToast } from '../contexts/ToastContext';
 import { formatPercent } from '../utils/format';
 import EmptyState from '../components/EmptyState';
 
@@ -77,11 +77,7 @@ export default function Favorites() {
     const [favorites, setFavorites] = useState<FundWithDetails[]>([]);
     const [favoriteCodes, setFavoriteCodes] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'warning' | 'info'; message: string }>({
-        show: false,
-        type: 'info',
-        message: ''
-    });
+    const { showToast } = useToast();
 
     // Favori fonları yükle
     useEffect(() => {
@@ -93,11 +89,7 @@ export default function Favorites() {
                 setFavoriteCodes(codes);
             } catch (error) {
                 console.error('Favoriler yüklenirken hata:', error);
-                setToast({
-                    show: true,
-                    type: 'error',
-                    message: 'Favoriler yüklenirken bir hata oluştu.'
-                });
+                showToast('Favoriler yüklenirken bir hata oluştu.', 'error');
             } finally {
                 setIsLoading(false);
             }
@@ -159,18 +151,10 @@ export default function Favorites() {
             if (newFavorites.length === 0) {
                 setFavorites([]);
             }
-            setToast({
-                show: true,
-                type: 'success',
-                message: 'Fon favorilerden kaldırıldı.'
-            });
+            showToast('Fon favorilerden kaldırıldı.', 'success');
         } catch (error) {
             console.error('Favori kaldırma işlemi başarısız:', error);
-            setToast({
-                show: true,
-                type: 'error',
-                message: 'Favori kaldırma işlemi başarısız oldu.'
-            });
+            showToast('Favori kaldırma işlemi başarısız oldu.', 'error');
         }
     };
 
@@ -196,13 +180,6 @@ export default function Favorites() {
 
     return (
         <div>
-            <Toast
-                show={toast.show}
-                type={toast.type}
-                message={toast.message}
-                onClose={() => setToast(prev => ({ ...prev, show: false }))}
-            />
-
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>

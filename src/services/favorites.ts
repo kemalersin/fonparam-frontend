@@ -1,4 +1,6 @@
-import { openDB, IDBPDatabase } from 'idb';
+import { getDB } from './db';
+
+const STORE_NAME = 'favorites';
 
 export interface FavoriteFund {
     code: string;
@@ -8,40 +10,6 @@ export interface FavoriteFund {
     management_company_title: string;
     management_company_logo?: string;
     added_at: Date;
-}
-
-const DB_NAME = 'fonparam';
-const STORE_NAME = 'favorites';
-const DB_VERSION = 3;
-
-let dbPromise: Promise<IDBPDatabase> | null = null;
-
-async function getDB(): Promise<IDBPDatabase> {
-    if (!dbPromise) {
-        dbPromise = openDB(DB_NAME, DB_VERSION, {
-            upgrade(db, oldVersion, newVersion) {
-                // Eğer favorites store yoksa oluştur
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    const store = db.createObjectStore(STORE_NAME, { keyPath: 'code' });
-                    // Ekleme tarihine göre indeks
-                    store.createIndex('added_at', 'added_at');
-                    // Şirket ID'sine göre indeks
-                    store.createIndex('management_company_id', 'management_company_id');
-                }
-            },
-            blocked() {
-                console.warn('Veritabanı güncellemesi engellendi. Lütfen tüm sekmeleri kapatıp tekrar deneyin.');
-            },
-            blocking() {
-                console.warn('Bu sekme veritabanı güncellemesini engelliyor.');
-            },
-            terminated() {
-                console.error('Veritabanı bağlantısı beklenmedik şekilde sonlandı.');
-                dbPromise = null;
-            }
-        });
-    }
-    return dbPromise;
 }
 
 export const addFavorite = async (fund: Omit<FavoriteFund, 'added_at'>): Promise<void> => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import { ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
-import Toast from './Toast';
+import { useToast } from '../contexts/ToastContext';
 
 interface ComparisonButtonProps {
     fund: {
@@ -18,11 +18,7 @@ interface ComparisonButtonProps {
 export default function ComparisonButton({ fund, className }: ComparisonButtonProps) {
     const [isInList, setIsInList] = useState(false);
     const [isChecking, setIsChecking] = useState(false);
-    const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'warning' | 'info'; message: string }>({
-        show: false,
-        type: 'info',
-        message: ''
-    });
+    const { showToast } = useToast();
 
     useEffect(() => {
         const checkComparisonStatus = async () => {
@@ -47,11 +43,7 @@ export default function ComparisonButton({ fund, className }: ComparisonButtonPr
             if (isInList) {
                 await removeFromComparison(fund.code);
                 setIsInList(false);
-                setToast({
-                    show: true,
-                    type: 'info',
-                    message: 'Fon karşılaştırma listesinden kaldırıldı.'
-                });
+                showToast('Fon karşılaştırma listesinden kaldırıldı.', 'info');
             } else {
                 await addToComparison({
                     code: fund.code,
@@ -61,26 +53,14 @@ export default function ComparisonButton({ fund, className }: ComparisonButtonPr
                     management_company_logo: fund.management_company_logo
                 });
                 setIsInList(true);
-                setToast({
-                    show: true,
-                    type: 'success',
-                    message: 'Fon karşılaştırma listesine eklendi.'
-                });
+                showToast('Fon karşılaştırma listesine eklendi.', 'success');
             }
         } catch (error) {
             if (error instanceof Error) {
-                setToast({
-                    show: true,
-                    type: 'warning',
-                    message: error.message
-                });
+                showToast(error.message, 'warning');
             } else {
                 console.error('Karşılaştırma listesi işlemi başarısız:', error);
-                setToast({
-                    show: true,
-                    type: 'error',
-                    message: 'Karşılaştırma listesi işlemi başarısız oldu.'
-                });
+                showToast('Karşılaştırma listesi işlemi başarısız oldu.', 'error');
             }
         } finally {
             setIsChecking(false);
@@ -88,26 +68,18 @@ export default function ComparisonButton({ fund, className }: ComparisonButtonPr
     };
 
     return (
-        <>
-            <button
-                onClick={handleClick}
-                disabled={isChecking}
-                className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center ${className || ''}`}
-            >
-                {isChecking ? (
-                    <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
-                ) : isInList ? (
-                    <ArrowsRightLeftIconSolid className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-                ) : (
-                    <ArrowsRightLeftIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" />
-                )}
-            </button>
-            <Toast
-                show={toast.show}
-                type={toast.type}
-                message={toast.message}
-                onClose={() => setToast(prev => ({ ...prev, show: false }))}
-            />
-        </>
+        <button
+            onClick={handleClick}
+            disabled={isChecking}
+            className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center ${className || ''}`}
+        >
+            {isChecking ? (
+                <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
+            ) : isInList ? (
+                <ArrowsRightLeftIconSolid className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            ) : (
+                <ArrowsRightLeftIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" />
+            )}
+        </button>
     );
 } 

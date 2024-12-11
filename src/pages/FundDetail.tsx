@@ -8,6 +8,16 @@ import { Combobox } from '@headlessui/react';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import ComparisonButton from '../components/ComparisonButton';
 import { formatPercent, formatCurrency, formatNumber, formatDate } from '../utils/format';
+import { saveAnalysis } from '../services/analysis';
+import type { YearlyIncreaseType } from '../types/api';
+import { useToast } from '../contexts/ToastContext';
+import { 
+    DEFAULT_INVESTMENT_PERIOD,
+    DEFAULT_INITIAL_INVESTMENT,
+    DEFAULT_MONTHLY_INVESTMENT,
+    DEFAULT_INCREASE_TYPE,
+    DEFAULT_INCREASE_VALUE
+} from '../constants';
 
 const PERIODS = [
     { label: 'Son 1 Ay', value: 'last_1_month' },
@@ -41,25 +51,17 @@ const getStartDate = (period: string): string => {
     }
 };
 
-const INCREASE_TYPES = [
+const INCREASE_TYPES: { id: YearlyIncreaseType; name: string; symbol: string }[] = [
     { id: 'percentage', name: 'Yüzde', symbol: '%' },
     { id: 'amount', name: 'Tutar', symbol: '₺' }
 ];
-
-const DEFAULT_VALUES = {
-    PERIOD: 'last_1_year',
-    INITIAL_INVESTMENT: 10000,
-    MONTHLY_INVESTMENT: 1000,
-    YEARLY_INCREASE_TYPE: 'percentage' as const,
-    YEARLY_INCREASE_VALUE: 10
-};
 
 export default function FundDetail() {
     const { code } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     
     const [selectedPeriod, setSelectedPeriod] = useState(() => 
-        searchParams.get('period') || localStorage.getItem('selectedPeriod') || DEFAULT_VALUES.PERIOD
+        searchParams.get('period') || DEFAULT_INVESTMENT_PERIOD
     );
     
     const [showMonthlyDetails, setShowMonthlyDetails] = useState(() => {
@@ -68,15 +70,18 @@ export default function FundDetail() {
     });
     const [isFavorited, setIsFavorited] = useState(false);
     const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
-    const [analysisParams, setAnalysisParams] = useState<AnalysisParams>(() => ({
-        initialInvestment: Number(searchParams.get('initial')) || DEFAULT_VALUES.INITIAL_INVESTMENT,
-        monthlyInvestment: Number(searchParams.get('monthly')) || DEFAULT_VALUES.MONTHLY_INVESTMENT,
-        yearlyIncrease: {
-            type: (searchParams.get('increaseType') as 'percentage' | 'amount') || DEFAULT_VALUES.YEARLY_INCREASE_TYPE,
-            value: Number(searchParams.get('increaseValue')) || DEFAULT_VALUES.YEARLY_INCREASE_VALUE
-        },
-        startDate: selectedPeriod
-    }));
+    const [analysisParams, setAnalysisParams] = useState<AnalysisParams>(() => {
+        const increaseType = searchParams.get('increaseType');
+        return {
+            initialInvestment: Number(searchParams.get('initial')) || DEFAULT_INITIAL_INVESTMENT,
+            monthlyInvestment: Number(searchParams.get('monthly')) || DEFAULT_MONTHLY_INVESTMENT,
+            yearlyIncrease: {
+                type: (increaseType === 'percentage' || increaseType === 'amount') ? increaseType : DEFAULT_INCREASE_TYPE,
+                value: Number(searchParams.get('increaseValue')) || DEFAULT_INCREASE_VALUE
+            },
+            startDate: selectedPeriod
+        };
+    });
 
     const [debouncedAnalysisParams, setDebouncedAnalysisParams] = useState(analysisParams);
 
@@ -105,15 +110,13 @@ export default function FundDetail() {
         includeMonthlyDetails: true
     });
 
+    const { showToast } = useToast();
+
     useEffect(() => {
         if (analysis) {
             setAnalysisData(analysis);
         }
     }, [analysis]);
-
-    useEffect(() => {
-        localStorage.setItem('selectedPeriod', selectedPeriod);
-    }, [selectedPeriod]);
 
     useEffect(() => {
         setAnalysisParams(prev => ({
@@ -171,31 +174,31 @@ export default function FundDetail() {
     useEffect(() => {
         const params = new URLSearchParams(searchParams);
         
-        if (selectedPeriod !== DEFAULT_VALUES.PERIOD) {
+        if (selectedPeriod !== DEFAULT_INVESTMENT_PERIOD) {
             params.set('period', selectedPeriod);
         } else {
             params.delete('period');
         }
         
-        if (analysisParams.initialInvestment !== DEFAULT_VALUES.INITIAL_INVESTMENT) {
+        if (analysisParams.initialInvestment !== DEFAULT_INITIAL_INVESTMENT) {
             params.set('initial', analysisParams.initialInvestment.toString());
         } else {
             params.delete('initial');
         }
         
-        if (analysisParams.monthlyInvestment !== DEFAULT_VALUES.MONTHLY_INVESTMENT) {
+        if (analysisParams.monthlyInvestment !== DEFAULT_MONTHLY_INVESTMENT) {
             params.set('monthly', analysisParams.monthlyInvestment.toString());
         } else {
             params.delete('monthly');
         }
         
-        if (analysisParams.yearlyIncrease.type !== DEFAULT_VALUES.YEARLY_INCREASE_TYPE) {
+        if (analysisParams.yearlyIncrease.type !== DEFAULT_INCREASE_TYPE) {
             params.set('increaseType', analysisParams.yearlyIncrease.type);
         } else {
             params.delete('increaseType');
         }
 
-        if (analysisParams.yearlyIncrease.value !== DEFAULT_VALUES.YEARLY_INCREASE_VALUE) {
+        if (analysisParams.yearlyIncrease.value !== DEFAULT_INCREASE_VALUE) {
             params.set('increaseValue', analysisParams.yearlyIncrease.value.toString());
         } else {
             params.delete('increaseValue');
@@ -203,6 +206,42 @@ export default function FundDetail() {
         
         setSearchParams(params, { replace: true });
     }, [selectedPeriod, analysisParams]);
+
+    const handleSaveAnalysis = async () => {
+        if (!currentFund || !analysis) {
+            showToast('Analiz verisi henüz yüklenmedi', 'error');
+            return;
+        }
+
+        try {
+            const record = {
+                fund: {
+                    code: currentFund.code,
+                    title: currentFund.title,
+                    management_company_id: currentFund.management_company_id,
+                    management_company_title: currentFund.management_company?.title ?? '',
+                    management_company_logo: currentFund.management_company?.logo
+                },
+                parameters: {
+                    initialInvestment: analysisParams.initialInvestment,
+                    monthlyInvestment: analysisParams.monthlyInvestment,
+                    yearlyIncrease: analysisParams.yearlyIncrease,
+                    startDate: analysisParams.startDate
+                },
+                summary: {
+                    totalInvestment: analysis.summary.totalInvestment,
+                    totalYield: analysis.summary.totalYield,
+                    currentValue: analysis.summary.currentValue,
+                    totalYieldPercentage: analysis.summary.totalYieldPercentage
+                }
+            };
+
+            await saveAnalysis(record);
+            showToast('Analiz kaydedildi', 'success');
+        } catch (error) {
+            showToast('Analiz kaydedilemedi. Lütfen tekrar deneyin.', 'error');
+        }
+    };
 
     if (isLoadingFund) {
         return (
@@ -223,7 +262,7 @@ export default function FundDetail() {
                 <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Belirtilen fon koduna sahip bir fon bulunamadı.</p>
                 <div className="mt-6">
                     <Link to="/funds" className="text-base font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400">
-                        Fon Listesine Dön <span aria-hidden="true">&rarr;</span>
+                        Fon Listesine D��n <span aria-hidden="true">&rarr;</span>
                     </Link>
                 </div>
             </div>
@@ -479,7 +518,7 @@ export default function FundDetail() {
                                             initialInvestment: Number(e.target.value),
                                         })
                                     }
-                                    placeholder={DEFAULT_VALUES.INITIAL_INVESTMENT.toString()}
+                                    placeholder={DEFAULT_INITIAL_INVESTMENT.toString()}
                                     className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -502,7 +541,7 @@ export default function FundDetail() {
                                             monthlyInvestment: Number(e.target.value),
                                         })
                                     }
-                                    placeholder={DEFAULT_VALUES.MONTHLY_INVESTMENT.toString()}
+                                    placeholder={DEFAULT_MONTHLY_INVESTMENT.toString()}
                                     className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                 />
                             </div>
@@ -594,7 +633,7 @@ export default function FundDetail() {
                                                 }
                                             })
                                         }
-                                        placeholder={DEFAULT_VALUES.YEARLY_INCREASE_VALUE.toString()}
+                                        placeholder={DEFAULT_INCREASE_VALUE.toString()}
                                         className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                                     />
                                 </div>
@@ -646,9 +685,20 @@ export default function FundDetail() {
             {analysisData && showMonthlyDetails && analysisData.monthlyDetails && (
                 <div 
                     id="monthly-details-table" 
-                    className={`bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32 ${isAnalysisLoading ? 'opacity-50' : ''}`}
+                    className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32"
                 >
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">Aylık Detaylar</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Aylık Detaylar</h2>
+                        <button
+                            onClick={handleSaveAnalysis}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                            </svg>
+                            Kaydet
+                        </button>
+                    </div>
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                             <thead>

@@ -5,7 +5,7 @@ import { MagnifyingGlassIcon, ChevronUpIcon, ChevronDownIcon, StarIcon, ArrowsRi
 import { StarIcon as StarIconSolid, ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
-import Toast from '../components/Toast';
+import { useToast } from '../contexts/ToastContext';
 import ComparisonButton from '../components/ComparisonButton';
 import { formatPercent } from '../utils/format';
 
@@ -63,11 +63,7 @@ export default function Funds() {
     const [isInitialized, setIsInitialized] = useState(false);
     const [favoriteStates, setFavoriteStates] = useState<Record<string, boolean>>({});
     const [checkingFavorites, setCheckingFavorites] = useState<Record<string, boolean>>({});
-    const [toast, setToast] = useState<{ show: boolean; type: 'success' | 'error' | 'warning' | 'info'; message: string }>({
-        show: false,
-        type: 'info',
-        message: ''
-    });
+    const { showToast } = useToast();
 
     // İlk yüklemede URL parametrelerini al
     useEffect(() => {
@@ -197,11 +193,7 @@ export default function Funds() {
             if (favoriteStates[fundCode]) {
                 await removeFromComparison(fundCode);
                 setFavoriteStates(prev => ({ ...prev, [fundCode]: false }));
-                setToast({
-                    show: true,
-                    type: 'info',
-                    message: 'Fon karşılaştırma listesinden kaldırıldı.'
-                });
+                showToast('Fon karşılaştırma listesinden kaldırıldı.', 'info');
             } else {
                 await addToComparison({
                     code: fund.code,
@@ -211,26 +203,14 @@ export default function Funds() {
                     management_company_logo: fund.management_company?.logo
                 });
                 setFavoriteStates(prev => ({ ...prev, [fundCode]: true }));
-                setToast({
-                    show: true,
-                    type: 'success',
-                    message: 'Fon karşılaştırma listesine eklendi.'
-                });
+                showToast('Fon karşılaştırma listesine eklendi.', 'success');
             }
         } catch (error) {
             if (error instanceof Error) {
-                setToast({
-                    show: true,
-                    type: 'warning',
-                    message: error.message
-                });
+                showToast(error.message, 'warning');
             } else {
                 console.error('Karşılaştırma listesi işlemi başarısız:', error);
-                setToast({
-                    show: true,
-                    type: 'error',
-                    message: 'Karşılaştırma listesi işlemi başarısız oldu.'
-                });
+                showToast('Karşılaştırma listesi işlemi başarısız oldu.', 'error');
             }
         } finally {
             setCheckingFavorites(prev => ({ ...prev, [fundCode]: false }));
@@ -260,13 +240,6 @@ export default function Funds() {
 
     return (
         <div>
-            <Toast
-                show={toast.show}
-                type={toast.type}
-                message={toast.message}
-                onClose={() => setToast(prev => ({ ...prev, show: false }))}
-            />
-
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
