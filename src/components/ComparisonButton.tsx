@@ -1,58 +1,42 @@
 import { useState, useEffect } from 'react';
 import { ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
-import { ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
+import type { Fund } from '../types/api';
 
 interface ComparisonButtonProps {
-    fund: {
-        code: string;
-        title: string;
-        management_company_id: string;
-        management_company_title: string;
-        management_company_logo?: string;
-    };
+    fund: Pick<Fund, 'code' | 'title' | 'management_company'>;
     className?: string;
 }
 
-export default function ComparisonButton({ fund, className }: ComparisonButtonProps) {
-    const [isInList, setIsInList] = useState(false);
-    const [isChecking, setIsChecking] = useState(false);
+export default function ComparisonButton({ fund, className = '' }: ComparisonButtonProps) {
+    const [isInComparisonList, setIsInComparisonList] = useState(false);
+    const [isCheckingComparison, setIsCheckingComparison] = useState(true);
     const { showToast } = useToast();
 
     useEffect(() => {
-        const checkComparisonStatus = async () => {
-            setIsChecking(true);
-            try {
-                const status = await isInComparison(fund.code);
-                setIsInList(status);
-            } catch (error) {
-                console.error('Karşılaştırma durumu kontrol edilirken hata:', error);
-            } finally {
-                setIsChecking(false);
-            }
-        };
-        checkComparisonStatus();
+        setIsCheckingComparison(true);
+        isInComparison(fund.code)
+            .then(setIsInComparisonList)
+            .finally(() => setIsCheckingComparison(false));
     }, [fund.code]);
 
-    const handleClick = async (event: React.MouseEvent) => {
-        event.stopPropagation();
-        
-        setIsChecking(true);
+    const toggleComparison = async (e: React.MouseEvent) => {
+        e.stopPropagation();
         try {
-            if (isInList) {
+            if (isInComparisonList) {
                 await removeFromComparison(fund.code);
-                setIsInList(false);
+                setIsInComparisonList(false);
                 showToast('Fon karşılaştırma listesinden kaldırıldı.', 'info');
             } else {
                 await addToComparison({
                     code: fund.code,
                     title: fund.title,
-                    management_company_id: fund.management_company_id,
-                    management_company_title: fund.management_company_title,
-                    management_company_logo: fund.management_company_logo
+                    management_company_id: fund.management_company.id,
+                    management_company_title: fund.management_company?.title ?? '',
+                    management_company_logo: fund.management_company?.logo
                 });
-                setIsInList(true);
+                setIsInComparisonList(true);
                 showToast('Fon karşılaştırma listesine eklendi.', 'success');
             }
         } catch (error) {
@@ -62,24 +46,30 @@ export default function ComparisonButton({ fund, className }: ComparisonButtonPr
                 console.error('Karşılaştırma listesi işlemi başarısız:', error);
                 showToast('Karşılaştırma listesi işlemi başarısız oldu.', 'error');
             }
-        } finally {
-            setIsChecking(false);
         }
     };
 
     return (
-        <button
-            onClick={handleClick}
-            disabled={isChecking}
-            className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center ${className || ''}`}
-        >
-            {isChecking ? (
-                <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
-            ) : isInList ? (
-                <ArrowsRightLeftIconSolid className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            ) : (
-                <ArrowsRightLeftIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400" />
-            )}
-        </button>
+        <div className="group relative">
+            <button
+                onClick={toggleComparison}
+                disabled={isCheckingComparison}
+                className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 ${className}`}
+            >
+                {isCheckingComparison ? (
+                    <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
+                ) : (
+                    <ArrowsRightLeftIcon className={`h-4 w-4 ${
+                        isInComparisonList 
+                            ? 'text-indigo-600 dark:text-indigo-400' 
+                            : 'text-gray-400 dark:text-gray-500 hover:text-indigo-600 dark:hover:text-indigo-400'
+                    }`} />
+                )}
+            </button>
+            <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max rounded bg-gray-900 dark:bg-gray-700 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                {isInComparisonList ? 'Karşılaştırmadan Çıkar' : 'Karşılaştırmaya Ekle'}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
+            </div>
+        </div>
     );
 } 

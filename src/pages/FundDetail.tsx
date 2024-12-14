@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi';
+import { useSwipe } from '../hooks/useSwipe';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BanknotesIcon, InformationCircleIcon, StarIcon, ChevronUpDownIcon, CheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { Combobox } from '@headlessui/react';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import ComparisonButton from '../components/ComparisonButton';
+import FavoriteButton from '../components/FavoriteButton';
 import { formatPercent, formatCurrency, formatNumber, formatDate } from '../utils/format';
 import { saveAnalysis } from '../services/analysis';
 import type { AnalysisParams, YearlyIncreaseType } from '../types/api';
@@ -68,6 +70,10 @@ export default function FundDetail() {
     const { code } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     const [performanceSlide, setPerformanceSlide] = useState(0);
+    const swipeHandlers = useSwipe({
+        onSwipeLeft: () => performanceSlide < 1 && setPerformanceSlide(1),
+        onSwipeRight: () => performanceSlide > 0 && setPerformanceSlide(0)
+    });
     
     const [selectedPeriod, setSelectedPeriod] = useState(() => 
         searchParams.get('period') || DEFAULT_INVESTMENT_PERIOD
@@ -111,7 +117,7 @@ export default function FundDetail() {
     });
 
     const [analysisData, setAnalysisData] = useState<typeof analysis>(null);
-    const { data: analysis, isLoading: isAnalysisLoading } = useAnalyzeFund(code ?? '', {
+    const { data: analysis, isLoading: isAnalysisLoading, error: analysisError } = useAnalyzeFund(code ?? '', {
         ...debouncedAnalysisParams,
         includeMonthlyDetails: showMonthlyDetails
     });
@@ -119,10 +125,10 @@ export default function FundDetail() {
     const { showToast } = useToast();
 
     useEffect(() => {
-        if (analysis) {
+        if (analysis && !analysisError) {
             setAnalysisData(analysis);
         }
-    }, [analysis]);
+    }, [analysis, analysisError]);
 
     useEffect(() => {
         setAnalysisParams(prev => ({
@@ -313,19 +319,7 @@ export default function FundDetail() {
                                                 {currentFund.title}
                                             </h1>
                                             <div className="flex gap-1">
-                                                <button
-                                                    onClick={() => toggleFavorite(currentFund.code)}
-                                                    disabled={isCheckingFavorite}
-                                                    className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                                                >
-                                                    {isCheckingFavorite ? (
-                                                        <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
-                                                    ) : isFavorited ? (
-                                                        <StarIconSolid className="h-4 w-4 text-yellow-400" />
-                                                    ) : (
-                                                        <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-yellow-400" />
-                                                    )}
-                                                </button>
+                                                <FavoriteButton fund={currentFund} />
                                                 <ComparisonButton fund={currentFund} />
                                             </div>
                                         </div>
@@ -344,24 +338,30 @@ export default function FundDetail() {
                                             <>
                                                 <span className="hidden sm:inline">•</span>
                                                 <div className="flex flex-wrap items-center gap-y-2 gap-x-1">
-                                                    <span>{formatDate(currentFund.last_historical_value.date)}</span>
+                                                    <span>{formatDate(currentFund.last_historical_value?.date)}</span>
                                                     <span className="mx-1">•</span>
                                                     <BanknotesIcon className="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" />
-                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(currentFund.last_historical_value.value)}</span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                                                        {formatCurrency(currentFund.last_historical_value?.value)}
+                                                    </span>
                                                 </div>
                                             </>
                                             <>
                                                 <span className="hidden sm:inline">•</span>
                                                 <div className="flex flex-wrap items-center gap-y-2 gap-x-1">
                                                     <ChartBarIcon className="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" />
-                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(currentFund.last_historical_value.aum)}</span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                                                        {formatCurrency(currentFund.last_historical_value?.aum)}
+                                                    </span>
                                                 </div>
                                             </>
                                             <>
                                                 <span className="hidden sm:inline">•</span>
                                                 <div className="flex flex-wrap items-center gap-y-2 gap-x-1">
                                                     <UsersIcon className="h-4 w-4 mr-1 text-gray-500 dark:text-gray-400" />
-                                                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatNumber(currentFund.last_historical_value.investor_count)} yatırımcı</span>
+                                                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                                                        {formatNumber(currentFund.last_historical_value?.investor_count)} yatırımcı
+                                                    </span>
                                                 </div>
                                             </>
                                         </div>
@@ -391,6 +391,7 @@ export default function FundDetail() {
                             <div 
                                 className="flex transition-transform duration-500 ease-in-out" 
                                 style={{ transform: `translateX(-${performanceSlide * 100}%)` }}
+                                {...swipeHandlers}
                             >
                                 <div className="w-full flex-shrink-0">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -401,8 +402,8 @@ export default function FundDetail() {
                                             { label: '6 Aylık', value: currentFund.yield_6m },
                                         ].map((item) => (
                                             <div key={item.label} className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg">
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</dt>
-                                                <dd className="mt-1 text-2xl sm:text-3xl font-semibold">
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center sm:text-left">{item.label}</dt>
+                                                <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-center sm:text-left">
                                                     {item.value != null ? (
                                                         <span className={item.value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                                                             {formatPercent(item.value)}
@@ -424,8 +425,8 @@ export default function FundDetail() {
                                             { label: '5 Yıllık', value: currentFund.yield_5y },
                                         ].map((item) => (
                                             <div key={item.label} className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg">
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">{item.label}</dt>
-                                                <dd className="mt-1 text-2xl sm:text-3xl font-semibold">
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center sm:text-left">{item.label}</dt>
+                                                <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-center sm:text-left">
                                                     {item.value != null ? (
                                                         <span className={item.value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
                                                             {formatPercent(item.value)}
@@ -566,7 +567,7 @@ export default function FundDetail() {
                                     type="button"
                                     className={`${
                                         showMonthlyDetails ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'
-                                    } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800`}
+                                    } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800`}
                                     role="switch"
                                     aria-checked={showMonthlyDetails}
                                     onClick={() => handleMonthlyDetailsToggle(!showMonthlyDetails)}
@@ -722,7 +723,7 @@ export default function FundDetail() {
                                 </div>
                             </div>
 
-                            {analysisData && (
+                            {analysisData && !analysisError && (
                                 <div className="lg:col-span-2">
                                     <dl className={`grid grid-cols-1 gap-6 sm:grid-cols-2 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
                                         <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
@@ -758,6 +759,16 @@ export default function FundDetail() {
                                             </dd>
                                         </div>
                                     </dl>
+                                </div>
+                            )}
+
+                            {analysisError && (
+                                <div className="lg:col-span-2">
+                                    <div className="bg-red-50 dark:bg-red-900/50 p-4 rounded-lg">
+                                        <p className="text-sm text-red-600 dark:text-red-400">
+                                            Analiz hesaplanamadı. Lütfen daha sonra tekrar deneyin.
+                                        </p>
+                                    </div>
                                 </div>
                             )}
                         </div>

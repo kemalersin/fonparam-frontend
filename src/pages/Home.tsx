@@ -4,6 +4,7 @@ import { useTopPerformingFunds } from '../hooks/useApi';
 import { formatPercent } from '../utils/format';
 import RecentlyViewedFunds from '../components/RecentlyViewedFunds';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
+import { useSwipe } from '../hooks/useSwipe';
 import { 
     ChartBarIcon, 
     BuildingOfficeIcon, 
@@ -74,8 +75,8 @@ const marketSummary = [
 
 export default function Home() {
     const { data: topFunds, isLoading } = useTopPerformingFunds();
-    const [search, setSearch] = useState('');
-    const [activeSlide, setActiveSlide] = useState(0);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [currentSlide, setCurrentSlide] = useState(0);
     const navigate = useNavigate();
 
     const [heroRef, isHeroVisible] = useIntersectionObserver();
@@ -85,10 +86,15 @@ export default function Home() {
     const [guidesRef, isGuidesVisible] = useIntersectionObserver();
     const [recentRef, isRecentVisible] = useIntersectionObserver();
 
+    const swipeHandlers = useSwipe({
+        onSwipeLeft: () => currentSlide < slides.length - 1 && setCurrentSlide(currentSlide + 1),
+        onSwipeRight: () => currentSlide > 0 && setCurrentSlide(currentSlide - 1)
+    });
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        if (search.trim()) {
-            navigate(`/funds?search=${encodeURIComponent(search.trim())}`);
+        if (searchQuery.trim()) {
+            navigate(`/funds?search=${encodeURIComponent(searchQuery.trim())}`);
         }
     };
 
@@ -101,14 +107,14 @@ export default function Home() {
     };
 
     useEffect(() => {
-        if (!isLoading && topFunds?.length) {
-            const timer = setInterval(() => {
-                setActiveSlide(current => (current + 1) % 2);
-            }, 5000); // Her 5 saniyede bir geçiş yap
+        const timer = setInterval(() => {
+            setCurrentSlide((current) => (current + 1) % slides.length);
+        }, 5000);
 
-            return () => clearInterval(timer);
-        }
-    }, [isLoading, topFunds]);
+        return () => clearInterval(timer);
+    }, []);
+
+    const slides = getFundGroups();
 
     return (
         <div className="space-y-8">
@@ -136,8 +142,8 @@ export default function Home() {
                             type="text"
                             className="block w-full rounded-lg border-0 py-3 pl-10 pr-4 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-900 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
                             placeholder="Fon kodu veya adı ile arayın..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                 </form>
@@ -228,9 +234,10 @@ export default function Home() {
                         <div className="relative overflow-hidden">
                             <div 
                                 className="flex transition-transform duration-500 ease-in-out" 
-                                style={{ transform: `translateX(-${activeSlide * 100}%)` }}
+                                style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                                {...swipeHandlers}
                             >
-                                {getFundGroups().map((group, groupIdx) => (
+                                {slides.map((group, groupIdx) => (
                                     <div 
                                         key={groupIdx}
                                         className="w-full flex-shrink-0 space-y-6 sm:space-y-4"
@@ -280,13 +287,13 @@ export default function Home() {
                                 ))}
                             </div>
                         </div>
-                        <div className="flex justify-center gap-2 mt-6">
-                            {getFundGroups().map((_, idx) => (
+                        <div className="flex justify-center gap-2 mt-4">
+                            {slides.map((_, index) => (
                                 <button
-                                    key={idx}
-                                    onClick={() => setActiveSlide(idx)}
+                                    key={index}
+                                    onClick={() => setCurrentSlide(index)}
                                     className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                                        activeSlide === idx
+                                        currentSlide === index
                                             ? 'bg-indigo-600 dark:bg-indigo-500'
                                             : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
                                     }`}

@@ -7,6 +7,7 @@ import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
 import ComparisonButton from '../components/ComparisonButton';
+import FavoriteButton from '../components/FavoriteButton';
 import SortHeader from '../components/SortHeader';
 import { formatPercent } from '../utils/format';
 import EmptyState from '../components/EmptyState';
@@ -396,17 +397,7 @@ export default function Funds() {
                                                             </Link>
                                                             <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
                                                             <div className="flex gap-1">
-                                                                <button
-                                                                    onClick={(e) => handleFavoriteClick(e, fund)}
-                                                                    className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
-                                                                    disabled={checkingFavorites[fund.code]}
-                                                                >
-                                                                    {favoriteStates[fund.code] ? (
-                                                                        <StarIconSolid className="h-4 w-4 text-yellow-400" />
-                                                                    ) : (
-                                                                        <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                                                                    )}
-                                                                </button>
+                                                                <FavoriteButton fund={fund} />
                                                                 <ComparisonButton fund={fund} />
                                                             </div>
                                                         </div>
