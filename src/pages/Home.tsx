@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTopPerformingFunds } from '../hooks/useApi';
 import { formatPercent } from '../utils/format';
 import RecentlyViewedFunds from '../components/RecentlyViewedFunds';
-import { Tab } from '@headlessui/react';
+import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { 
     ChartBarIcon, 
     BuildingOfficeIcon, 
@@ -20,22 +20,22 @@ import {
 const stats = [
     {
         name: 'Toplam Fon',
-        value: '500+',
+        value: '1500+',
         description: 'Aktif olarak işlem gören'
     },
     {
         name: 'Portföy Yönetim Şirketi',
-        value: '50+',
+        value: '70+',
         description: 'Türkiye genelinde'
     },
     {
-        name: 'Günlük İşlem Hacmi',
-        value: '₺1.2B+',
+        name: 'Yatırımcı Sayısı',
+        value: '10Mn+',
         description: 'Ortalama'
     },
     {
         name: 'Toplam Portföy Büyüklüğü',
-        value: '₺450B+',
+        value: '₺4Tr+',
         description: 'Yönetilen varlık'
     }
 ];
@@ -78,6 +78,13 @@ export default function Home() {
     const [activeSlide, setActiveSlide] = useState(0);
     const navigate = useNavigate();
 
+    const [heroRef, isHeroVisible] = useIntersectionObserver();
+    const [statsRef, isStatsVisible] = useIntersectionObserver();
+    const [topFundsRef, isTopFundsVisible] = useIntersectionObserver();
+    const [marketRef, isMarketVisible] = useIntersectionObserver();
+    const [guidesRef, isGuidesVisible] = useIntersectionObserver();
+    const [recentRef, isRecentVisible] = useIntersectionObserver();
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (search.trim()) {
@@ -106,16 +113,21 @@ export default function Home() {
     return (
         <div className="space-y-8">
             {/* Hero Section */}
-            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center animate-fade-in">
+            <div 
+                ref={heroRef}
+                className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center transition-opacity duration-1000 ${
+                    isHeroVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
                 <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 animate-slide-down">
                     Türkiye'nin Yatırım Fonu Verileri
                 </h1>
                 <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto animate-slide-up">
-                    Tüm yatırım fonlarının güncel ve geçmiş verilerine erişin, karşılaştırmalar yapın, yatırımlarınızı analiz edin
+                    Yatırım fonlarının güncel ve geçmiş verilerine erişin, karşılaştırmalar yapın, yatırımlarınızı analiz edin
                 </p>
 
                 {/* Search */}
-                <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-8" style={{ animationDelay: '200ms' }}>
                     <div className="relative">
                         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -131,7 +143,7 @@ export default function Home() {
                 </form>
 
                 {/* Quick Links */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-fade-in" style={{ animationDelay: '400ms' }}>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4" style={{ animationDelay: '400ms' }}>
                     <Link
                         to="/funds"
                         className="flex items-center justify-center p-6 bg-white dark:bg-gray-900 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-sm hover:shadow-lg transform hover:scale-105"
@@ -166,17 +178,22 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div 
+                ref={statsRef}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${
+                    isStatsVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
                 <div className="mx-auto max-w-7xl">
                     <dl className="grid grid-cols-1 gap-x-8 gap-y-8 sm:gap-y-0 sm:grid-cols-2 lg:grid-cols-4 p-8">
                         {stats.map((stat, index) => (
                             <div 
                                 key={stat.name} 
-                                className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8 animate-fade-in"
+                                className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
                                 style={{ animationDelay: `${index * 100}ms` }}
                             >
                                 <dt className="text-sm leading-6 text-gray-600 dark:text-gray-400">{stat.name}</dt>
-                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100 animate-count">
+                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
                                     {stat.value}
                                 </dd>
                                 <p className="text-xs text-gray-500 dark:text-gray-500">{stat.description}</p>
@@ -187,7 +204,12 @@ export default function Home() {
             </div>
 
             {/* Top Performing Funds */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+            <div 
+                ref={topFundsRef}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-opacity duration-1000 ${
+                    isTopFundsVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">En İyi Performans Gösteren Fonlar</h2>
                     <Link to="/funds" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
@@ -196,7 +218,7 @@ export default function Home() {
                 </div>
 
                 {isLoading ? (
-                    <div className="animate-pulse space-y-4">
+                    <div className="space-y-4">
                         {[...Array(5)].map((_, i) => (
                             <div key={i} className="h-16 bg-gray-100 dark:bg-gray-700 rounded"></div>
                         ))}
@@ -225,7 +247,7 @@ export default function Home() {
                                                             className="flex-shrink-0 hover:opacity-75 cursor-pointer"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                window.location.href = `/companies/${fund.management_company_id}`;
+                                                                window.location.href = `/companies/${fund.management_company.code}`;
                                                             }}
                                                         >
                                                             {fund.management_company?.logo ? (
@@ -275,40 +297,13 @@ export default function Home() {
                 )}
             </div>
 
-            {/* Education Section */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-                <div className="mx-auto max-w-7xl px-6 py-8">
-                    <div className="text-center mb-8">
-                        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Yatırım Fonu Rehberi</h2>
-                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                            Yatırım fonları hakkında temel bilgiler ve yatırım stratejileri
-                        </p>
-                    </div>
-                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-                        {guides.map((guide) => (
-                            <div
-                                key={guide.title}
-                                className="relative flex flex-col gap-6 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors cursor-pointer group"
-                            >
-                                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-500 dark:bg-indigo-600 group-hover:bg-indigo-600 dark:group-hover:bg-indigo-500 transition-colors">
-                                    <guide.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">
-                                        {guide.title}
-                                    </h3>
-                                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                        {guide.description}
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
             {/* Market Summary */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div 
+                ref={marketRef}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${
+                    isMarketVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
                 <div className="mx-auto max-w-7xl px-6 py-8">
                     <div className="flex justify-between items-center mb-8">
                         <div>
@@ -338,7 +333,7 @@ export default function Home() {
                                         %{item.value}
                                     </p>
                                 </div>
-                                <div className="animate-pulse-slow">
+                                <div>
                                     {item.trend === 'up' ? (
                                         <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
                                     ) : (
@@ -351,8 +346,34 @@ export default function Home() {
                 </div>
             </div>
 
+            {/* Guides */}
+            <div 
+                ref={guidesRef}
+                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-1000 ${
+                    isGuidesVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+                {guides.map((guide) => (
+                    <div
+                        key={guide.title}
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
+                    >
+                        <guide.icon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{guide.title}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{guide.description}</p>
+                    </div>
+                ))}
+            </div>
+
             {/* Recently Viewed Funds */}
-            <RecentlyViewedFunds />
+            <div 
+                ref={recentRef}
+                className={`transition-opacity duration-1000 ${
+                    isRecentVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+                <RecentlyViewedFunds />
+            </div>
         </div>
     );
 } 

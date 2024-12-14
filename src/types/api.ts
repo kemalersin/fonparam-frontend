@@ -1,3 +1,20 @@
+export interface FundType {
+    type: string;
+    short_name: string;
+    long_name: string;
+    group_name: string;
+}
+
+export interface FundHistoricalValue {
+    code?: string;
+    value: number;
+    aum: number;
+    shares_active: number;
+    cumulative_cashflow: number;
+    date: string;
+    investor_count: number;
+}
+
 export interface FundManagementCompany {
     code: string;
     title: string;
@@ -6,6 +23,7 @@ export interface FundManagementCompany {
 
 export interface CompanyListItem extends FundManagementCompany {
     total_funds: number;
+    avg_yield_1d?: number;
     avg_yield_1m?: number;
     avg_yield_6m?: number;
     avg_yield_ytd?: number;
@@ -14,23 +32,18 @@ export interface CompanyListItem extends FundManagementCompany {
     avg_yield_5y?: number;
 }
 
-export interface CompanyStatistics {
-    total_funds: number;
-    avg_yield_1m?: number;
-    avg_yield_6m?: number;
-    avg_yield_ytd?: number;
-    avg_yield_1y?: number;
-    avg_yield_3y?: number;
-    avg_yield_5y?: number;
-    best_performing_funds?: FundYield[];
+export interface CompanyDetails extends CompanyListItem {
+    best_performing_funds?: Fund[];
+    funds?: Fund[];
 }
 
-export interface FundYield {
+export interface Fund {
     code: string;
-    management_company_id: string;
     title: string;
-    type: 'Hisse Senedi' | 'Borçlanma Araçları' | 'Karma' | 'Para Piyasası' | 'Altın' | 'Serbest' | 'Diğer';
-    tefas?: boolean;
+    type: string;
+    tefas: boolean;
+    yield_1d?: number;    
+    yield_1w?: number;    
     yield_1m?: number;
     yield_3m?: number;
     yield_6m?: number;
@@ -38,26 +51,9 @@ export interface FundYield {
     yield_1y?: number;
     yield_3y?: number;
     yield_5y?: number;
-    management_company?: FundManagementCompany;
-}
-
-export interface FundHistoricalValue {
-    code: string;
-    date: string;
-    value: number;
-}
-
-export interface PaginatedResponse<T> {
-    total: number;
-    page: number;
-    limit: number;
-    data: T[];
-}
-
-export interface CompanyDetails {
-    company: FundManagementCompany;
-    stats: CompanyStatistics;
-    funds?: FundYield[];
+    management_company: FundManagementCompany;
+    fund_type: FundType;
+    last_historical_value: FundHistoricalValue;
 }
 
 export interface FundAnalysis {
@@ -70,7 +66,7 @@ export interface FundAnalysis {
         totalYield: number;
         totalYieldPercentage: number;
     };
-    monthlyDetails?: {
+    periodDetails?: {
         date: string;
         investment: number;
         totalInvestment: number;
@@ -78,11 +74,18 @@ export interface FundAnalysis {
         units: number;
         totalUnits: number;
         value: number;
-        monthlyChange: number;
-        monthlyChangePercentage: number;
+        periodChange: number;
+        periodChangePercentage: number;
         totalYield: number;
         totalYieldPercentage: number;
     }[];
+}
+
+export interface PaginatedResponse<T> {
+    total: number;
+    page: number;
+    limit: number;
+    data: T[];
 }
 
 export type YearlyIncreaseType = 'percentage' | 'amount';

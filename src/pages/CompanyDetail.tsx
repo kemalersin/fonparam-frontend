@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom';
 import { useCompanyDetails } from '../hooks/useApi';
 import { ArrowUpIcon, ArrowDownIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import type { FundYield } from '../types/api';
+import type { Fund } from '../types/api';
 import EmptyState from '../components/EmptyState';
 import { formatPercent, formatNumber } from '../utils/format';
 
@@ -44,13 +44,13 @@ export default function CompanyDetail() {
             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{data.company.title}</h1>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{data.company.code}</p>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{data.title}</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{data.code}</p>
                     </div>
-                    {data.company.logo && (
+                    {data.logo && (
                         <img
-                            src={data.company.logo}
-                            alt={data.company.title}
+                            src={data.logo}
+                            alt={data.title}
                             className="h-16 w-16 object-contain"
                         />
                     )}
@@ -71,7 +71,7 @@ export default function CompanyDetail() {
                                         Toplam Fon Sayısı
                                     </dt>
                                     <dd className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                                        {formatNumber(data.stats.total_funds)}
+                                        {formatNumber(data.total_funds)}
                                     </dd>
                                 </dl>
                             </div>
@@ -80,9 +80,9 @@ export default function CompanyDetail() {
                 </div>
 
                 {[
-                    { label: '1 Aylık', value: data.stats.avg_yield_1m },
-                    { label: '6 Aylık', value: data.stats.avg_yield_6m },
-                    { label: 'Yıllık', value: data.stats.avg_yield_1y },
+                    { label: '1 Aylık', value: data.avg_yield_1m },
+                    { label: '6 Aylık', value: data.avg_yield_6m },
+                    { label: 'Yıllık', value: data.avg_yield_1y },
                 ].map((stat) => (
                     <div key={stat.label} className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                         <div className="p-5">
@@ -113,11 +113,11 @@ export default function CompanyDetail() {
             </div>
 
             {/* Best Performing Funds */}
-            {data.stats.best_performing_funds && data.stats.best_performing_funds.length > 0 && (
+            {data.best_performing_funds && data.best_performing_funds.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">En İyi Performans Gösteren Fonlar</h2>
                     <div className="space-y-4">
-                        {data.stats.best_performing_funds.map((fund) => (
+                        {data.best_performing_funds.map((fund) => (
                             <Link
                                 key={fund.code}
                                 to={`/funds/${fund.code}`}
@@ -147,7 +147,7 @@ export default function CompanyDetail() {
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Tüm Fonlar</h2>
                     {data.funds && data.funds.length > 0 && (
                         <Link
-                            to={`/funds?company=${data.company.code}`}
+                            to={`/funds?company=${data.code}`}
                             className="text-sm font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-500 dark:hover:text-indigo-400"
                         >
                             Tümünü Gör →
@@ -180,9 +180,8 @@ export default function CompanyDetail() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                {(data.funds as FundYield[])
-                                    ?.sort(() => 0.5 - Math.random())
-                                    .slice(0, 20)
+                                {(data.funds as Fund[])
+                                    ?.slice(0, 20)
                                     .map((fund) => (
                                         <tr
                                             key={fund.code}

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MagnifyingGlassIcon, TrashIcon } from '@heroicons/react/24/outline';
-import { getAnalyses, deleteAnalysis } from '../services/analysis';
+import { getAnalyses, deleteAnalysis, AnalysisRecord } from '../services/analysis';
 import { formatDate, formatCurrency, formatPercent } from '../utils/format';
 import EmptyState from '../components/EmptyState';
 import { useToast } from '../contexts/ToastContext';
 import SortHeader from '../components/SortHeader';
+import LoadingOverlay from '../components/LoadingOverlay';
 import { 
     DEFAULT_INVESTMENT_PERIOD,
     DEFAULT_INITIAL_INVESTMENT,
@@ -15,10 +16,12 @@ import {
 } from '../constants';
 
 const PERIODS: Record<string, string> = {
+    'last_1_day': '1 Gün',
+    'last_1_week': '1 Hafta',
     'last_1_month': '1 Ay',
     'last_3_months': '3 Ay',
     'last_6_months': '6 Ay',
-    'year_start': 'YTD',
+    'year_start': 'YBB',
     'last_1_year': '1 Yıl',
     'last_3_years': '3 Yıl',
     'last_5_years': '5 Yıl'
@@ -109,13 +112,15 @@ export default function Analyses() {
                     break;
                 case 'startDate':
                     const periodOrder = {
-                        'last_1_month': 1,
-                        'last_3_months': 2,
-                        'last_6_months': 3,
-                        'year_start': 4,
-                        'last_1_year': 5,
-                        'last_3_years': 6,
-                        'last_5_years': 7
+                        'last_1_day': 1,
+                        'last_1_week': 2,
+                        'last_1_month': 3,
+                        'last_3_months': 4,
+                        'last_6_months': 5,
+                        'year_start': 6,
+                        'last_1_year': 7,
+                        'last_3_years': 8,
+                        'last_5_years': 9
                     };
                     aValue = periodOrder[a.parameters.startDate] || 0;
                     bValue = periodOrder[b.parameters.startDate] || 0;
@@ -174,6 +179,8 @@ export default function Analyses() {
 
     return (
         <div>
+            <LoadingOverlay isLoading={isLoading} />
+            
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -270,13 +277,7 @@ export default function Analyses() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {isLoading ? (
-                                            <tr>
-                                                <td colSpan={9} className="text-center py-4 text-gray-500 dark:text-gray-400">
-                                                    Yükleniyor...
-                                                </td>
-                                            </tr>
-                                        ) : filteredAnalyses.length === 0 ? (
+                                        {(!isLoading && filteredAnalyses.length === 0) ? (
                                             <tr>
                                                 <td colSpan={9}>
                                                     <EmptyState
@@ -295,19 +296,19 @@ export default function Analyses() {
                                                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
                                                         <div className="flex items-center gap-3">
                                                             <Link
-                                                                to={`/companies/${analysis.fund.management_company_id}`}
+                                                                to={`/companies/${analysis.fund.management_company.code}`}
                                                                 className="company-logo flex-shrink-0 hover:opacity-75"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
-                                                                {analysis.fund.management_company_logo ? (
+                                                                {analysis.fund.management_company.logo ? (
                                                                     <img
-                                                                        src={analysis.fund.management_company_logo}
-                                                                        alt={analysis.fund.management_company_title}
+                                                                        src={analysis.fund.management_company.logo}
+                                                                        alt={analysis.fund.management_company.title}
                                                                         className="h-6 w-6 object-contain"
                                                                     />
                                                                 ) : (
                                                                     <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                                        {analysis.fund.management_company_title.charAt(0)}
+                                                                        {analysis.fund.management_company.title.charAt(0)}
                                                                     </div>
                                                                 )}
                                                             </Link>

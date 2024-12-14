@@ -1,8 +1,7 @@
 import axios from 'axios';
 import type { 
-    FundManagementCompany, 
+    Fund,
     CompanyDetails, 
-    FundYield, 
     FundHistoricalValue,
     FundAnalysis,
     PaginatedResponse,
@@ -51,19 +50,19 @@ export const getFunds = async (params?: {
     sort?: string;
     order?: 'ASC' | 'DESC';
 }) => {
-    const { data } = await api.get<PaginatedResponse<FundYield>>('/funds', { params });
+    const { data } = await api.get<PaginatedResponse<Fund>>('/funds', { params });
     return data;
 };
 
 export const getTopPerformingFunds = async (funds?: string) => {
-    const { data } = await api.get<FundYield[]>('/funds/top-performing', {
+    const { data } = await api.get<Fund[]>('/funds/top-performing', {
         params: { funds }
     });
     return data;
 };
 
 export const compareFunds = async (codes: string[]) => {
-    const { data } = await api.get<FundYield[]>('/funds/compare', {
+    const { data } = await api.get<Fund[]>('/funds/compare', {
         params: { codes: codes.join(',') }
     });
     return data;

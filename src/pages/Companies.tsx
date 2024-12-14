@@ -4,6 +4,8 @@ import { useCompanies } from '../hooks/useApi';
 import { MagnifyingGlassIcon, ArrowTrendingUpIcon, ChartBarIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { Combobox } from '@headlessui/react';
 import { formatPercent, formatNumber } from '../utils/format';
+import { DEFAULT_PAGE_SIZE } from '../constants';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 const SORT_OPTIONS = [
     { id: 'code', name: 'Şirket Kodu', order: 'ASC' },
@@ -12,7 +14,7 @@ const SORT_OPTIONS = [
     { id: 'avg_yield_1m', name: '1 Aylık Getiri', order: 'DESC' },
     { id: 'avg_yield_3m', name: '3 Aylık Getiri', order: 'DESC' },
     { id: 'avg_yield_6m', name: '6 Aylık Getiri', order: 'DESC' },
-    { id: 'avg_yield_ytd', name: 'YTD Getiri', order: 'DESC' },
+    { id: 'avg_yield_ytd', name: 'YBB Getiri', order: 'DESC' },
     { id: 'avg_yield_1y', name: '1 Yıllık Getiri', order: 'DESC' },
     { id: 'avg_yield_3y', name: '3 Yıllık Getiri', order: 'DESC' },
     { id: 'avg_yield_5y', name: '5 Yıllık Getiri', order: 'DESC' }
@@ -124,7 +126,7 @@ export default function Companies() {
 
     const { data, isLoading } = useCompanies({
         page,
-        limit: 20,
+        limit: DEFAULT_PAGE_SIZE,
         search: debouncedSearch,
         sort,
         order,
@@ -141,6 +143,8 @@ export default function Companies() {
 
     return (
         <div>
+            <LoadingOverlay isLoading={isLoading} />
+            
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -199,7 +203,7 @@ export default function Companies() {
                                             <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
                                         </span>
                                     </Combobox.Button>
-                                    <Combobox.Options className="absolute left-0 right-0 z-10 mt-1 max-h-60 overflow-auto scrollbar rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    <Combobox.Options className="absolute left-0 right-0 z-10 mt-1 overflow-auto rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                                         {SORT_OPTIONS.map((option) => (
                                             <Combobox.Option
                                                 key={option.id}
@@ -252,16 +256,6 @@ export default function Companies() {
                                 value={minFundsInput}
                                 onChange={(e) => handleMinFundsChange(e.target.value)}
                             />
-                            {minFundsInput && (
-                                <button
-                                    onClick={() => handleMinFundsChange('')}
-                                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400"
-                                >
-                                    <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-                                    </svg>
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -272,13 +266,35 @@ export default function Companies() {
                         [...Array(6)].map((_, i) => (
                             <div
                                 key={i}
-                                className="animate-pulse bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6 space-y-4"
+                                className="animate-pulse bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 space-y-4"
                             >
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                                <div className="space-y-2">
-                                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex-1 space-y-3">
+                                        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-6 pt-2">
+                                    <div className="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 space-y-2">
+                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                    </div>
+                                    <div className="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-3 space-y-2">
+                                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                                        <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-100 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        {[...Array(3)].map((_, j) => (
+                                            <div key={j} className="bg-white dark:bg-gray-800 rounded-lg p-2 space-y-2">
+                                                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         ))
@@ -403,9 +419,9 @@ export default function Companies() {
                             <div>
                                 <p className="text-sm text-gray-700 dark:text-gray-300">
                                     Toplam <span className="font-medium">{data.total}</span> şirketten{' '}
-                                    <span className="font-medium">{Math.min((page - 1) * 20 + 1, data.total || 0)}</span>-
+                                    <span className="font-medium">{(page - 1) * DEFAULT_PAGE_SIZE + 1}</span>-
                                     <span className="font-medium">
-                                        {Math.min(page * 20, data.total || 0)}
+                                        {Math.min(page * DEFAULT_PAGE_SIZE, data.total)}
                                     </span>{' '}
                                     arası gösteriliyor
                                 </p>

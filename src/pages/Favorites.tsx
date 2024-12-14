@@ -9,6 +9,7 @@ import { useToast } from '../contexts/ToastContext';
 import SortHeader from '../components/SortHeader';
 import { formatPercent } from '../utils/format';
 import EmptyState from '../components/EmptyState';
+import LoadingOverlay from '../components/LoadingOverlay';
 
 interface FundWithDetails {
     code: string;
@@ -55,7 +56,7 @@ export default function Favorites() {
     }, []);
 
     // Favori fonların detaylarını çek
-    const { data: fundsData } = useFunds(
+    const { data: fundsData, isLoading: isFundsLoading } = useFunds(
         favoriteCodes.length > 0 
             ? { code: favoriteCodes.join(','), limit: favoriteCodes.length }
             : undefined
@@ -137,6 +138,8 @@ export default function Favorites() {
 
     return (
         <div>
+            <LoadingOverlay isLoading={isLoading || isFundsLoading} />
+            
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -207,7 +210,7 @@ export default function Favorites() {
                                                 onSort={handleSort}
                                             />
                                             <SortHeader
-                                                label="YTD"
+                                                label="YBB"
                                                 field="yield_ytd"
                                                 currentSort={sort}
                                                 currentOrder={order}
@@ -237,13 +240,7 @@ export default function Favorites() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {isLoading ? (
-                                            <tr>
-                                                <td colSpan={9} className="text-center py-4 text-gray-500 dark:text-gray-400">
-                                                    Yükleniyor...
-                                                </td>
-                                            </tr>
-                                        ) : filteredFunds.length === 0 ? (
+                                        {(!isLoading && !isFundsLoading && filteredFunds.length === 0) ? (
                                             <tr>
                                                 <td colSpan={9}>
                                                     <EmptyState

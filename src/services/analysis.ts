@@ -1,5 +1,5 @@
 import { getDB } from './db';
-import type { YearlyIncreaseType } from '../types/api';
+import type { FundManagementCompany, YearlyIncreaseType } from '../types/api';
 
 export interface AnalysisRecord {
     id?: number;
@@ -7,9 +7,7 @@ export interface AnalysisRecord {
     fund: {
         code: string;
         title: string;
-        management_company_id: string;
-        management_company_title: string;
-        management_company_logo?: string;
+        management_company: FundManagementCompany;
     };
     parameters: {
         initialInvestment: number;

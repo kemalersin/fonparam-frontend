@@ -1,12 +1,11 @@
+import { FundManagementCompany } from '../types/api';
 import { getDB } from './db';
 
 export interface RecentlyViewedFund {
     id?: number;
     code: string;
     title: string;
-    management_company_id: string;
-    management_company_title: string;
-    management_company_logo?: string;
+    management_company: FundManagementCompany;
     viewed_at: string;
 }
 

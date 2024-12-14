@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useFunds } from '../hooks/useApi';
-import { MagnifyingGlassIcon, StarIcon, ArrowsRightLeftIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid, ArrowsRightLeftIcon as ArrowsRightLeftIconSolid } from '@heroicons/react/24/solid';
+import { MagnifyingGlassIcon, StarIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
+import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import { addToComparison, removeFromComparison, isInComparison } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
 import ComparisonButton from '../components/ComparisonButton';
 import SortHeader from '../components/SortHeader';
 import { formatPercent } from '../utils/format';
+import EmptyState from '../components/EmptyState';
+import LoadingOverlay from '../components/LoadingOverlay';
+import { DEFAULT_PAGE_SIZE, FUND_TYPES } from '../constants';
+import { Combobox } from '@headlessui/react';
 
 export default function Funds() {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -20,6 +24,8 @@ export default function Funds() {
     const [isInitialized, setIsInitialized] = useState(false);
     const [favoriteStates, setFavoriteStates] = useState<Record<string, boolean>>({});
     const [checkingFavorites, setCheckingFavorites] = useState<Record<string, boolean>>({});
+    const [selectedType, setSelectedType] = useState(searchParams.get('type') || '');
+    const [currentData, setCurrentData] = useState<typeof data>(null);
     const { showToast } = useToast();
 
     // İlk yüklemede URL parametrelerini al
@@ -29,7 +35,7 @@ export default function Funds() {
             const pageFromUrl = searchParams.get('page');
             const sortFromUrl = searchParams.get('sort');
             const orderFromUrl = searchParams.get('order') as 'ASC' | 'DESC';
-            const companyFromUrl = searchParams.get('company');
+            const typeFromUrl = searchParams.get('type');
 
             if (searchFromUrl) {
                 setSearchInput(searchFromUrl);
@@ -38,55 +44,62 @@ export default function Funds() {
             if (pageFromUrl) setPage(Number(pageFromUrl));
             if (sortFromUrl) setSort(sortFromUrl);
             if (orderFromUrl) setOrder(orderFromUrl);
+            if (typeFromUrl) setSelectedType(typeFromUrl);
 
             setIsInitialized(true);
         }
     }, [searchParams, isInitialized]);
 
+    // URL parametrelerini güncelle
+    const updateUrlParams = () => {
+        const params = new URLSearchParams(searchParams);
+        if (searchInput) params.set('search', searchInput);
+        else params.delete('search');
+        if (page > 1) params.set('page', page.toString());
+        if (sort !== 'code') params.set('sort', sort);
+        else params.delete('sort');
+        if (order !== 'ASC') params.set('order', order);
+        else params.delete('order');
+        if (selectedType) params.set('type', selectedType);
+        else params.delete('type');
+        setSearchParams(params, { replace: true });
+    };
+
     // Debounced search için useEffect
     useEffect(() => {
         if (!isInitialized) return;
 
-        // Arama kutusu boşsa hemen güncelle
-        if (!searchInput) {
-            setDebouncedSearch('');
-            const params = new URLSearchParams(searchParams);
-            params.delete('search');
-            if (page > 1) params.set('page', page.toString());
-            const company = searchParams.get('company');
-            if (company) params.set('company', company);
-            setSearchParams(params, { replace: true });
-            return;
-        }
-
         const timer = setTimeout(() => {
             setDebouncedSearch(searchInput);
-            const params = new URLSearchParams(searchParams);
-            params.set('search', searchInput);
-            if (page > 1) params.set('page', page.toString());
-            const company = searchParams.get('company');
-            if (company) params.set('company', company);
-            setSearchParams(params, { replace: true });
+            updateUrlParams();
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [searchInput, page, isInitialized]);
+    }, [searchInput, page, sort, order, selectedType, isInitialized]);
 
-    // Arama değiştiğinde sayfa numarasını sıfırla
+    // Arama veya fon tipi değiştiğinde sayfa numarasını sıfırla
     useEffect(() => {
         if (isInitialized) {
             setPage(1);
         }
-    }, [debouncedSearch, isInitialized]);
+    }, [debouncedSearch, selectedType, isInitialized]);
 
     const { data, isLoading } = useFunds({
         page,
-        limit: 20,
+        limit: DEFAULT_PAGE_SIZE,
         search: debouncedSearch,
         sort,
         order,
+        type: selectedType || undefined,
         management_company: searchParams.get('company') || undefined
     });
+
+    // Yeni veriler geldiğinde mevcut verileri güncelle
+    useEffect(() => {
+        if (data) {
+            setCurrentData(data);
+        }
+    }, [data]);
 
     const handleSearch = (value: string) => {
         setSearchInput(value);
@@ -217,19 +230,59 @@ export default function Funds() {
 
             {/* Content */}
             <div className="mt-6 space-y-6">
-                {/* Search */}
-                <div className="relative">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                {/* Filters */}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                    {/* Search */}
+                    <div className="relative sm:col-span-3">
+                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                        </div>
+                        <input
+                            type="text"
+                            className="block w-full rounded-md border-0 py-2 pl-10 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
+                            placeholder="Fon kodu veya adı ile arayın..."
+                            value={searchInput}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
                     </div>
-                    <input
-                        type="text"
-                        className="block w-full rounded-md border-0 py-2 pl-10 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
-                        placeholder="Fon kodu veya adı ile arayın..."
-                        value={searchInput}
-                        onChange={(e) => handleSearch(e.target.value)}
-                    />
+
+                    {/* Fund Type Filter */}
+                    <div>
+                        <Combobox
+                            as="div"
+                            value={FUND_TYPES.find(type => type.value === selectedType)}
+                            onChange={(type) => setSelectedType(type.value)}
+                        >
+                            <div className="relative">
+                                <Combobox.Button className="relative w-full cursor-default rounded-md bg-white dark:bg-gray-800 py-2 pl-3 pr-10 text-left text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6">
+                                    <span className="block truncate">
+                                        {FUND_TYPES.find(type => type.value === selectedType)?.label || 'Tüm Fonlar'}
+                                    </span>
+                                    <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                        <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+                                    </span>
+                                </Combobox.Button>
+                                <Combobox.Options className="absolute left-0 right-0 z-10 mt-1 rounded-md bg-white dark:bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                    {FUND_TYPES.map((type) => (
+                                        <Combobox.Option
+                                            key={type.value}
+                                            value={type}
+                                            className={({ active }) =>
+                                                `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                                                    active ? 'bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100'
+                                                }`
+                                            }
+                                        >
+                                            {type.label}
+                                        </Combobox.Option>
+                                    ))}
+                                </Combobox.Options>
+                            </div>
+                        </Combobox>
+                    </div>
                 </div>
+
+                <LoadingOverlay isLoading={isLoading} />
 
                 {/* Table */}
                 <div className="flow-root">
@@ -275,7 +328,7 @@ export default function Funds() {
                                                 onSort={handleSort}
                                             />
                                             <SortHeader
-                                                label="YTD"
+                                                label="YBB"
                                                 field="yield_ytd"
                                                 currentSort={sort}
                                                 currentOrder={order}
@@ -305,55 +358,53 @@ export default function Funds() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {isLoading ? (
+                                        {!isLoading && currentData?.data.length === 0 ? (
                                             <tr>
-                                                <td colSpan={9} className="text-center py-4 text-gray-500 dark:text-gray-400">
-                                                    Yükleniyor...
+                                                <td colSpan={9} className="py-8">
+                                                    <EmptyState
+                                                        title={searchInput ? "Arama Sonucu Bulunamadı" : "Fon Bulunamadı"}
+                                                        description={searchInput ? "Arama kriterlerinize uygun fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin." : "Sistemde kayıtlı fon bulunmuyor."}
+                                                        icon={<MagnifyingGlassIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />}
+                                                    />
                                                 </td>
                                             </tr>
                                         ) : (
-                                            data?.data.map((fund) => (
-                                                <tr
+                                            currentData?.data.map((fund) => (
+                                                <tr 
                                                     key={fund.code}
                                                     onClick={(e) => handleRowClick(e, fund.code)}
                                                     className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 >
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
                                                         <div className="flex items-center gap-3">
                                                             <Link
-                                                                to={`/companies/${fund.management_company_id}`}
+                                                                to={`/companies/${fund.management_company?.code}`}
                                                                 className="company-logo flex-shrink-0 hover:opacity-75"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
-                                                                {fund.management_company?.logo && (
+                                                                {fund.management_company?.logo ? (
                                                                     <img
                                                                         src={fund.management_company.logo}
                                                                         alt={fund.management_company.title}
                                                                         className="h-6 w-6 object-contain"
                                                                     />
-                                                                )}
-                                                                {!fund.management_company?.logo && (
-                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                                        {fund.management_company?.title.charAt(0)}
+                                                                ) : (
+                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                                                                        {fund.management_company?.title?.charAt(0)}
                                                                     </div>
                                                                 )}
                                                             </Link>
-                                                            <span>{fund.code}</span>
+                                                            <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
                                                             <div className="flex gap-1">
                                                                 <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleFavoriteClick(e, fund);
-                                                                    }}
-                                                                    disabled={checkingFavorites[fund.code]}
+                                                                    onClick={(e) => handleFavoriteClick(e, fund)}
                                                                     className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                                                                    disabled={checkingFavorites[fund.code]}
                                                                 >
-                                                                    {checkingFavorites[fund.code] ? (
-                                                                        <div className="w-4 h-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded-full" />
-                                                                    ) : favoriteStates[fund.code] ? (
+                                                                    {favoriteStates[fund.code] ? (
                                                                         <StarIconSolid className="h-4 w-4 text-yellow-400" />
                                                                     ) : (
-                                                                        <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-yellow-400" />
+                                                                        <StarIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                                                                     )}
                                                                 </button>
                                                                 <ComparisonButton fund={fund} />
@@ -361,9 +412,7 @@ export default function Funds() {
                                                         </div>
                                                     </td>
                                                     <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                        <div className="line-clamp-2">
-                                                            {fund.title}
-                                                        </div>
+                                                        <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
                                                     </td>
                                                     {[
                                                         fund.yield_1m,
@@ -379,9 +428,11 @@ export default function Funds() {
                                                             className="whitespace-nowrap px-3 py-4 text-sm text-right"
                                                         >
                                                             <span
-                                                                className={value != null ? (
-                                                                    value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                                                                ) : 'text-gray-500 dark:text-gray-400'}
+                                                                className={
+                                                                    value != null ? (
+                                                                        value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                                    ) : 'text-gray-500 dark:text-gray-400'
+                                                                }
                                                             >
                                                                 {formatPercent(value)}
                                                             </span>
@@ -398,7 +449,7 @@ export default function Funds() {
                 </div>
 
                 {/* Pagination */}
-                {data && (
+                {currentData && currentData.data.length > 0 && (
                     <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 sm:px-6">
                         <div className="flex flex-1 justify-between sm:hidden">
                             <button
@@ -414,9 +465,9 @@ export default function Funds() {
                             </button>
                             <button
                                 onClick={() => setPage(page + 1)}
-                                disabled={page * 20 >= data.total}
+                                disabled={page * DEFAULT_PAGE_SIZE >= currentData.total}
                                 className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium ${
-                                    page * 20 >= data.total
+                                    page * DEFAULT_PAGE_SIZE >= currentData.total
                                         ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                                         : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
                                 }`}
@@ -427,10 +478,10 @@ export default function Funds() {
                         <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                             <div>
                                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                                    Toplam <span className="font-medium">{data.total}</span> fondan{' '}
-                                    <span className="font-medium">{(page - 1) * 20 + 1}</span>-
+                                    Toplam <span className="font-medium">{currentData.total}</span> fondan{' '}
+                                    <span className="font-medium">{(page - 1) * DEFAULT_PAGE_SIZE + 1}</span>-
                                     <span className="font-medium">
-                                        {Math.min(page * 20, data.total)}
+                                        {Math.min(page * DEFAULT_PAGE_SIZE, currentData.total)}
                                     </span>{' '}
                                     arası gösteriliyor
                                 </p>
@@ -453,10 +504,10 @@ export default function Funds() {
                                         <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                                     </button>
                                     <button
-                                        onClick={() => setPage(Math.min(Math.ceil(data?.total / 20), page + 1))}
-                                        disabled={!data?.total || page >= Math.ceil(data.total / 20)}
+                                        onClick={() => setPage(Math.min(Math.ceil(currentData?.total / DEFAULT_PAGE_SIZE), page + 1))}
+                                        disabled={!currentData?.total || page >= Math.ceil(currentData.total / DEFAULT_PAGE_SIZE)}
                                         className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-20 focus:outline-offset-0 ${
-                                            !data?.total || page >= Math.ceil(data.total / 20)
+                                            !currentData?.total || page >= Math.ceil(currentData.total / DEFAULT_PAGE_SIZE)
                                                 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
                                                 : 'text-gray-400 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'
                                         }`}
