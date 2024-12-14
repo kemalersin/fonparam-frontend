@@ -7,36 +7,43 @@ import ComparisonButton from '../components/ComparisonButton';
 import FavoriteButton from '../components/FavoriteButton';
 import EmptyState from '../components/EmptyState';
 import LoadingOverlay from '../components/LoadingOverlay';
+import SortHeader from '../components/SortHeader';
 import { StarIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useUrlSort } from '../hooks/useUrlSort';
+
+type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
 export default function Favorites() {
+    const { search, setSearch, sort, order, handleSort } = useUrlSort<SortableFields>({
+        defaultSort: 'code',
+        defaultOrder: 'ASC'
+    });
+
     const [favorites, setFavorites] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [favoriteCodes, setFavoriteCodes] = useState<string[]>([]);
-    const [search, setSearch] = useState('');
+    const { data: fundsData } = useFunds(
+        favoriteCodes.length > 0 
+            ? { code: favoriteCodes.join(',') }
+            : null
+    );
 
     useEffect(() => {
-        const loadFavorites = async () => {
-            setIsLoading(true);
-            try {
-                const favoritesData = await getFavorites();
-                setFavorites(favoritesData);
-                setFavoriteCodes(favoritesData.map(f => f.code));
-            } catch (error) {
-                console.error('Favoriler yüklenirken hata oluştu:', error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         loadFavorites();
     }, []);
 
-    const { data: fundsData } = useFunds(
-        favoriteCodes.length > 0 
-            ? { code: favoriteCodes.join(','), limit: favoriteCodes.length }
-            : undefined
-    );
+    const loadFavorites = async () => {
+        setIsLoading(true);
+        try {
+            const data = await getFavorites();
+            setFavorites(data);
+            setFavoriteCodes(data.map((f: any) => f.code));
+        } catch (error) {
+            console.error('Favoriler yüklenirken hata:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleRowClick = (event: React.MouseEvent, fundCode: string) => {
         if ((event.target as HTMLElement).closest('.company-logo')) {
@@ -45,11 +52,34 @@ export default function Favorites() {
         window.location.href = `/funds/${fundCode}`;
     };
 
-    const filteredFavorites = favorites.filter(fund => 
-        search.trim() === '' || 
-        fund.code.toLowerCase().includes(search.toLowerCase()) || 
-        fund.title.toLowerCase().includes(search.toLowerCase())
-    );
+    const filteredFavorites = favorites
+        .filter(fund => 
+            search.trim() === '' || 
+            fund.code.toLowerCase().includes(search.toLowerCase()) || 
+            fund.title.toLowerCase().includes(search.toLowerCase())
+        )
+        .sort((a, b) => {
+            let aValue, bValue;
+
+            if (sort === 'code') {
+                aValue = a.code;
+                bValue = b.code;
+            } else if (sort === 'title') {
+                aValue = a.title;
+                bValue = b.title;
+            } else {
+                const aFund = fundsData?.data?.find(f => f.code === a.code);
+                const bFund = fundsData?.data?.find(f => f.code === b.code);
+                aValue = aFund?.[sort as keyof typeof aFund] ?? null;
+                bValue = bFund?.[sort as keyof typeof bFund] ?? null;
+            }
+
+            if (aValue === null) return 1;
+            if (bValue === null) return -1;
+
+            const comparison = aValue < bValue ? -1 : 1;
+            return order === 'ASC' ? comparison : -comparison;
+        });
 
     return (
         <div>
@@ -86,33 +116,70 @@ export default function Favorites() {
                                 <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-800">
                                         <tr>
-                                            <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                Fon Kodu
-                                            </th>
-                                            <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                Fon Adı
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                1 Ay
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                3 Ay
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                6 Ay
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                YBB
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                1 Yıl
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                3 Yıl
-                                            </th>
-                                            <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                                5 Yıl
-                                            </th>
+                                            <SortHeader
+                                                label="Fon Kodu"
+                                                field="code"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <th />
+                                            <SortHeader
+                                                label="Fon Adı"
+                                                field="title"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="1 Ay"
+                                                field="yield_1m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="3 Ay"
+                                                field="yield_3m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="6 Ay"
+                                                field="yield_6m"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="YBB"
+                                                field="yield_ytd"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="1 Yıl"
+                                                field="yield_1y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="3 Yıl"
+                                                field="yield_3y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
+                                            <SortHeader
+                                                label="5 Yıl"
+                                                field="yield_5y"
+                                                currentSort={sort}
+                                                currentOrder={order}
+                                                onSort={handleSort}
+                                            />
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
@@ -121,7 +188,7 @@ export default function Favorites() {
                                                 <td colSpan={9} className="py-8">
                                                     <EmptyState
                                                         title={search.trim() ? "Arama sonucu bulunamadı" : "Favori Fon Bulunamadı"}
-                                                        description={search.trim() 
+                                                        description={search.trim()
                                                             ? "Aramanızla eşleşen favori fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
                                                             : "Henüz favori olarak işaretlediğiniz fon bulunmuyor. Fonlar sayfasından favori fonlarınızı ekleyebilirsiniz."
                                                         }
@@ -139,10 +206,10 @@ export default function Favorites() {
                                                         className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     >
                                                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
-                                                            <div className="flex items-center gap-3">
+                                                            <div className="flex items-center">
                                                                 <Link
                                                                     to={`/companies/${fund.management_company_id}`}
-                                                                    className="company-logo flex-shrink-0 hover:opacity-75"
+                                                                    className="company-logo flex-shrink-0 hover:opacity-75 mr-3"
                                                                     onClick={(e) => e.stopPropagation()}
                                                                 >
                                                                     {fund.management_company_logo ? (
@@ -158,16 +225,26 @@ export default function Favorites() {
                                                                     )}
                                                                 </Link>
                                                                 <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
-                                                                <div className="flex gap-1">
-                                                                    <FavoriteButton 
-                                                                        fund={fund} 
-                                                                        onRemove={() => {
-                                                                            setFavorites(prev => prev.filter(f => f.code !== fund.code));
-                                                                            setFavoriteCodes(prev => prev.filter(code => code !== fund.code));
-                                                                        }}
-                                                                    />
-                                                                    <ComparisonButton fund={fund} />
-                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="whitespace-nowrap py-4 pr-3 text-sm">
+                                                            <div className="flex items-center justify-center gap-0.5">
+                                                                <FavoriteButton 
+                                                                    fund={fund} 
+                                                                    onRemove={() => {
+                                                                        setFavorites(prev => prev.filter(f => f.code !== fund.code));
+                                                                        setFavoriteCodes(prev => prev.filter(code => code !== fund.code));
+                                                                    }}
+                                                                />
+                                                                <ComparisonButton fund={{
+                                                                    code: fund.code,
+                                                                    title: fund.title,
+                                                                    management_company: {
+                                                                        id: fund.management_company_id,
+                                                                        title: fund.management_company_title,
+                                                                        logo: fund.management_company_logo
+                                                                    }
+                                                                }} />
                                                             </div>
                                                         </td>
                                                         <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
@@ -180,21 +257,16 @@ export default function Favorites() {
                                                             currentFund?.yield_ytd,
                                                             currentFund?.yield_1y,
                                                             currentFund?.yield_3y,
-                                                            currentFund?.yield_5y,
+                                                            currentFund?.yield_5y
                                                         ].map((value, index) => (
-                                                            <td
-                                                                key={index}
-                                                                className="whitespace-nowrap px-3 py-4 text-sm text-right"
-                                                            >
-                                                                <span
-                                                                    className={
-                                                                        value != null ? (
-                                                                            value >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                                                                        ) : 'text-gray-500 dark:text-gray-400'
-                                                                    }
-                                                                >
-                                                                    {formatPercent(value)}
-                                                                </span>
+                                                            <td key={index} className='whitespace-nowrap px-3 py-4 text-sm text-right'>
+                                                                {value !== undefined && value !== null ? (
+                                                                    <span className={value >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}>
+                                                                        {formatPercent(value)}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                                )}
                                                             </td>
                                                         ))}
                                                     </tr>

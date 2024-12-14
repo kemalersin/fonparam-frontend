@@ -7,6 +7,7 @@ import EmptyState from '../components/EmptyState';
 import { useToast } from '../contexts/ToastContext';
 import SortHeader from '../components/SortHeader';
 import LoadingOverlay from '../components/LoadingOverlay';
+import { useUrlSort } from '../hooks/useUrlSort';
 import { 
     DEFAULT_INVESTMENT_PERIOD,
     DEFAULT_INITIAL_INVESTMENT,
@@ -30,9 +31,11 @@ const PERIODS: Record<string, string> = {
 type SortableFields = 'code' | 'title' | 'date' | 'startDate' | 'totalInvestment' | 'totalYield' | 'currentValue' | 'totalYieldPercentage';
 
 export default function Analyses() {
-    const [search, setSearch] = useState('');
-    const [sort, setSort] = useState<SortableFields>('date');
-    const [order, setOrder] = useState<'ASC' | 'DESC'>('DESC');
+    const { search, setSearch, sort, order, handleSort } = useUrlSort<SortableFields>({
+        defaultSort: 'date',
+        defaultOrder: 'DESC'
+    });
+
     const [analyses, setAnalyses] = useState<AnalysisRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
@@ -51,15 +54,6 @@ export default function Analyses() {
             showToast('Analizler yüklenirken bir hata oluştu.', 'error');
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleSort = (field: string) => {
-        if (sort === field as SortableFields) {
-            setOrder(order === 'ASC' ? 'DESC' : 'ASC');
-        } else {
-            setSort(field as SortableFields);
-            setOrder('ASC');
         }
     };
 

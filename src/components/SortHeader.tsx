@@ -6,6 +6,7 @@ interface SortHeaderProps {
     currentSort: string;
     currentOrder: 'ASC' | 'DESC';
     onSort: (field: string) => void;
+    className?: string;
 }
 
 export default function SortHeader({ 
@@ -13,17 +14,16 @@ export default function SortHeader({
     field, 
     currentSort, 
     currentOrder, 
-    onSort 
+    onSort,
+    className = ''
 }: SortHeaderProps) {
     const isTextColumn = field === 'code' || field === 'title';
     return (
         <th
             scope="col"
             className={`whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-gray-900 dark:text-gray-100 cursor-pointer group ${
-                field === 'code' ? 'w-24' : 
-                field === 'title' ? 'w-48' : 
-                'w-20'
-            } ${isTextColumn ? 'text-left' : 'text-right'}`}
+                isTextColumn ? 'text-left' : 'text-right'
+            } ${className}`}
             onClick={() => onSort(field)}
         >
             <div className={`flex items-center gap-1 ${isTextColumn ? 'justify-start' : 'justify-end'}`}>

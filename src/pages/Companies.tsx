@@ -4,8 +4,10 @@ import { useCompanies } from '../hooks/useApi';
 import { MagnifyingGlassIcon, ArrowTrendingUpIcon, ChartBarIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { Combobox } from '@headlessui/react';
 import { formatPercent, formatNumber } from '../utils/format';
-import { DEFAULT_PAGE_SIZE } from '../constants';
+import { DEFAULT_PAGE_SIZE, DEBOUNCE_DELAY } from '../constants';
 import LoadingOverlay from '../components/LoadingOverlay';
+import EmptyState from '../components/EmptyState';
+import { useUrlSort } from '../hooks/useUrlSort';
 
 const SORT_OPTIONS = [
     { id: 'code', name: 'Şirket Kodu', order: 'ASC' },
@@ -29,100 +31,29 @@ const formatPercentage = (value: number | null | undefined): string => {
 };
 
 export default function Companies() {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [searchInput, setSearchInput] = useState(searchParams.get('search') || '');
+    const { search: searchInput, setSearch: setSearchInput, min_total_funds: minFundsInput, setMinFunds: setMinFundsInput, sort, order, handleSort, page, setPage } = useUrlSort<string>({
+        defaultSort: 'code',
+        defaultOrder: 'ASC'
+    });
+
     const [debouncedSearch, setDebouncedSearch] = useState(searchInput);
-    const [minFundsInput, setMinFundsInput] = useState<string>(searchParams.get('min_funds') || '');
-    const [debouncedMinFunds, setDebouncedMinFunds] = useState<number | undefined>(
-        searchParams.get('min_funds') ? Number(searchParams.get('min_funds')) : undefined
-    );
-    const [sort, setSort] = useState(searchParams.get('sort') || 'code');
-    const [order, setOrder] = useState<'ASC' | 'DESC'>((searchParams.get('order') as 'ASC' | 'DESC') || 'ASC');
-    const [page, setPage] = useState(searchParams.get('page') ? parseInt(searchParams.get('page') || '1', 10) : 1);
+    const [debouncedMinFunds, setDebouncedMinFunds] = useState(minFundsInput);
 
-    // İlk yüklemede URL parametrelerini al
     useEffect(() => {
-        const searchFromUrl = searchParams.get('search');
-        const minFundsFromUrl = searchParams.get('min_funds');
-        const pageFromUrl = searchParams.get('page');
-        const sortFromUrl = searchParams.get('sort');
-        const orderFromUrl = searchParams.get('order') as 'ASC' | 'DESC';
-
-        if (searchFromUrl) {
-            setSearchInput(searchFromUrl);
-            setDebouncedSearch(searchFromUrl);
-        }
-        if (minFundsFromUrl) {
-            setMinFundsInput(minFundsFromUrl);
-            setDebouncedMinFunds(Number(minFundsFromUrl));
-        }
-        if (pageFromUrl) {
-            const pageNumber = parseInt(pageFromUrl, 10);
-            if (!isNaN(pageNumber) && pageNumber > 0) {
-                setPage(pageNumber);
-            }
-        }
-        if (sortFromUrl) setSort(sortFromUrl);
-        if (orderFromUrl) setOrder(orderFromUrl);
-    }, []);
-
-    // Debounced search için useEffect
-    useEffect(() => {
-        // Arama kutusu boşsa hemen güncelle
-        if (!searchInput) {
-            setDebouncedSearch('');
-            updateUrlParams('', debouncedMinFunds);
-            return;
-        }
-
         const timer = setTimeout(() => {
             setDebouncedSearch(searchInput);
-            updateUrlParams(searchInput, debouncedMinFunds);
-        }, 300);
+        }, DEBOUNCE_DELAY);
 
         return () => clearTimeout(timer);
     }, [searchInput]);
 
-    // Debounced min funds için useEffect
     useEffect(() => {
-        // Minimum fon sayısı boşsa hemen güncelle
-        if (!minFundsInput) {
-            setDebouncedMinFunds(undefined);
-            updateUrlParams(debouncedSearch, undefined);
-            return;
-        }
-
-        const numValue = Number(minFundsInput);
-        if (isNaN(numValue) || numValue < 0) return;
-
         const timer = setTimeout(() => {
-            setDebouncedMinFunds(numValue);
-            updateUrlParams(debouncedSearch, numValue);
-        }, 300);
+            setDebouncedMinFunds(minFundsInput);
+        }, DEBOUNCE_DELAY);
 
         return () => clearTimeout(timer);
     }, [minFundsInput]);
-
-    // URL parametrelerini güncelle
-    const updateUrlParams = (search: string, minFunds: number | undefined) => {
-        const params = new URLSearchParams();
-        if (search) params.set('search', search);
-        if (minFunds !== undefined) params.set('min_funds', minFunds.toString());
-        if (page > 1) params.set('page', page.toString());
-        if (sort !== 'code') params.set('sort', sort);
-        if (order !== 'ASC') params.set('order', order);
-        setSearchParams(params, { replace: true });
-    };
-
-    // Sayfa değiştiğinde URL'i güncelle
-    useEffect(() => {
-        updateUrlParams(debouncedSearch, debouncedMinFunds);
-    }, [page, sort, order]);
-
-    // Arama veya minimum fon sayısı değiştiğinde sayfa numarasını sıfırla
-    useEffect(() => {
-        setPage(1);
-    }, [debouncedSearch, debouncedMinFunds]);
 
     const { data, isLoading } = useCompanies({
         page,
@@ -130,21 +61,13 @@ export default function Companies() {
         search: debouncedSearch,
         sort,
         order,
-        min_total_funds: debouncedMinFunds,
+        min_total_funds: debouncedMinFunds ? parseInt(debouncedMinFunds, 10) : undefined,
     });
-
-    const handleSearch = (value: string) => {
-        setSearchInput(value);
-    };
-
-    const handleMinFundsChange = (value: string) => {
-        setMinFundsInput(value);
-    };
 
     return (
         <div>
             <LoadingOverlay isLoading={isLoading} />
-            
+
             {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
@@ -174,7 +97,7 @@ export default function Companies() {
                                 className="block w-full rounded-md border-0 py-2 pl-10 pr-3 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 bg-white dark:bg-gray-800 sm:text-sm sm:leading-6"
                                 placeholder="Şirket adı veya kodu ile arayın..."
                                 value={searchInput}
-                                onChange={(e) => handleSearch(e.target.value)}
+                                onChange={(e) => setSearchInput(e.target.value)}
                             />
                         </div>
                     </div>
@@ -191,8 +114,7 @@ export default function Companies() {
                                 value={SORT_OPTIONS.find(option => option.id === sort)}
                                 onChange={(option) => {
                                     if (option) {
-                                        setSort(option.id);
-                                        setOrder(option.order as 'ASC' | 'DESC');
+                                        handleSort(option.id);
                                     }
                                 }}
                             >
@@ -209,8 +131,7 @@ export default function Companies() {
                                                 key={option.id}
                                                 value={option}
                                                 className={({ active }) =>
-                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                                                        active ? 'bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100'
+                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100'
                                                     }`
                                                 }
                                             >
@@ -221,7 +142,7 @@ export default function Companies() {
                                 </div>
                             </Combobox>
                             <button
-                                onClick={() => setOrder(order === 'ASC' ? 'DESC' : 'ASC')}
+                                onClick={() => handleSort(sort)}
                                 className="p-1.5 rounded-md border-0 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500"
                                 title={order === 'ASC' ? 'Artan Sıralama' : 'Azalan Sıralama'}
                             >
@@ -254,7 +175,7 @@ export default function Companies() {
                                 className="block w-full rounded-md border-0 py-2 px-3 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 bg-white dark:bg-gray-800 sm:text-sm sm:leading-6"
                                 placeholder="Örn: 5"
                                 value={minFundsInput}
-                                onChange={(e) => handleMinFundsChange(e.target.value)}
+                                onChange={(e) => setMinFundsInput(e.target.value)}
                             />
                         </div>
                     </div>
@@ -298,6 +219,13 @@ export default function Companies() {
                                 </div>
                             </div>
                         ))
+                    ) : !data?.data || data.data.length === 0 ? (
+                        <div className="col-span-full py-8">
+                            <EmptyState
+                                title="Şirket Bulunamadı"
+                                description="Aramanızla eşleşen şirket bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                            />
+                        </div>
                     ) : (
                         data?.data.map((company) => (
                             <Link
@@ -338,11 +266,10 @@ export default function Companies() {
                                             <ArrowTrendingUpIcon className="h-4 w-4 mr-1.5 text-gray-500 dark:text-gray-400" />
                                             Yıllık Ort. Getiri
                                         </div>
-                                        <p className={`text-lg font-medium ${
-                                            company.avg_yield_1y && company.avg_yield_1y >= 0
+                                        <p className={`text-lg font-medium ${company.avg_yield_1y && company.avg_yield_1y >= 0
                                                 ? 'text-emerald-600 dark:text-emerald-400'
                                                 : 'text-rose-600 dark:text-rose-400'
-                                        }`}>
+                                            }`}>
                                             {formatPercentage(company.avg_yield_1y)}
                                         </p>
                                     </div>
@@ -353,31 +280,28 @@ export default function Companies() {
                                     <div className="grid grid-cols-3 gap-4 text-sm">
                                         <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                             <div className="text-gray-600 dark:text-gray-400 mb-1">1A</div>
-                                            <div className={`font-medium ${
-                                                company.avg_yield_1m && company.avg_yield_1m >= 0
+                                            <div className={`font-medium ${company.avg_yield_1m && company.avg_yield_1m >= 0
                                                     ? 'text-emerald-600 dark:text-emerald-400'
                                                     : 'text-rose-600 dark:text-rose-400'
-                                            }`}>
+                                                }`}>
                                                 {formatPercentage(company.avg_yield_1m)}
                                             </div>
                                         </div>
                                         <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                             <div className="text-gray-600 dark:text-gray-400 mb-1">6A</div>
-                                            <div className={`font-medium ${
-                                                company.avg_yield_6m && company.avg_yield_6m >= 0
+                                            <div className={`font-medium ${company.avg_yield_6m && company.avg_yield_6m >= 0
                                                     ? 'text-emerald-600 dark:text-emerald-400'
                                                     : 'text-rose-600 dark:text-rose-400'
-                                            }`}>
+                                                }`}>
                                                 {formatPercentage(company.avg_yield_6m)}
                                             </div>
                                         </div>
                                         <div className="bg-white dark:bg-gray-800 rounded-lg p-2">
                                             <div className="text-gray-600 dark:text-gray-400 mb-1">3Y</div>
-                                            <div className={`font-medium ${
-                                                company.avg_yield_3y && company.avg_yield_3y >= 0
+                                            <div className={`font-medium ${company.avg_yield_3y && company.avg_yield_3y >= 0
                                                     ? 'text-emerald-600 dark:text-emerald-400'
                                                     : 'text-rose-600 dark:text-rose-400'
-                                            }`}>
+                                                }`}>
                                                 {formatPercentage(company.avg_yield_3y)}
                                             </div>
                                         </div>
@@ -389,96 +313,51 @@ export default function Companies() {
                 </div>
 
                 {/* Pagination */}
-                {data && (
-                    <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6">
-                        <div className="flex flex-1 justify-between sm:hidden">
-                            <button
-                                onClick={() => setPage(Math.max(1, page - 1))}
-                                disabled={page === 1}
-                                className={`relative inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium ${
-                                    page === 1 
-                                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed' 
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                }`}
-                            >
-                                Önceki
-                            </button>
-                            <button
-                                onClick={() => setPage(page + 1)}
-                                disabled={page * 20 >= (data.total || 0)}
-                                className={`relative ml-3 inline-flex items-center rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium ${
-                                    page * 20 >= (data.total || 0)
-                                        ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                }`}
-                            >
-                                Sonraki
-                            </button>
-                        </div>
-                        <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                {data && data.total > 0 && (
+                    <div className="mt-6">
+                        <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                                    Toplam <span className="font-medium">{data.total}</span> şirketten{' '}
-                                    <span className="font-medium">{(page - 1) * DEFAULT_PAGE_SIZE + 1}</span>-
-                                    <span className="font-medium">
-                                        {Math.min(page * DEFAULT_PAGE_SIZE, data.total)}
-                                    </span>{' '}
-                                    arası gösteriliyor
+                                    {data.total > DEFAULT_PAGE_SIZE ? (
+                                        <>
+                                            Toplam <span className="font-medium">{data.total}</span> şirketten{' '}
+                                            <span className="font-medium">{(page - 1) * DEFAULT_PAGE_SIZE + 1}</span>-
+                                            <span className="font-medium">
+                                                {Math.min(page * DEFAULT_PAGE_SIZE, data.total)}
+                                            </span>{' '}
+                                            arası gösteriliyor
+                                        </>
+                                    ) : (
+                                        <>
+                                            Toplam <span className="font-medium">{data.total}</span> şirket gösteriliyor
+                                        </>
+                                    )}
                                 </p>
                             </div>
-                            <div>
-                                <nav
-                                    className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-                                    aria-label="Pagination"
-                                >
+                            {data.total > DEFAULT_PAGE_SIZE && (
+                                <div className="flex items-center space-x-2">
                                     <button
                                         onClick={() => setPage(Math.max(1, page - 1))}
                                         disabled={page === 1}
-                                        className={`relative inline-flex items-center rounded-l-md px-2 py-2 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-20 focus:outline-offset-0 ${
-                                            page === 1
+                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${page === 1
                                                 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                                : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                        }`}
+                                                : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                            }`}
                                     >
-                                        <span className="sr-only">Önceki</span>
-                                        <svg
-                                            className="h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        Önceki
                                     </button>
                                     <button
                                         onClick={() => setPage(page + 1)}
-                                        disabled={page * 20 >= (data.total || 0)}
-                                        className={`relative inline-flex items-center rounded-r-md px-2 py-2 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:z-20 focus:outline-offset-0 ${
-                                            page * 20 >= (data.total || 0)
+                                        disabled={page * DEFAULT_PAGE_SIZE >= (data.total || 0)}
+                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${page * DEFAULT_PAGE_SIZE >= (data.total || 0)
                                                 ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                                : 'text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700'
-                                        }`}
+                                                : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                            }`}
                                     >
-                                        <span className="sr-only">Sonraki</span>
-                                        <svg
-                                            className="h-5 w-5"
-                                            viewBox="0 0 20 20"
-                                            fill="currentColor"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
+                                        Sonraki
                                     </button>
-                                </nav>
-                            </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
