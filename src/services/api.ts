@@ -98,4 +98,10 @@ export const getFundHistory = async (
 ) => {
     const { data } = await api.get<FundHistoricalValue[]>(`/funds/${code}/historical`, { params });
     return data;
-}; 
+};
+
+export const getFundDetails = async (code: string) => {
+    const { data } = await api.get<Fund>(`/funds/${code}`);
+    return data;
+};
+ 

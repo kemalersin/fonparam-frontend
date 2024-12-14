@@ -73,7 +73,7 @@ export const useFundHistory = (
 export const useFundDetails = (code: string) => {
     return useQuery({
         queryKey: ['fund', code],
-        queryFn: () => api.getFunds({ code }).then(response => response.data[0]),
+        queryFn: () => api.getFundDetails(code),
         staleTime: 5 * 60 * 1000, // 5 dakika
         enabled: !!code,
     });
