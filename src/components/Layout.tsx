@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, ScrollRestoration, useLocation, Outlet } from 'react-router-dom';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../contexts/ThemeContext';
@@ -100,12 +100,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <main className="flex-1">
                 <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-8 pb-12">
-                    {children}
+                    <Outlet />
                 </div>
             </main>
 
             <Footer />
             <ScrollToTopButton />
+            <ScrollRestoration/>
         </div>
     );
 } 

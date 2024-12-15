@@ -1,102 +1,122 @@
-<div class="max-w-4xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">FonParam API</h1>
-    <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+<div class="max-w-4xl mx-auto sm:p-6">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-6">FonParam API</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
         <span class="font-medium">API Adresi:</span> <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono">https://api.fonparam.com</code>
     </p>
 
-    <div class="space-y-8">
-        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Genel Bilgi</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
+    <div class="space-y-6">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 space-y-3">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Genel Bilgi</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-3">
                 FonParam, Türkiye'deki yatırım fonlarının verilerini sunan bir API servisidir. Bu API ile fonların güncel ve geçmiş verilerine erişebilir, karşılaştırmalar yapabilir ve detaylı analizler gerçekleştirebilirsiniz.
             </p>
-            <ul class="space-y-3 text-gray-600 dark:text-gray-400">
-                <li class="flex items-center">
-                    <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                    Tüm yatırım fonlarının güncel verileri
-                </li>
-                <li class="flex items-center">
-                    <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                    Geçmiş performans verileri
-                </li>
-                <li class="flex items-center">
-                    <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                    Gelişmiş filtreleme ve arama
-                </li>
-                <li class="flex items-center">
-                    <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                    Fon karşılaştırma
-                </li>
-                <li class="flex items-center">
-                    <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                    Portföy yönetim şirketi bilgileri
-                </li>
-            </ul>
+            <div class="space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0">
+                        <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400">Tüm yatırım fonlarının güncel verileri</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0">
+                        <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400">Geçmiş performans verileri</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0">
+                        <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400">Gelişmiş filtreleme ve arama</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0">
+                        <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400">Fon karşılaştırma</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="flex-shrink-0">
+                        <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600 dark:text-gray-400">Portföy yönetim şirketi bilgileri</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Endpoint'ler</h2>
-            <div class="space-y-8">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 space-y-3">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Endpoint'ler</h2>
+            <div class="space-y-6">
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Fonlar</h3>
-                    <div class="grid gap-4">
+                    <div class="flex flex-col space-y-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /funds</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Tüm fonları listeler ve filtreleme imkanı sunar.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /funds?type=hisse_senedi&page=1&limit=20</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /funds?type=hisse_senedi&page=1&limit=20</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /funds/top-performing</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">En iyi performans gösteren fonları listeler.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /funds/top-performing?funds=AAK,DAH</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /funds/top-performing?funds=AAK,DAH</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /funds/compare</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Seçilen fonların performanslarını karşılaştırır.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /funds/compare?codes=AAK,GPB</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /funds/compare?codes=AAK,GPB</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /funds/{code}/analyze</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen fon için geçmiş verileri kullanarak yatırım analizi yapar.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /funds/AAK/analyze?startDate=year_start&initialInvestment=10000</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /funds/AAK/analyze?startDate=year_start&initialInvestment=10000</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /funds/{code}/historical</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen fonun geçmiş birim pay değerlerini getirir.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /funds/AAK/historical?start_date=2023-01-01&end_date=2023-12-31</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /funds/AAK/historical?start_date=2023-01-01&end_date=2023-12-31</code>
                             </div>
                         </div>
                     </div>
@@ -104,28 +124,28 @@
 
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Portföy Yönetim Şirketleri</h3>
-                    <div class="grid gap-4">
+                    <div class="flex flex-col space-y-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /companies</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Tüm portföy yönetim şirketlerini listeler.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /companies?page=1&limit=20&sort=total_funds</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /companies?page=1&limit=20&sort=total_funds</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /companies/{code}</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen portföy yönetim şirketinin detaylarını getirir.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /companies/APY?include_funds=true</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /companies/APY?include_funds=true</code>
                             </div>
                         </div>
                     </div>
@@ -133,40 +153,40 @@
 
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">İstatistikler</h3>
-                    <div class="grid gap-4">
+                    <div class="flex flex-col space-y-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /statistics</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Günlük bazda toplam fon, şirket, yatırımcı sayısı ve ortalama getiri istatistiklerini listeler.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /statistics?start_date=2023-01-01&end_date=2023-12-31</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /statistics?start_date=2023-01-01&end_date=2023-12-31</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /statistics/latest</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">En son güne ait istatistikleri getirir.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /statistics/latest</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /statistics/latest</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /statistics/{date}</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen tarihe ait istatistikleri getirir.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /statistics/2023-12-31</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /statistics/2023-12-31</code>
                             </div>
                         </div>
                     </div>
@@ -174,28 +194,28 @@
 
                 <div>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Fon Tipleri</h3>
-                    <div class="grid gap-4">
+                    <div class="flex flex-col space-y-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /fund-types</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Tüm fon tiplerini ve detaylarını listeler.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /fund-types?sort=total_funds&order=DESC</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /fund-types?sort=total_funds&order=DESC</code>
                             </div>
                         </div>
 
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
                             <div class="flex items-center justify-between mb-4">
                                 <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /fund-types/{type}</code>
-                                <span class="px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
                             </div>
                             <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen fon tipinin detaylarını getirir.</p>
                             <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
                                 <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
-                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200">GET /fund-types/hisse_senedi</code>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /fund-types/hisse_senedi</code>
                             </div>
                         </div>
                     </div>
@@ -203,16 +223,16 @@
             </div>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Önbellek (Cache)</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 space-y-3">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Önbellek (Cache)</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-3">
                 Performansı artırmak için önbellek kullanılmaktadır. Tüm endpoint'ler için önbellek süresi 30 dakikadır.
             </p>
         </div>
 
-        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Rate Limiting</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8 space-y-3">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Rate Limiting</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-3">
                 API'ye erişim API Key tabanlı bir sistem üzerinden kontrol edilmektedir:
             </p>
             <div class="space-y-6">
@@ -221,20 +241,32 @@
                     <p class="text-gray-600 dark:text-gray-400 mb-3">
                         API Key belirtilmeden yapılan istekler için:
                     </p>
-                    <ul class="space-y-2 text-gray-600 dark:text-gray-400">
-                        <li class="flex items-center">
-                            <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                            24 saat içinde tüm endpoint'ler için toplam 100 istek hakkı
-                        </li>
-                        <li class="flex items-center">
-                            <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                            Rate limit aşıldığında&nbsp;<code class="font-mono bg-gray-100 dark:bg-gray-900 px-1.5 py-0.5 rounded text-sm">429 (Too Many Requests)</code>&nbsp;hatası döner
-                        </li>
-                        <li class="flex items-center">
-                            <span class="h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mr-3"></span>
-                            Rate limit sayaçları IP bazlı tutulur
-                        </li>
-                    </ul>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0">
+                                <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600 dark:text-gray-400">24 saat içinde tüm endpoint'ler için toplam 100 istek hakkı</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0">
+                                <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600 dark:text-gray-400">Rate limit aşıldığında&nbsp;<code class="font-mono bg-gray-100 dark:bg-gray-900 px-1.5 py-0.5 rounded text-sm">429 (Too Many Requests)</code>&nbsp;hatası döner</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex-shrink-0">
+                                <span class="block h-2 w-2 bg-indigo-600 dark:bg-indigo-400 rounded-full mt-1"></span>
+                            </div>
+                            <div>
+                                <span class="text-gray-600 dark:text-gray-400">Rate limit sayaçları IP bazlı tutulur</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="bg-white dark:bg-gray-800 rounded-lg p-6">
@@ -244,28 +276,10 @@
                     </p>
                     <div class="bg-gray-50 dark:bg-gray-900 rounded p-4">
                         <p class="text-sm font-mono text-gray-600 dark:text-gray-400 mb-2">API Key kullanımı:</p>
-                        <code class="text-sm font-mono text-gray-800 dark:text-gray-200">curl https://api.fonparam.com/funds \<br />-H "X-API-Key: api-anahtariniz"</code>
+                        <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">curl https://api.fonparam.com/funds \
+-H "X-API-Key: api-anahtariniz"</code>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-8">
-            <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">İletişim</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">
-                API erişimi ve teknik destek için bizimle iletişime geçebilirsiniz.
-            </p>
-            <div class="flex space-x-4">
-                <a href="https://github.com/kemalersin" target="_blank" rel="noopener noreferrer" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
-                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
-                    </svg>
-                </a>
-                <a href="mailto:mail@kemalersin.com" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                </a>
             </div>
         </div>
     </div>
