@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon, XMarkIcon, ArrowsRightLeftIcon, TrashIcon } from '
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { addToComparison, removeFromComparison, getComparisonList } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import EmptyState from '../components/EmptyState';
 import { formatPercent, formatCurrency } from '../utils/format';
 import SortHeader from '../components/SortHeader';
@@ -30,6 +30,7 @@ const getStartDate = (period: string): string => {
 };
 
 export default function Compare() {
+    const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
     const [selectedFunds, setSelectedFunds] = useState<Fund[]>([]);
@@ -497,7 +498,7 @@ export default function Compare() {
                                                 key={fund.code}
                                                 onClick={(e) => {
                                                     if (!(e.target as HTMLElement).closest('.company-logo, .delete-button')) {
-                                                        window.location.href = `/funds/${fund.code}`;
+                                                        navigate(`/funds/${fund.code}`);
                                                     }
                                                 }}
                                                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -600,7 +601,14 @@ export default function Compare() {
                                                     backgroundColor: 'var(--background)',
                                                     borderColor: 'var(--gray-200)',
                                                     borderRadius: '0.5rem',
-                                                    padding: '0.75rem'
+                                                    padding: '0.75rem',
+                                                    color: 'var(--foreground)'
+                                                }}
+                                                itemStyle={{
+                                                    color: 'var(--foreground)'
+                                                }}
+                                                labelStyle={{
+                                                    color: 'var(--foreground)'
                                                 }}
                                             />
                                             <Legend 
@@ -649,7 +657,14 @@ export default function Compare() {
                                                     backgroundColor: 'var(--background)',
                                                     borderColor: 'var(--gray-200)',
                                                     borderRadius: '0.5rem',
-                                                    padding: '0.75rem'
+                                                    padding: '0.75rem',
+                                                    color: 'var(--foreground)'
+                                                }}
+                                                itemStyle={{
+                                                    color: 'var(--foreground)'
+                                                }}
+                                                labelStyle={{
+                                                    color: 'var(--foreground)'
                                                 }}
                                             />
                                             <Legend 
@@ -680,14 +695,15 @@ export default function Compare() {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart 
                                         barSize={20}
+                                        className="dark:[&_.recharts-tooltip-cursor]:fill-gray-700"
                                         data={[
-                                        { period: '1 Aylık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_1m }), {}) },
-                                        { period: '3 Aylık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_3m }), {}) },
-                                        { period: '6 Aylık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_6m }), {}) },
+                                        { period: '1 Ay', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_1m }), {}) },
+                                        { period: '3 Ay', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_3m }), {}) },
+                                        { period: '6 Ay', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_6m }), {}) },
                                         { period: 'YBB', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_ytd }), {}) },
-                                        { period: '1 Yıllık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_1y }), {}) },
-                                        { period: '3 Yıllık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_3y }), {}) },
-                                        { period: '5 Yıllık', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_5y }), {}) }
+                                        { period: '1 Yıl', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_1y }), {}) },
+                                        { period: '3 Yıl', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_3y }), {}) },
+                                        { period: '5 Yıl', ...comparisonData.reduce((acc, fund) => ({ ...acc, [fund.code]: fund.yield_5y }), {}) }
                                     ]}>
                                         <CartesianGrid strokeDasharray="3 3" className="text-gray-200 dark:text-gray-700" />
                                         <XAxis 

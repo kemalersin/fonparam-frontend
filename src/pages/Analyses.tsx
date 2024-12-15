@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { getAnalyses, deleteAnalysis, AnalysisRecord } from '../services/analysis';
 import { formatDate, formatCurrency, formatPercent } from '../utils/format';
@@ -31,6 +31,7 @@ const PERIODS: Record<string, string> = {
 type SortableFields = 'code' | 'title' | 'date' | 'startDate' | 'totalInvestment' | 'totalYield' | 'currentValue' | 'totalYieldPercentage';
 
 export default function Analyses() {
+    const navigate = useNavigate();
     const { search, setSearch, sort, order, handleSort } = useUrlSort<SortableFields>({
         defaultSort: 'date',
         defaultOrder: 'DESC'
@@ -57,11 +58,11 @@ export default function Analyses() {
         }
     };
 
-    const handleRowClick = (event: React.MouseEvent, fundCode: string) => {
+    const handleRowClick = (event: React.MouseEvent, analysis: AnalysisRecord) => {
         if ((event.target as HTMLElement).closest('.company-logo')) {
             return;
         }
-        window.location.href = `/funds/${fundCode}`;
+        navigate(getAnalysisLink(analysis));
     };
 
     const handleDelete = async (id: number) => {
@@ -202,96 +203,97 @@ export default function Analyses() {
                 </div>
 
                 {/* Table */}
-                <div className="flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-opacity-10 sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <SortHeader
-                                                label="Fon Kodu"
-                                                field="code"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Fon Adı"
-                                                field="title"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Analiz Tarihi"
-                                                field="date"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Yatırım Süresi"
-                                                field="startDate"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Toplam Yatırım"
-                                                field="totalInvestment"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Güncel Değer"
-                                                field="currentValue"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Toplam Kazanç"
-                                                field="totalYield"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="Getiri Oranı"
-                                                field="totalYieldPercentage"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                                <span className="sr-only">İşlemler</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {(!isLoading && filteredAnalyses.length === 0) ? (
+                {(!isLoading && filteredAnalyses.length === 0) ? (
+                    <div className="flex items-center justify-center sm:min-h-[400px]">
+                        <EmptyState
+                            title={search.trim() ? "Arama sonucu bulunamadı" : "Kayıtlı analiz bulunmuyor"}
+                            description={search.trim()
+                                ? "Aramanızla eşleşen analiz bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                                : "Henüz kaydettiğiniz analiz bulunmuyor. Fon sayfasından analiz yapıp kaydedebilirsiniz."
+                            }
+                        />
+                    </div>
+                ) : (
+                    <div className="flow-root">
+                        <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
+                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-opacity-10 sm:rounded-lg">
+                                    <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                        <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <td colSpan={9}>
-                                                    <EmptyState
-                                                        title="Kayıtlı analiz bulunmuyor"
-                                                        description="Henüz kaydettiğiniz analiz bulunmuyor. Fon sayfasından analiz yapıp kaydedebilirsiniz."
-                                                    />
-                                                </td>
+                                                <SortHeader
+                                                    label="Fon Kodu"
+                                                    field="code"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Fon Adı"
+                                                    field="title"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Analiz Tarihi"
+                                                    field="date"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Yatırım Süresi"
+                                                    field="startDate"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Toplam Yatırım"
+                                                    field="totalInvestment"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Güncel Değer"
+                                                    field="currentValue"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Toplam Kazanç"
+                                                    field="totalYield"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="Getiri Oranı"
+                                                    field="totalYieldPercentage"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                                    <span className="sr-only">İşlemler</span>
+                                                </th>
                                             </tr>
-                                        ) : (
-                                            filteredAnalyses.map((analysis) => (
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                                            {filteredAnalyses.map((analysis) => (
                                                 <tr
                                                     key={analysis.id}
-                                                    className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
-                                                    onClick={() => window.location.href = getAnalysisLink(analysis)}
+                                                    onClick={(e) => handleRowClick(e, analysis)}
+                                                    className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
                                                 >
-                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100 sm:pl-6">
-                                                        <div className="flex items-center gap-3">
+                                                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
+                                                        <div className="flex items-center">
                                                             <Link
                                                                 to={`/companies/${analysis.fund.management_company.code}`}
-                                                                className="company-logo flex-shrink-0 hover:opacity-75"
+                                                                className="company-logo flex-shrink-0 hover:opacity-75 mr-3"
                                                                 onClick={(e) => e.stopPropagation()}
                                                             >
                                                                 {analysis.fund.management_company.logo ? (
@@ -301,12 +303,12 @@ export default function Analyses() {
                                                                         className="h-6 w-6 object-contain"
                                                                     />
                                                                 ) : (
-                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                                        {analysis.fund.management_company.title.charAt(0)}
+                                                                    <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                                                                        {analysis.fund.management_company.title?.charAt(0)}
                                                                     </div>
                                                                 )}
                                                             </Link>
-                                                            <span>{analysis.fund.code}</span>
+                                                            <div className="font-medium text-gray-900 dark:text-gray-100">{analysis.fund.code}</div>
                                                         </div>
                                                     </td>
                                                     <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
@@ -348,14 +350,27 @@ export default function Analyses() {
                                                         </button>
                                                     </td>
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
+
+                {/* Pagination */}
+                {!isLoading && filteredAnalyses.length > 0 && (
+                    <div className="mt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Toplam <span className="font-medium">{filteredAnalyses.length}</span> analiz gösteriliyor
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

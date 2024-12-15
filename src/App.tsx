@@ -10,6 +10,7 @@ import CompanyDetailPage from './pages/CompanyDetail';
 import ComparePage from './pages/Compare';
 import FavoritesPage from './pages/Favorites';
 import Analyses from './pages/Analyses';
+import Static from './pages/Static';
 
 // Components
 import Layout from './components/Layout';
@@ -41,6 +42,10 @@ function App() {
                                 <Route path="/compare" element={<ComparePage />} />
                                 <Route path="/favorites" element={<FavoritesPage />} />
                                 <Route path="/analyses" element={<Analyses />} />
+                                <Route path="/guides/:slug" element={<Static />} />
+                                <Route path="/privacy" element={<Static />} />
+                                <Route path="/terms" element={<Static />} />
+                                <Route path="/about" element={<Static />} />
                             </Routes>
                         </Layout>
                     </Router>

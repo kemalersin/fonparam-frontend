@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { useFunds } from '../hooks/useApi';
 import { formatPercent } from '../utils/format';
@@ -15,6 +15,7 @@ import { Combobox } from '@headlessui/react';
 type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
 export default function Funds() {
+    const navigate = useNavigate();
     const { search: searchInput, setSearch: setSearchInput, sort, order, handleSort, type, setType, page, setPage } = useUrlSort<SortableFields>({
         defaultSort: 'code',
         defaultOrder: 'ASC',
@@ -55,23 +56,27 @@ export default function Funds() {
         if ((event.target as HTMLElement).closest('.company-logo')) {
             return;
         }
-        window.location.href = `/funds/${fundCode}`;
+        navigate(`/funds/${fundCode}`);
     };
 
     const displayData = isLoading ? currentData : data;
+
+    const headerContent = (
+        <div className="sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Yatırım Fonları</h1>
+                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    Tüm yatırım fonlarını görüntüleyin ve performanslarını karşılaştırın
+                </p>
+            </div>
+        </div>
+    );
 
     if (isFirstLoad && isLoading) {
         return (
             <div>
                 <LoadingOverlay isLoading={true} />
-                <div className="sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Yatırım Fonları</h1>
-                        <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                            Tüm yatırım fonlarını görüntüleyin ve performanslarını karşılaştırın
-                        </p>
-                    </div>
-                </div>
+                {headerContent}
             </div>
         );
     }
@@ -79,16 +84,9 @@ export default function Funds() {
     return (
         <div>
             <LoadingOverlay isLoading={isLoading} />
-            
+
             {/* Header */}
-            <div className="sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Yatırım Fonları</h1>
-                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                        Tüm yatırım fonlarını görüntüleyin ve performanslarını karşılaştırın
-                    </p>
-                </div>
-            </div>
+            {headerContent}
 
             <div className="mt-6 space-y-6">
                 {/* Filters */}
@@ -129,8 +127,7 @@ export default function Funds() {
                                             key={type.value}
                                             value={type}
                                             className={({ active }) =>
-                                                `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                                                    active ? 'bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100'
+                                                `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-indigo-600 text-white' : 'text-gray-900 dark:text-gray-100'
                                                 }`
                                             }
                                         >
@@ -143,91 +140,90 @@ export default function Funds() {
                     </div>
                 </div>
 
-                <div className="flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <SortHeader
-                                                label="Fon Kodu"
-                                                field="code"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <th />
-                                            <SortHeader
-                                                label="Fon Adı"
-                                                field="title"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="1 Ay"
-                                                field="yield_1m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="3 Ay"
-                                                field="yield_3m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="6 Ay"
-                                                field="yield_6m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="YBB"
-                                                field="yield_ytd"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="1 Yıl"
-                                                field="yield_1y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="3 Yıl"
-                                                field="yield_3y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="5 Yıl"
-                                                field="yield_5y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {!isLoading && (!displayData?.data || displayData.data.length === 0) ? (
+                {/* Table */}
+                {!isLoading && (!displayData?.data || displayData.data.length === 0) ? (
+                    <div className="flex items-center justify-center sm:min-h-[400px]">
+                        <EmptyState
+                            title="Fon Bulunamadı"
+                            description="Aramanızla eşleşen fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                        />
+                    </div>
+                ) : (
+                    <div className="flow-root">
+                        <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
+                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                                    <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                        <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <td colSpan={10} className="py-8">
-                                                    <EmptyState
-                                                        title="Fon Bulunamadı"
-                                                        description="Aramanızla eşleşen fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
-                                                    />
-                                                </td>
+                                                <SortHeader
+                                                    label="Fon Kodu"
+                                                    field="code"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <th />
+                                                <SortHeader
+                                                    label="Fon Adı"
+                                                    field="title"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="1 Ay"
+                                                    field="yield_1m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="3 Ay"
+                                                    field="yield_3m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="6 Ay"
+                                                    field="yield_6m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="YBB"
+                                                    field="yield_ytd"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="1 Yıl"
+                                                    field="yield_1y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="3 Yıl"
+                                                    field="yield_3y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="5 Yıl"
+                                                    field="yield_5y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
                                             </tr>
-                                        ) : (
-                                            displayData?.data?.map((fund) => (
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                                            {displayData?.data?.map((fund) => (
                                                 <tr
                                                     key={fund.code}
                                                     onClick={(e) => handleRowClick(e, fund.code)}
@@ -284,14 +280,14 @@ export default function Funds() {
                                                         </td>
                                                     ))}
                                                 </tr>
-                                            ))
-                                        )}
-                                    </tbody>
-                                </table>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Pagination */}
                 {displayData && displayData.total > 0 && (
@@ -320,22 +316,20 @@ export default function Funds() {
                                     <button
                                         onClick={() => setPage(Math.max(1, page - 1))}
                                         disabled={page === 1}
-                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${
-                                            page === 1
-                                                ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                                : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                        }`}
+                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${page === 1
+                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                            : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                            }`}
                                     >
                                         Önceki
                                     </button>
                                     <button
                                         onClick={() => setPage(page + 1)}
                                         disabled={page * DEFAULT_PAGE_SIZE >= (displayData.total || 0)}
-                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${
-                                            page * DEFAULT_PAGE_SIZE >= (displayData.total || 0)
-                                                ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
-                                                : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-                                        }`}
+                                        className={`relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold ${page * DEFAULT_PAGE_SIZE >= (displayData.total || 0)
+                                            ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed'
+                                            : 'text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                            }`}
                                     >
                                         Sonraki
                                     </button>

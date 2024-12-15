@@ -220,11 +220,13 @@ export default function Companies() {
                             </div>
                         ))
                     ) : !data?.data || data.data.length === 0 ? (
-                        <div className="col-span-full py-8">
-                            <EmptyState
-                                title="Şirket Bulunamadı"
-                                description="Aramanızla eşleşen şirket bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
-                            />
+                        <div className="col-span-full">
+                            <div className="flex items-center justify-center sm:min-h-[400px]">
+                                <EmptyState
+                                    title="Şirket Bulunamadı"
+                                    description="Aramanızla eşleşen şirket bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                                />
+                            </div>
                         </div>
                     ) : (
                         data?.data.map((company) => (

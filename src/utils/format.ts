@@ -1,24 +1,46 @@
-export const formatPercent = (value: number | undefined | null): string => {
-    if (value === undefined || value === null) return '-';
+export const formatPercent = (value: number | null | undefined): string => {
+    if (value == null) return '-';
     return `%${value.toLocaleString('tr-TR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     })}`;
 };
 
-export const formatCurrency = (value: number | undefined | null): string => {
-    if (value === undefined || value === null) return '-';
+export const formatCompactNumber = (value: number): string => {
+    const trillion = 1_000_000_000_000;
+    const billion = 1_000_000_000;
+    const million = 1_000_000;
+    const thousand = 1_000;
+
+    if (value >= trillion) {
+        const truncated = Math.floor((value / trillion) * 10) / 10;
+        return `+${truncated.toLocaleString('tr-TR')}T`;
+    } else if (value >= billion) {
+        const truncated = Math.floor((value / billion) * 10) / 10;
+        return `+${truncated.toLocaleString('tr-TR')}B`;
+    } else if (value >= million) {
+        const truncated = Math.floor((value / million) * 10) / 10;
+        return `+${truncated.toLocaleString('tr-TR')}M`;
+    } else if (value >= thousand) {
+        const truncated = Math.floor((value / thousand) * 10) / 10;
+        return `+${truncated.toLocaleString('tr-TR')}K`;
+    }
+    return value.toLocaleString('tr-TR');
+};
+
+export const formatNumber = (value: number | null | undefined): string => {
+    if (value == null) return '-';
+    return value.toLocaleString('tr-TR');
+};
+
+export const formatCurrency = (value: number | null | undefined): string => {
+    if (value == null) return '-';
     return value.toLocaleString('tr-TR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
         style: 'currency',
         currency: 'TRY'
     });
-};
-
-export const formatNumber = (value: number | undefined | null): string => {
-    if (value === undefined || value === null) return '-';
-    return value.toLocaleString('tr-TR');
 };
 
 export const formatDate = (date: string | Date): string => {

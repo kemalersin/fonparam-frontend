@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getFavorites } from '../services/favorites';
 import { formatPercent } from '../utils/format';
 import { useFunds } from '../hooks/useApi';
@@ -14,6 +14,7 @@ import { useUrlSort } from '../hooks/useUrlSort';
 type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
 export default function Favorites() {
+    const navigate = useNavigate();
     const { search, setSearch, sort, order, handleSort } = useUrlSort<SortableFields>({
         defaultSort: 'code',
         defaultOrder: 'ASC'
@@ -49,7 +50,7 @@ export default function Favorites() {
         if ((event.target as HTMLElement).closest('.company-logo')) {
             return;
         }
-        window.location.href = `/funds/${fundCode}`;
+        navigate(`/funds/${fundCode}`);
     };
 
     const filteredFavorites = favorites
@@ -109,176 +110,205 @@ export default function Favorites() {
                     />
                 </div>
 
-                <div className="flow-root">
-                    <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
-                        <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-                            <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
-                                <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-800">
-                                        <tr>
-                                            <SortHeader
-                                                label="Fon Kodu"
-                                                field="code"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <th />
-                                            <SortHeader
-                                                label="Fon Adı"
-                                                field="title"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="1 Ay"
-                                                field="yield_1m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="3 Ay"
-                                                field="yield_3m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="6 Ay"
-                                                field="yield_6m"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="YBB"
-                                                field="yield_ytd"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="1 Yıl"
-                                                field="yield_1y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="3 Yıl"
-                                                field="yield_3y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                            <SortHeader
-                                                label="5 Yıl"
-                                                field="yield_5y"
-                                                currentSort={sort}
-                                                currentOrder={order}
-                                                onSort={handleSort}
-                                            />
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
-                                        {!isLoading && filteredFavorites.length === 0 ? (
+                {/* Table */}
+                {!isLoading && filteredFavorites.length === 0 ? (
+                    <div className="flex items-center justify-center sm:min-h-[400px]">
+                        <EmptyState
+                            title={search.trim() ? "Arama sonucu bulunamadı" : "Favori Fon Bulunamadı"}
+                            description={search.trim()
+                                ? "Aramanızla eşleşen favori fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                                : "Henüz favori olarak işaretlediğiniz fon bulunmuyor. Fonlar sayfasından favori fonlarınızı ekleyebilirsiniz."
+                            }
+                            icon={<StarIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />}
+                        />
+                    </div>
+                ) : (
+                    <div className="flow-root">
+                        <div className="-mx-4 -my-2 overflow-x-auto scrollbar sm:-mx-6 lg:-mx-8">
+                            <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                                    <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                                        <thead className="bg-gray-50 dark:bg-gray-800">
                                             <tr>
-                                                <td colSpan={9} className="py-8">
-                                                    <EmptyState
-                                                        title={search.trim() ? "Arama sonucu bulunamadı" : "Favori Fon Bulunamadı"}
-                                                        description={search.trim()
-                                                            ? "Aramanızla eşleşen favori fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
-                                                            : "Henüz favori olarak işaretlediğiniz fon bulunmuyor. Fonlar sayfasından favori fonlarınızı ekleyebilirsiniz."
-                                                        }
-                                                        icon={<StarIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />}
-                                                    />
-                                                </td>
+                                                <SortHeader
+                                                    label="Fon Kodu"
+                                                    field="code"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <th />
+                                                <SortHeader
+                                                    label="Fon Adı"
+                                                    field="title"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="1 Ay"
+                                                    field="yield_1m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="3 Ay"
+                                                    field="yield_3m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="6 Ay"
+                                                    field="yield_6m"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="YBB"
+                                                    field="yield_ytd"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="1 Yıl"
+                                                    field="yield_1y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="3 Yıl"
+                                                    field="yield_3y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
+                                                <SortHeader
+                                                    label="5 Yıl"
+                                                    field="yield_5y"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
                                             </tr>
-                                        ) : (
-                                            filteredFavorites.map((fund) => {
-                                                const currentFund = fundsData?.data?.find(f => f.code === fund.code);
-                                                return (
-                                                    <tr
-                                                        key={fund.code}
-                                                        onClick={(e) => handleRowClick(e, fund.code)}
-                                                        className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                    >
-                                                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
-                                                            <div className="flex items-center">
-                                                                <Link
-                                                                    to={`/companies/${fund.management_company_id}`}
-                                                                    className="company-logo flex-shrink-0 hover:opacity-75 mr-3"
-                                                                    onClick={(e) => e.stopPropagation()}
-                                                                >
-                                                                    {fund.management_company_logo ? (
-                                                                        <img
-                                                                            src={fund.management_company_logo}
-                                                                            alt={fund.management_company_title}
-                                                                            className="h-6 w-6 object-contain"
-                                                                        />
-                                                                    ) : (
-                                                                        <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                                            {fund.management_company_title?.charAt(0)}
-                                                                        </div>
-                                                                    )}
-                                                                </Link>
-                                                                <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="whitespace-nowrap py-4 pr-3 text-sm">
-                                                            <div className="flex items-center justify-center gap-0.5">
-                                                                <FavoriteButton 
-                                                                    fund={fund} 
-                                                                    onRemove={() => {
-                                                                        setFavorites(prev => prev.filter(f => f.code !== fund.code));
-                                                                        setFavoriteCodes(prev => prev.filter(code => code !== fund.code));
-                                                                    }}
-                                                                />
-                                                                <ComparisonButton fund={{
-                                                                    code: fund.code,
-                                                                    title: fund.title,
-                                                                    management_company: {
-                                                                        id: fund.management_company_id,
-                                                                        title: fund.management_company_title,
-                                                                        logo: fund.management_company_logo
-                                                                    }
-                                                                }} />
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                            <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
-                                                        </td>
-                                                        {[
-                                                            currentFund?.yield_1m,
-                                                            currentFund?.yield_3m,
-                                                            currentFund?.yield_6m,
-                                                            currentFund?.yield_ytd,
-                                                            currentFund?.yield_1y,
-                                                            currentFund?.yield_3y,
-                                                            currentFund?.yield_5y
-                                                        ].map((value, index) => (
-                                                            <td key={index} className='whitespace-nowrap px-3 py-4 text-sm text-right'>
-                                                                {value !== undefined && value !== null ? (
-                                                                    <span className={value >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}>
-                                                                        {formatPercent(value)}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
-                                                                )}
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
+                                            {!isLoading && filteredFavorites.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={10} className="py-8">
+                                                        <div className="flex items-center justify-center min-h-[400px]">
+                                                            <EmptyState
+                                                                title={search.trim() ? "Arama sonucu bulunamadı" : "Favori Fon Bulunamadı"}
+                                                                description={search.trim()
+                                                                    ? "Aramanızla eşleşen favori fon bulunamadı. Lütfen farklı bir arama yapmayı deneyin."
+                                                                    : "Henüz favori olarak işaretlediğiniz fon bulunmuyor. Fonlar sayfasından favori fonlarınızı ekleyebilirsiniz."
+                                                                }
+                                                                icon={<StarIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />}
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ) : (
+                                                filteredFavorites.map((fund) => {
+                                                    const currentFund = fundsData?.data?.find(f => f.code === fund.code);
+                                                    return (
+                                                        <tr
+                                                            key={fund.code}
+                                                            onClick={(e) => handleRowClick(e, fund.code)}
+                                                            className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                        >
+                                                            <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
+                                                                <div className="flex items-center">
+                                                                    <Link
+                                                                        to={`/companies/${fund.management_company_id}`}
+                                                                        className="company-logo flex-shrink-0 hover:opacity-75 mr-3"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    >
+                                                                        {fund.management_company_logo ? (
+                                                                            <img
+                                                                                src={fund.management_company_logo}
+                                                                                alt={fund.management_company_title}
+                                                                                className="h-6 w-6 object-contain"
+                                                                            />
+                                                                        ) : (
+                                                                            <div className="h-6 w-6 rounded bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                                                                                {fund.management_company_title?.charAt(0)}
+                                                                            </div>
+                                                                        )}
+                                                                    </Link>
+                                                                    <div className="font-medium text-gray-900 dark:text-gray-100">{fund.code}</div>
+                                                                </div>
                                                             </td>
-                                                        ))}
-                                                    </tr>
-                                                );
-                                            })
-                                        )}
-                                    </tbody>
-                                </table>
+                                                            <td className="whitespace-nowrap py-4 pr-3 text-sm">
+                                                                <div className="flex items-center justify-center gap-0.5">
+                                                                    <FavoriteButton 
+                                                                        fund={fund} 
+                                                                        onRemove={() => {
+                                                                            setFavorites(prev => prev.filter(f => f.code !== fund.code));
+                                                                            setFavoriteCodes(prev => prev.filter(code => code !== fund.code));
+                                                                        }}
+                                                                    />
+                                                                    <ComparisonButton fund={{
+                                                                        code: fund.code,
+                                                                        title: fund.title,
+                                                                        management_company: {
+                                                                            code: fund.management_company_id,
+                                                                            title: fund.management_company_title,
+                                                                            logo: fund.management_company_logo
+                                                                        }
+                                                                    }} />
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                                                <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
+                                                            </td>
+                                                            {[
+                                                                currentFund?.yield_1m,
+                                                                currentFund?.yield_3m,
+                                                                currentFund?.yield_6m,
+                                                                currentFund?.yield_ytd,
+                                                                currentFund?.yield_1y,
+                                                                currentFund?.yield_3y,
+                                                                currentFund?.yield_5y
+                                                            ].map((value, index) => (
+                                                                <td key={index} className='whitespace-nowrap px-3 py-4 text-sm text-right'>
+                                                                    {value !== undefined && value !== null ? (
+                                                                        <span className={value >= 0 ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'}>
+                                                                            {formatPercent(value)}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                                    )}
+                                                                </td>
+                                                            ))}
+                                                        </tr>
+                                                    );
+                                                })
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
+
+                {/* Pagination */}
+                {!isLoading && filteredFavorites.length > 0 && (
+                    <div className="mt-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
+                                    Toplam <span className="font-medium">{filteredFavorites.length}</span> favori fon gösteriliyor
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

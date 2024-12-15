@@ -5,6 +5,34 @@ export interface FundType {
     group_name: string;
 }
 
+export interface DailyStatistics {
+    date: string;
+    total_funds: number;
+    total_companies: number;
+    total_investors: number;
+    total_aum: number;
+    avg_profit: number;
+    avg_loss: number;
+}
+
+export interface FundTypeDetails {
+    type: string;
+    short_name: string;
+    long_name: string;
+    group_name: string;
+    yield_1d?: number;
+    yield_1w?: number;
+    yield_1m?: number;
+    yield_3m?: number;
+    yield_6m?: number;
+    yield_ytd?: number;
+    yield_1y?: number;
+    yield_3y?: number;
+    yield_5y?: number;
+    total_funds: number;
+    total_aum?: number;
+}
+
 export interface FundHistoricalValue {
     code?: string;
     value: number;

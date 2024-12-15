@@ -5,7 +5,9 @@ import type {
     FundHistoricalValue,
     FundAnalysis,
     PaginatedResponse,
-    CompanyListItem
+    CompanyListItem,
+    DailyStatistics,
+    FundTypeDetails
 } from '../types/api';
 
 const api = axios.create({
@@ -102,6 +104,45 @@ export const getFundHistory = async (
 
 export const getFundDetails = async (code: string) => {
     const { data } = await api.get<Fund>(`/funds/${code}`);
+    return data;
+};
+
+// İstatistikler
+export const getStatistics = async (params?: {
+    start_date?: string;
+    end_date?: string;
+    sort?: 'date' | 'total_funds' | 'total_companies' | 'total_investors' | 'total_aum' | 'avg_profit' | 'avg_loss';
+    order?: 'ASC' | 'DESC';
+    page?: number;
+    limit?: number;
+}) => {
+    const { data } = await api.get<PaginatedResponse<DailyStatistics>>('/statistics', { params });
+    return data;
+};
+
+export const getLatestStatistics = async () => {
+    const { data } = await api.get<DailyStatistics>('/statistics/latest');
+    return data;
+};
+
+export const getStatisticsByDate = async (date: string) => {
+    const { data } = await api.get<DailyStatistics>(`/statistics/${date}`);
+    return data;
+};
+
+// Fon Tipleri
+export const getFundTypes = async (params?: {
+    sort?: 'type' | 'short_name' | 'long_name' | 'group_name';
+    order?: 'ASC' | 'DESC';
+    min_total_funds?: number;
+    max_total_funds?: number;
+}) => {
+    const { data } = await api.get<FundTypeDetails[]>('/fund-types', { params });
+    return data;
+};
+
+export const getFundTypeDetails = async (type: string) => {
+    const { data } = await api.get<FundTypeDetails>(`/fund-types/${type}`);
     return data;
 };
  

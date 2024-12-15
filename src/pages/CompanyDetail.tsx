@@ -4,10 +4,12 @@ import { ArrowUpIcon, ArrowDownIcon, ChartBarIcon } from '@heroicons/react/24/ou
 import type { Fund } from '../types/api';
 import EmptyState from '../components/EmptyState';
 import { formatPercent, formatNumber } from '../utils/format';
+import { useNavigate } from 'react-router-dom';
 
 export default function CompanyDetail() {
     const { code } = useParams<{ code: string }>();
     const { data, isLoading } = useCompanyDetails(code ?? '');
+    const navigate = useNavigate();
 
     if (isLoading) {
         return (
@@ -186,7 +188,7 @@ export default function CompanyDetail() {
                                         <tr
                                             key={fund.code}
                                             className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
-                                            onClick={() => window.location.href = `/funds/${fund.code}`}
+                                            onClick={() => navigate(`/funds/${fund.code}`)}
                                         >
                                             <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                                                 <Link

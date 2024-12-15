@@ -8,8 +8,11 @@ export const DEFAULT_INCREASE_TYPE: YearlyIncreaseType = 'percentage';
 export const DEFAULT_INCREASE_VALUE = 10;
 
 // Pagination Parameters
-export const DEFAULT_PAGE_SIZE = 20;
+export const DEFAULT_PAGE_SIZE = 50;
 export const DEBOUNCE_DELAY = 300;
+
+// Cache Parameters
+export const STALE_TIME = 30 * 60 * 1000; // 30 dakika
 
 // Fund Types
 export const FUND_TYPES = [

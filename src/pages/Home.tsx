@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTopPerformingFunds } from '../hooks/useApi';
-import { formatPercent } from '../utils/format';
+import { useTopPerformingFunds, useLatestStatistics, useFundTypes } from '../hooks/useApi';
+import { formatPercent, formatCurrency, formatNumber, formatCompactNumber, formatDate } from '../utils/format';
 import RecentlyViewedFunds from '../components/RecentlyViewedFunds';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useSwipe } from '../hooks/useSwipe';
@@ -15,68 +15,45 @@ import {
     ScaleIcon,
     ClockIcon,
     ArrowUpIcon,
-    ArrowDownIcon
+    ArrowDownIcon,
+    UsersIcon,
+    CurrencyDollarIcon
 } from '@heroicons/react/24/outline';
-
-const stats = [
-    {
-        name: 'Toplam Fon',
-        value: '1500+',
-        description: 'Aktif olarak işlem gören'
-    },
-    {
-        name: 'Portföy Yönetim Şirketi',
-        value: '70+',
-        description: 'Türkiye genelinde'
-    },
-    {
-        name: 'Yatırımcı Sayısı',
-        value: '10Mn+',
-        description: 'Ortalama'
-    },
-    {
-        name: 'Toplam Portföy Büyüklüğü',
-        value: '₺4Tr+',
-        description: 'Yönetilen varlık'
-    }
-];
 
 const guides = [
     {
         title: 'Yatırım Fonu Nedir?',
         description: 'Yatırım fonları, birçok yatırımcının birikimlerini bir araya getirerek oluşturduğu portföylerdir.',
         icon: AcademicCapIcon,
+        slug: 'yatirim-fonu-nedir'
     },
     {
         title: 'Fon Türleri',
         description: 'Hisse senedi, borçlanma araçları, karma ve serbest fonlar hakkında bilgi edinin.',
         icon: ChartPieIcon,
+        slug: 'fon-turleri'
     },
     {
         title: 'Nasıl Fon Seçilir?',
         description: 'Fon seçerken dikkat edilmesi gereken kriterler ve analiz yöntemleri.',
         icon: ScaleIcon,
+        slug: 'nasil-fon-secilir'
     },
     {
         title: 'Yatırım Stratejileri',
         description: 'Düzenli yatırım, portföy çeşitlendirme ve risk yönetimi hakkında ipuçları.',
         icon: ClockIcon,
+        slug: 'yatirim-stratejileri'
     },
-];
-
-const marketSummary = [
-    { type: 'Hisse Senedi Fonları', value: 112.4, trend: 'up' },
-    { type: 'Borçlanma Araçları Fonları', value: 42.8, trend: 'up' },
-    { type: 'Karma Fonlar', value: 28.5, trend: 'down' },
-    { type: 'Para Piyasas Fonları', value: 35.2, trend: 'up' },
-    { type: 'Katılım Fonları', value: 45.6, trend: 'up' },
-    { type: 'Serbest Fonlar', value: 65.3, trend: 'down' }
 ];
 
 export default function Home() {
     const { data: topFunds, isLoading } = useTopPerformingFunds();
+    const { data: latestStats, isLoading: isStatsLoading } = useLatestStatistics();
+    const { data: fundTypes, isLoading: isMarketLoading } = useFundTypes();
     const [searchQuery, setSearchQuery] = useState('');
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [marketSlide, setMarketSlide] = useState(0);
     const navigate = useNavigate();
 
     const [heroRef, isHeroVisible] = useIntersectionObserver();
@@ -89,6 +66,11 @@ export default function Home() {
     const swipeHandlers = useSwipe({
         onSwipeLeft: () => currentSlide < slides.length - 1 && setCurrentSlide(currentSlide + 1),
         onSwipeRight: () => currentSlide > 0 && setCurrentSlide(currentSlide - 1)
+    });
+
+    const marketSwipeHandlers = useSwipe({
+        onSwipeLeft: () => marketSlide < Math.ceil(marketSummary.length / 9) - 1 && setMarketSlide(marketSlide + 1),
+        onSwipeRight: () => marketSlide > 0 && setMarketSlide(marketSlide - 1)
     });
 
     const handleSearch = (e: React.FormEvent) => {
@@ -115,6 +97,40 @@ export default function Home() {
     }, []);
 
     const slides = getFundGroups();
+
+    const stats = [
+        {
+            name: 'Toplam Fon',
+            value: latestStats?.total_funds ?? 0,
+            description: 'Aktif olarak işlem gören',
+            icon: ChartBarIcon
+        },
+        {
+            name: 'Portföy Yönetim Şirketi',
+            value: latestStats?.total_companies ?? 0,
+            description: 'Türkiye genelinde',
+            icon: BuildingOfficeIcon
+        },
+        {
+            name: 'Yatırımcı Sayısı',
+            value: latestStats?.total_investors ?? 0,
+            description: 'Ortalama',
+            icon: UsersIcon
+        },
+        {
+            name: 'Toplam Portföy Büyüklüğü',
+            value: latestStats?.total_aum ?? 0,
+            description: 'Yönetilen varlık',
+            icon: CurrencyDollarIcon
+        }
+    ];
+
+    const marketSummary = fundTypes?.map(type => ({
+        type: type.type,
+        groupName: type.group_name,
+        value: type.yield_1y ?? 0,
+        trend: (type.yield_1y ?? 0) >= 0 ? 'up' : 'down'
+    })) ?? [];
 
     return (
         <div className="space-y-8">
@@ -192,22 +208,39 @@ export default function Home() {
             >
                 <div className="mx-auto max-w-7xl">
                     <dl className="grid grid-cols-1 gap-x-8 gap-y-8 sm:gap-y-0 sm:grid-cols-2 lg:grid-cols-4 p-8">
-                        {stats.map((stat, index) => (
-                            <div 
-                                key={stat.name} 
-                                className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                                <dt className="text-sm leading-6 text-gray-600 dark:text-gray-400">{stat.name}</dt>
-                                <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-                                    {stat.value}
-                                </dd>
-                                <p className="text-xs text-gray-500 dark:text-gray-500">{stat.description}</p>
-                            </div>
-                        ))}
+                        {isStatsLoading ? (
+                            // Loading skeleton
+                            [...Array(4)].map((_, index) => (
+                                <div 
+                                    key={index}
+                                    className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
+                                >
+                                    <div className="h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                </div>
+                            ))
+                        ) : (
+                            stats.map((stat, index) => (
+                                <div 
+                                    key={stat.name} 
+                                    className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    <dt className="text-sm leading-6 text-gray-600 dark:text-gray-400">{stat.name}</dt>
+                                    <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
+                                        {stat.name === 'Toplam Portföy Büyüklüğü' 
+                                            ? `+₺${formatCompactNumber(stat.value).substring(1)}`
+                                            : formatCompactNumber(stat.value)
+                                        }
+                                    </dd>
+                                    <p className="text-xs text-gray-500 dark:text-gray-500">{stat.description}</p>
+                                </div>
+                            ))
+                        )}
                     </dl>
                 </div>
-            </div>
+            </div>       
 
             {/* Top Performing Funds */}
             <div 
@@ -224,9 +257,23 @@ export default function Home() {
                 </div>
 
                 {isLoading ? (
-                    <div className="space-y-4">
+                    <div className="space-y-6 sm:space-y-4">
                         {[...Array(5)].map((_, i) => (
-                            <div key={i} className="h-16 bg-gray-100 dark:bg-gray-700 rounded"></div>
+                            <div key={i} className="p-0 sm:p-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                    <div className="flex items-start sm:items-center gap-3">
+                                        <div className="h-9 w-9 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                        <div className="flex flex-col gap-2">
+                                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                            <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1"></div>
+                                        <div className="h-3 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 ) : (
@@ -254,7 +301,7 @@ export default function Home() {
                                                             className="flex-shrink-0 hover:opacity-75 cursor-pointer"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                window.location.href = `/companies/${fund.management_company.code}`;
+                                                                navigate(`/companies/${fund.management_company.code}`);
                                                             }}
                                                         >
                                                             {fund.management_company?.logo ? (
@@ -304,6 +351,26 @@ export default function Home() {
                 )}
             </div>
 
+            {/* Guides */}
+            <div 
+                ref={guidesRef}
+                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-1000 ${
+                    isGuidesVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+            >
+                {guides.map((guide) => (
+                    <Link
+                        key={guide.title}
+                        to={`/guides/${guide.slug}`}
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 hover:scale-102 hover:-translate-y-1"
+                    >
+                        <guide.icon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{guide.title}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{guide.description}</p>
+                    </Link>
+                ))}
+            </div>  
+
             {/* Market Summary */}
             <div 
                 ref={marketRef}
@@ -320,57 +387,100 @@ export default function Home() {
                             </p>
                         </div>
                         <div className="text-sm text-gray-600 dark:text-gray-400">
-                            Son güncelleme: {new Date().toLocaleDateString('tr-TR')}
+                            Son güncelleme: {latestStats ? formatDate(latestStats.date) : '-'}
                         </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {marketSummary.map((item, index) => (
-                            <div
-                                key={item.type}
-                                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg transform transition-all duration-200 hover:scale-102 hover:-translate-y-1"
-                                style={{ animationDelay: `${index * 100}ms` }}
-                            >
-                                <div>
-                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.type}</h3>
-                                    <p className={`text-2xl font-semibold mt-1 ${
-                                        item.trend === 'up' 
-                                            ? 'text-green-600 dark:text-green-400' 
-                                            : 'text-red-600 dark:text-red-400'
-                                    }`}>
-                                        %{item.value}
-                                    </p>
+                    {isMarketLoading ? (
+                        // Loading skeleton
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[...Array(9)].map((_, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                                >
+                                    <div className="flex-1">
+                                        <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
+                                        <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                                    </div>
+                                    <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
                                 </div>
-                                <div>
-                                    {item.trend === 'up' ? (
-                                        <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
-                                    ) : (
-                                        <ArrowDownIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
-                                    )}
+                            ))}
+                        </div>
+                    ) : marketSummary.length > 0 ? (
+                        <div className="relative">
+                            <div className="relative overflow-hidden">
+                                <div 
+                                    className="flex transition-transform duration-500 ease-in-out" 
+                                    style={{ transform: `translateX(-${marketSlide * 100}%)` }}
+                                    {...marketSwipeHandlers}
+                                >
+                                    {Array.from({ length: Math.ceil(marketSummary.length / 9) }).map((_, pageIndex) => (
+                                        <div 
+                                            key={pageIndex}
+                                            className="w-full flex-shrink-0"
+                                        >
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                {marketSummary
+                                                    .slice(pageIndex * 9, (pageIndex + 1) * 9)
+                                                    .map((item, index) => (
+                                                        <Link
+                                                            key={item.type}
+                                                            to={`/funds?type=${encodeURIComponent(item.type)}`}
+                                                            className="block p-4 bg-gray-50 dark:bg-gray-900 rounded-lg transform transition-all duration-200 hover:scale-102 hover:-translate-y-1"
+                                                            style={{ animationDelay: `${index * 100}ms` }}
+                                                        >
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.groupName}</h3>
+                                                                    <p className={`text-2xl font-semibold mt-1 ${
+                                                                        item.trend === 'up' 
+                                                                            ? 'text-green-600 dark:text-green-400' 
+                                                                            : 'text-red-600 dark:text-red-400'
+                                                                    }`}>
+                                                                        {formatPercent(item.value)}
+                                                                    </p>
+                                                                </div>
+                                                                <div>
+                                                                    {item.trend === 'up' ? (
+                                                                        <ArrowUpIcon className="h-8 w-8 text-green-600 dark:text-green-400" />
+                                                                    ) : (
+                                                                        <ArrowDownIcon className="h-8 w-8 text-red-600 dark:text-red-400" />
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                            {marketSummary.length > 9 && (
+                                <div className="flex justify-center gap-2 mt-4">
+                                    {Array.from({ length: Math.ceil(marketSummary.length / 9) }).map((_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setMarketSlide(index)}
+                                            className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
+                                                marketSlide === index
+                                                    ? 'bg-indigo-600 dark:bg-indigo-500'
+                                                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="col-span-full">
+                            <EmptyState
+                                title="Veri Bulunamadı"
+                                description="Piyasa özeti verilerine şu anda ulaşılamıyor."
+                            />
+                        </div>
+                    )}
                 </div>
-            </div>
-
-            {/* Guides */}
-            <div 
-                ref={guidesRef}
-                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-1000 ${
-                    isGuidesVisible ? 'opacity-100' : 'opacity-0'
-                }`}
-            >
-                {guides.map((guide) => (
-                    <div
-                        key={guide.title}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
-                    >
-                        <guide.icon className="h-8 w-8 text-indigo-600 dark:text-indigo-400 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">{guide.title}</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{guide.description}</p>
-                    </div>
-                ))}
-            </div>
+            </div>               
 
             {/* Recently Viewed Funds */}
             <div 

@@ -5,6 +5,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 import ScrollToTopButton from './ScrollToTopButton';
+import Footer from './Footer';
 
 const navigation = [
     { name: 'Fonlar', href: '/funds' },
@@ -102,6 +103,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                     {children}
                 </div>
             </main>
+
+            <Footer />
             <ScrollToTopButton />
         </div>
     );

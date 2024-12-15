@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getRecentlyViewed } from '../services/recentlyViewed';
 
 export default function RecentlyViewedFunds() {
+    const navigate = useNavigate();
     const [funds, setFunds] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -57,7 +58,7 @@ export default function RecentlyViewedFunds() {
                                 className="flex-shrink-0 hover:opacity-75 cursor-pointer"
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    window.location.href = `/companies/${fund.management_company.code}`;
+                                    navigate(`/companies/${fund.management_company.code}`);
                                 }}
                             >
                                 {fund.management_company?.logo ? (
