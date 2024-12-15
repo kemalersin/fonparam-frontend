@@ -46,6 +46,7 @@ function App() {
                                 <Route path="/privacy" element={<Static />} />
                                 <Route path="/terms" element={<Static />} />
                                 <Route path="/about" element={<Static />} />
+                                <Route path="/api" element={<Static />} />
                             </Routes>
                         </Layout>
                     </Router>

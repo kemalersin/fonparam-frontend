@@ -15,6 +15,7 @@ import {
     DEFAULT_INCREASE_TYPE,
     DEFAULT_INCREASE_VALUE
 } from '../constants';
+import ExportButton from '../components/ExportButton';
 
 const PERIODS: Record<string, string> = {
     'last_1_day': '1 Gün',
@@ -184,9 +185,9 @@ export default function Analyses() {
                         Kaydettiğiniz fon analizlerini görüntüleyin ve karşılaştırın
                     </p>
                 </div>
+                <ExportButton storeName="analysis" />
             </div>
 
-            {/* Content */}
             <div className="mt-6 space-y-6">
                 {/* Search */}
                 <div className="relative">

@@ -10,6 +10,7 @@ import { formatPercent, formatCurrency } from '../utils/format';
 import SortHeader from '../components/SortHeader';
 import { Fund } from '../types/api';
 import LoadingOverlay from '../components/LoadingOverlay';
+import ExportButton from '../components/ExportButton';
 
 const COLORS = [
     '#4f46e5', // indigo-600
@@ -312,6 +313,7 @@ export default function Compare() {
                         Seçtiğiniz fonların performanslarını karşılaştırın
                     </p>
                 </div>
+                <ExportButton storeName="comparison" />
             </div>
 
             {/* Content */}

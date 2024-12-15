@@ -10,6 +10,7 @@ import LoadingOverlay from '../components/LoadingOverlay';
 import SortHeader from '../components/SortHeader';
 import { StarIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useUrlSort } from '../hooks/useUrlSort';
+import ExportButton from '../components/ExportButton';
 
 type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
@@ -86,6 +87,7 @@ export default function Favorites() {
         <div>
             <LoadingOverlay isLoading={isLoading} />
             
+            {/* Header */}
             <div className="sm:flex sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Favori Fonlarım</h1>
@@ -93,6 +95,7 @@ export default function Favorites() {
                         Favori olarak işaretlediğiniz fonları görüntüleyin ve takip edin
                     </p>
                 </div>
+                <ExportButton storeName="favorites" />
             </div>
 
             <div className="mt-6 space-y-6">
