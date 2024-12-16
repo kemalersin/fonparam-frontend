@@ -33,11 +33,11 @@ export const formatNumber = (value: number | null | undefined): string => {
     return value.toLocaleString('tr-TR');
 };
 
-export const formatCurrency = (value: number | null | undefined): string => {
+export const formatCurrency = (value: number | null | undefined, maxFractionDigits?: number): string => {
     if (value == null) return '-';
     return value.toLocaleString('tr-TR', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        maximumFractionDigits: maxFractionDigits ?? 2,
         style: 'currency',
         currency: 'TRY'
     });
