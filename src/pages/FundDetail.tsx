@@ -394,7 +394,7 @@ export default function FundDetail() {
                                 {...swipeHandlers}
                             >
                                 <div className="w-full flex-shrink-0">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         {[
                                             { label: '1 Haftalık', value: currentFund.yield_1w },
                                             { label: '1 Aylık', value: currentFund.yield_1m },
@@ -417,7 +417,7 @@ export default function FundDetail() {
                                     </div>
                                 </div>
                                 <div className="w-full flex-shrink-0">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                                         {[
                                             { label: 'YBB', value: currentFund.yield_ytd },
                                             { label: '1 Yıllık', value: currentFund.yield_1y },
@@ -504,6 +504,8 @@ export default function FundDetail() {
                                                 })
                                             }
                                             className="text-gray-600 dark:text-gray-300"
+                                            domain={['auto', 'auto']}
+                                            padding={{ top: 20, bottom: 20 }}
                                         />
                                         <Tooltip
                                             formatter={(value: number, name: string, props: any) => {
@@ -725,7 +727,7 @@ export default function FundDetail() {
 
                             {analysisData && !analysisError && (
                                 <div className="lg:col-span-2">
-                                    <dl className={`grid grid-cols-1 gap-6 sm:grid-cols-2 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
+                                    <dl className={`grid grid-cols-2 gap-6 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
                                         <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                                 Toplam Yatırım

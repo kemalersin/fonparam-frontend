@@ -106,7 +106,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             <Footer />
             <ScrollToTopButton />
-            <ScrollRestoration/>
+            <ScrollRestoration getKey={location => location.pathname}/>
         </div>
     );
 } 
