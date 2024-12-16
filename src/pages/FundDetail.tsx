@@ -296,10 +296,10 @@ export default function FundDetail() {
                     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                             <div className="flex-1 min-w-0">
-                                <div className="flex items-start sm:items-center gap-4">
+                                <div className="flex items-start lg:items-center gap-4">
                                     <Link
                                         to={`/companies/${currentFund.management_company.code}`}
-                                        className="flex-shrink-0 hover:opacity-75"
+                                        className="flex-shrink-0 hover:opacity-75 mt-1 sm:mt-2 lg:mt-0"
                                     >
                                         {currentFund.management_company?.logo ? (
                                             <img
@@ -314,8 +314,8 @@ export default function FundDetail() {
                                         )}
                                     </Link>
                                     <div className="min-w-0">
-                                        <div className="flex items-center gap-4">
-                                            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">
+                                        <div className="flex lg:items-center gap-4">
+                                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                                                 {currentFund.title}
                                             </h1>
                                             <div className="flex gap-1">

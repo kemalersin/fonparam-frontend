@@ -237,7 +237,7 @@ export default function Companies() {
                             >
                                 <div className="flex items-start justify-between gap-4">
                                     <div className="min-w-0">
-                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 sm:truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                             {company.title}
                                         </h2>
                                         <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 min-h-[2.5rem] mt-1">
