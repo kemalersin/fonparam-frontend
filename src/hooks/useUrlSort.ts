@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 interface UseUrlSortOptions<T> {
@@ -8,6 +7,7 @@ interface UseUrlSortOptions<T> {
     defaultType?: string;
     defaultPage?: number;
     defaultMinFunds?: string;
+    defaultCompany?: string;
 }
 
 export function useUrlSort<T extends string>({
@@ -16,7 +16,8 @@ export function useUrlSort<T extends string>({
     defaultSearch = '',
     defaultType = '',
     defaultPage = 1,
-    defaultMinFunds = ''
+    defaultMinFunds = '',
+    defaultCompany = ''
 }: UseUrlSortOptions<T>) {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -26,6 +27,7 @@ export function useUrlSort<T extends string>({
     const type = searchParams.get('type') || defaultType;
     const page = Number(searchParams.get('page')) || defaultPage;
     const minFunds = searchParams.get('minFunds') || defaultMinFunds;
+    const company = searchParams.get('company') || defaultCompany;
 
     const setSearch = (value: string) => {
         const newParams = new URLSearchParams(searchParams);
@@ -81,6 +83,17 @@ export function useUrlSort<T extends string>({
         setSearchParams(newParams);
     };
 
+    const setCompany = (value: string) => {
+        const newParams = new URLSearchParams(searchParams);
+        if (value) {
+            newParams.set('company', value);
+        } else {
+            newParams.delete('company');
+        }
+        newParams.delete('page');
+        setSearchParams(newParams);
+    };
+
     return {
         search,
         setSearch,
@@ -92,6 +105,8 @@ export function useUrlSort<T extends string>({
         page,
         setPage,
         minFunds,
-        setMinFunds
+        setMinFunds,
+        company,
+        setCompany
     };
 } 

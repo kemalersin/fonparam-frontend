@@ -32,7 +32,7 @@ export default function ComparisonButton({ fund, className = '' }: ComparisonBut
                 await addToComparison({
                     code: fund.code,
                     title: fund.title,
-                    management_company_id: fund.management_company.id,
+                    management_company_id: fund.management_company.code,
                     management_company_title: fund.management_company?.title ?? '',
                     management_company_logo: fund.management_company?.logo
                 });

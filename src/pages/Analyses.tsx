@@ -41,10 +41,17 @@ export default function Analyses() {
     const [analyses, setAnalyses] = useState<AnalysisRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
         loadAnalyses();
     }, []);
+
+    useEffect(() => {
+        if (!isLoading) {
+            setIsFirstLoad(false);
+        }
+    }, [isLoading]);
 
     const loadAnalyses = async () => {
         setIsLoading(true);
@@ -77,13 +84,6 @@ export default function Analyses() {
         }
     };
 
-    const calculateInvestmentPeriod = (startDate: string) => {
-        const start = new Date(startDate);
-        const now = new Date();
-        const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-        return `${Math.floor(months / 12)} yıl ${months % 12} ay`;
-    };
-
     const filteredAnalyses = analyses
         .filter(analysis => 
             search.trim() === '' || 
@@ -107,16 +107,16 @@ export default function Analyses() {
                     bValue = new Date(b.date).getTime();
                     break;
                 case 'startDate':
-                    const periodOrder = {
-                        'last_1_day': 1,
-                        'last_1_week': 2,
-                        'last_1_month': 3,
-                        'last_3_months': 4,
-                        'last_6_months': 5,
-                        'year_start': 6,
-                        'last_1_year': 7,
-                        'last_3_years': 8,
-                        'last_5_years': 9
+                    const periodOrder: { [key: string]: number } = {
+                        last_1_day: 1,
+                        last_1_week: 2,
+                        last_1_month: 3,
+                        last_3_months: 4,
+                        last_6_months: 5,
+                        year_start: 6,
+                        last_1_year: 7,
+                        last_3_years: 8,
+                        last_5_years: 9
                     };
                     aValue = periodOrder[a.parameters.startDate] || 0;
                     bValue = periodOrder[b.parameters.startDate] || 0;
@@ -173,20 +173,31 @@ export default function Analyses() {
         return `/funds/${analysis.fund.code}${queryString ? `?${queryString}` : ''}`;
     };
 
+    const headerContent = (
+        <div className="sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Analizlerim</h1>
+                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    Kaydettiğiniz fon analizlerini görüntüleyin ve takip edin
+                </p>
+            </div>
+            <ExportButton storeName="analyses" />
+        </div>
+    );
+
+    if (isFirstLoad) {
+        return (
+            <div>
+                <LoadingOverlay isLoading={true} />
+                {headerContent}
+            </div>
+        );
+    }
+
     return (
         <div>
             <LoadingOverlay isLoading={isLoading} />
-            
-            {/* Header */}
-            <div className="sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Kayıtlı Analizler</h1>
-                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                        Kaydettiğiniz fon analizlerini görüntüleyin ve karşılaştırın
-                    </p>
-                </div>
-                <ExportButton storeName="analysis" />
-            </div>
+            {headerContent}
 
             <div className="mt-6 space-y-6">
                 {/* Search */}
@@ -224,56 +235,56 @@ export default function Analyses() {
                                             <tr>
                                                 <SortHeader
                                                     label="Fon Kodu"
-                                                    field="code"
+                                                    field={'code' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Fon Adı"
-                                                    field="title"
+                                                    field={'title' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Analiz Tarihi"
-                                                    field="date"
+                                                    field={'date' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Yatırım Süresi"
-                                                    field="startDate"
+                                                    field={'startDate' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Toplam Yatırım"
-                                                    field="totalInvestment"
+                                                    field={'totalInvestment' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Güncel Değer"
-                                                    field="currentValue"
+                                                    field={'currentValue' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Toplam Kazanç"
-                                                    field="totalYield"
+                                                    field={'totalYield' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
                                                 <SortHeader
                                                     label="Getiri Oranı"
-                                                    field="totalYieldPercentage"
+                                                    field={'totalYieldPercentage' as SortableFields}
                                                     currentSort={sort}
                                                     currentOrder={order}
                                                     onSort={handleSort}

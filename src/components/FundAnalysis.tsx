@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 const FundAnalysis: React.FC = () => {
-    const [showMonthlyDetails, setShowMonthlyDetails] = React.useState(false);
+    const [showMonthlyDetails] = React.useState(false);
 
     useEffect(() => {
         localStorage.setItem('showMonthlyDetails', JSON.stringify(showMonthlyDetails));
@@ -19,7 +19,9 @@ const FundAnalysis: React.FC = () => {
     }, [showMonthlyDetails]);
 
     return (
-        // Rest of the component code remains unchanged
+        <div>
+            {/* Rest of the component code remains unchanged */}
+        </div>
     );
 };
 

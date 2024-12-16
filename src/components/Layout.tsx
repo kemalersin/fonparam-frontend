@@ -1,6 +1,5 @@
-import { Fragment } from 'react';
 import { Link, ScrollRestoration, useLocation, Outlet } from 'react-router-dom';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useTheme } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
@@ -19,7 +18,7 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default function Layout() {
     const { theme } = useTheme();
     const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
     const location = useLocation();

@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTopPerformingFunds, useLatestStatistics, useFundTypes } from '../hooks/useApi';
-import { formatPercent, formatCurrency, formatNumber, formatCompactNumber, formatDate } from '../utils/format';
+import { formatPercent, formatCompactNumber, formatDate } from '../utils/format';
 import RecentlyViewedFunds from '../components/RecentlyViewedFunds';
+import EmptyState from '../components/EmptyState';
 import { useIntersectionObserver } from '../hooks/useIntersectionObserver';
 import { useSwipe } from '../hooks/useSwipe';
-import { 
-    ChartBarIcon, 
-    BuildingOfficeIcon, 
-    ArrowTrendingUpIcon, 
+import {
+    ChartBarIcon,
+    BuildingOfficeIcon,
+    ArrowTrendingUpIcon,
     MagnifyingGlassIcon,
     AcademicCapIcon,
     ChartPieIcon,
@@ -135,11 +136,10 @@ export default function Home() {
     return (
         <div className="space-y-8">
             {/* Hero Section */}
-            <div 
+            <div
                 ref={heroRef}
-                className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center transition-opacity duration-1000 ${
-                    isHeroVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg shadow-sm p-8 text-center transition-opacity duration-1000 ${isHeroVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 animate-slide-down">
                     Türkiye'nin Yatırım Fonu Verileri
@@ -200,18 +200,17 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div 
+            <div
                 ref={statsRef}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${
-                    isStatsVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${isStatsVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 <div className="mx-auto max-w-7xl">
                     <dl className="grid grid-cols-1 gap-x-8 gap-y-8 sm:gap-y-0 sm:grid-cols-2 lg:grid-cols-4 p-8">
                         {isStatsLoading ? (
                             // Loading skeleton
                             [...Array(4)].map((_, index) => (
-                                <div 
+                                <div
                                     key={index}
                                     className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
                                 >
@@ -222,14 +221,14 @@ export default function Home() {
                             ))
                         ) : (
                             stats.map((stat, index) => (
-                                <div 
-                                    key={stat.name} 
+                                <div
+                                    key={stat.name}
                                     className="flex flex-col items-center gap-y-2 border-gray-100 dark:border-gray-700 sm:border-l first:border-0 sm:px-8"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     <dt className="text-sm leading-6 text-gray-600 dark:text-gray-400">{stat.name}</dt>
                                     <dd className="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-                                        {stat.name === 'Toplam Portföy Büyüklüğü' 
+                                        {stat.name === 'Toplam Portföy Büyüklüğü'
                                             ? `+₺${formatCompactNumber(stat.value).substring(1)}`
                                             : formatCompactNumber(stat.value)
                                         }
@@ -240,19 +239,21 @@ export default function Home() {
                         )}
                     </dl>
                 </div>
-            </div>       
+            </div>
 
             {/* Top Performing Funds */}
-            <div 
+            <div
                 ref={topFundsRef}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-opacity duration-1000 ${
-                    isTopFundsVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-opacity duration-1000 ${isTopFundsVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">En İyi Performans Gösteren Fonlar</h2>
+                    <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                        <span className="hidden sm:inline">En İyi Performans Gösteren Fonlar</span>
+                        <span className="sm:hidden">En Performanslı Fonlar</span>
+                    </h2>
                     <Link to="/funds" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
-                        Tümünü Gör →
+                        Tümü<span className="hidden sm:inline">nü Gör</span> →
                     </Link>
                 </div>
 
@@ -279,13 +280,13 @@ export default function Home() {
                 ) : (
                     <div className="relative">
                         <div className="relative overflow-hidden">
-                            <div 
-                                className="flex transition-transform duration-500 ease-in-out" 
+                            <div
+                                className="flex transition-transform duration-500 ease-in-out"
                                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                                 {...swipeHandlers}
                             >
                                 {slides.map((group, groupIdx) => (
-                                    <div 
+                                    <div
                                         key={groupIdx}
                                         className="w-full flex-shrink-0 space-y-6 sm:space-y-4"
                                     >
@@ -318,7 +319,11 @@ export default function Home() {
                                                         </div>
                                                         <div className="flex flex-col">
                                                             <h3 className="font-medium text-gray-900 dark:text-gray-100 leading-tight">{fund.title}</h3>
-                                                            <p className="text-sm text-gray-500 dark:text-gray-400">{fund.type}</p>
+                                                            <p className="flex flex-wrap items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                                                <span>{fund.code}</span>
+                                                                <span >•</span>
+                                                                <span>{fund.type}</span>
+                                                            </p>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
@@ -339,11 +344,10 @@ export default function Home() {
                                 <button
                                     key={index}
                                     onClick={() => setCurrentSlide(index)}
-                                    className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                                        currentSlide === index
-                                            ? 'bg-indigo-600 dark:bg-indigo-500'
-                                            : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                                    }`}
+                                    className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${currentSlide === index
+                                        ? 'bg-indigo-600 dark:bg-indigo-500'
+                                        : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                                        }`}
                                 />
                             ))}
                         </div>
@@ -352,11 +356,10 @@ export default function Home() {
             </div>
 
             {/* Guides */}
-            <div 
+            <div
                 ref={guidesRef}
-                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-1000 ${
-                    isGuidesVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-1000 ${isGuidesVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 {guides.map((guide) => (
                     <Link
@@ -369,27 +372,28 @@ export default function Home() {
                         <p className="text-sm text-gray-500 dark:text-gray-400">{guide.description}</p>
                     </Link>
                 ))}
-            </div>  
+            </div>
 
             {/* Market Summary */}
-            <div 
+            <div
                 ref={marketRef}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${
-                    isMarketVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm transition-opacity duration-1000 ${isMarketVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 <div className="mx-auto max-w-7xl px-6 py-8">
-                    <div className="flex justify-between items-center mb-8">
-                        <div>
+                    <div className="mb-8">
+                        <div className="flex justify-between items-center">
                             <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Piyasa Özeti</h2>
-                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                Fon türlerine göre yıllık ortalama getiriler
-                            </p>
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                                <span className="hidden sm:inline">Son güncelleme:</span> {latestStats ? formatDate(latestStats.date) : '-'}
+                            </div>
                         </div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
-                            Son güncelleme: {latestStats ? formatDate(latestStats.date) : '-'}
-                        </div>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            Fon türlerine göre yıllık ortalama getiriler
+                        </p>
                     </div>
+
+
                     {isMarketLoading ? (
                         // Loading skeleton
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -409,13 +413,13 @@ export default function Home() {
                     ) : marketSummary.length > 0 ? (
                         <div className="relative">
                             <div className="relative overflow-hidden">
-                                <div 
-                                    className="flex transition-transform duration-500 ease-in-out" 
+                                <div
+                                    className="flex transition-transform duration-500 ease-in-out"
                                     style={{ transform: `translateX(-${marketSlide * 100}%)` }}
                                     {...marketSwipeHandlers}
                                 >
                                     {Array.from({ length: Math.ceil(marketSummary.length / 9) }).map((_, pageIndex) => (
-                                        <div 
+                                        <div
                                             key={pageIndex}
                                             className="w-full flex-shrink-0"
                                         >
@@ -432,11 +436,10 @@ export default function Home() {
                                                             <div className="flex items-center justify-between">
                                                                 <div>
                                                                     <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">{item.groupName}</h3>
-                                                                    <p className={`text-2xl font-semibold mt-1 ${
-                                                                        item.trend === 'up' 
-                                                                            ? 'text-green-600 dark:text-green-400' 
-                                                                            : 'text-red-600 dark:text-red-400'
-                                                                    }`}>
+                                                                    <p className={`text-2xl font-semibold mt-1 ${item.trend === 'up'
+                                                                        ? 'text-green-600 dark:text-green-400'
+                                                                        : 'text-red-600 dark:text-red-400'
+                                                                        }`}>
                                                                         {formatPercent(item.value)}
                                                                     </p>
                                                                 </div>
@@ -461,11 +464,10 @@ export default function Home() {
                                         <button
                                             key={index}
                                             onClick={() => setMarketSlide(index)}
-                                            className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${
-                                                marketSlide === index
-                                                    ? 'bg-indigo-600 dark:bg-indigo-500'
-                                                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
-                                            }`}
+                                            className={`w-2.5 h-2.5 rounded-full transition-colors duration-200 ${marketSlide === index
+                                                ? 'bg-indigo-600 dark:bg-indigo-500'
+                                                : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
+                                                }`}
                                         />
                                     ))}
                                 </div>
@@ -480,14 +482,13 @@ export default function Home() {
                         </div>
                     )}
                 </div>
-            </div>               
+            </div>
 
             {/* Recently Viewed Funds */}
-            <div 
+            <div
                 ref={recentRef}
-                className={`transition-opacity duration-1000 ${
-                    isRecentVisible ? 'opacity-100' : 'opacity-0'
-                }`}
+                className={`transition-opacity duration-1000 ${isRecentVisible ? 'opacity-100' : 'opacity-0'
+                    }`}
             >
                 <RecentlyViewedFunds />
             </div>

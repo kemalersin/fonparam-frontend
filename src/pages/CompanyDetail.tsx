@@ -15,7 +15,7 @@ export default function CompanyDetail() {
         return (
             <div className="animate-pulse space-y-8">
                 <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                     {[...Array(4)].map((_, i) => (
                         <div key={i} className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
                     ))}
@@ -60,7 +60,7 @@ export default function CompanyDetail() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
                 <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg">
                     <div className="p-5">
                         <div className="flex items-center">
@@ -70,7 +70,7 @@ export default function CompanyDetail() {
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                                        Toplam Fon Sayısı
+                                        <span className="hidden sm:inline">Toplam</span> Fon Sayısı
                                     </dt>
                                     <dd className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                                         {formatNumber(data.total_funds)}

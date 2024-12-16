@@ -1,22 +1,22 @@
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
 
-interface SortHeaderProps {
+interface SortHeaderProps<T extends string = string> {
     label: string;
-    field: string;
+    field: T;
     currentSort: string;
     currentOrder: 'ASC' | 'DESC';
-    onSort: (field: string) => void;
+    onSort: (field: T) => void;
     className?: string;
 }
 
-export default function SortHeader({ 
+export default function SortHeader<T extends string = string>({ 
     label, 
     field, 
     currentSort, 
     currentOrder, 
     onSort,
     className = ''
-}: SortHeaderProps) {
+}: SortHeaderProps<T>) {
     const isTextColumn = field === 'code' || field === 'title';
     return (
         <th

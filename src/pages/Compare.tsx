@@ -25,16 +25,11 @@ const COLORS = [
     '#9333ea'  // purple-600
 ];
 
-const getStartDate = (period: string): string => {
-    const today = new Date();
-    return new Date(today.setFullYear(today.getFullYear() - 5)).toISOString().split('T')[0];
-};
-
 export default function Compare() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
     const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
-    const [selectedFunds, setSelectedFunds] = useState<Fund[]>([]);
+    const [selectedFunds, setSelectedFunds] = useState<Pick<Fund, 'code' | 'title'>[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showResults, setShowResults] = useState(false);
     const [historicalData, setHistoricalData] = useState<{ [key: string]: any[] }>({});
@@ -53,7 +48,7 @@ export default function Compare() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const { data: searchResults, isLoading: isSearching } = useFunds(
+    const { data: searchResults } = useFunds(
         search ? {
             search,
             limit: 50,

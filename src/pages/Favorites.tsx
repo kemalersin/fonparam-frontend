@@ -27,12 +27,20 @@ export default function Favorites() {
     const { data: fundsData } = useFunds(
         favoriteCodes.length > 0 
             ? { code: favoriteCodes.join(',') }
-            : null
+            : undefined
     );
+
+    const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     useEffect(() => {
         loadFavorites();
     }, []);
+
+    useEffect(() => {
+        if (!isLoading) {
+            setIsFirstLoad(false);
+        }
+    }, [isLoading]);
 
     const loadFavorites = async () => {
         setIsLoading(true);
@@ -83,20 +91,31 @@ export default function Favorites() {
             return order === 'ASC' ? comparison : -comparison;
         });
 
+    const headerContent = (
+        <div className="sm:flex sm:items-center sm:justify-between">
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Favori Fonlarım</h1>
+                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    Favori olarak işaretlediğiniz fonları görüntüleyin ve takip edin
+                </p>
+            </div>
+            <ExportButton storeName="favorites" />
+        </div>
+    );
+
+    if (isFirstLoad) {
+        return (
+            <div>
+                <LoadingOverlay isLoading={true} />
+                {headerContent}
+            </div>
+        );
+    }
+
     return (
         <div>
             <LoadingOverlay isLoading={isLoading} />
-            
-            {/* Header */}
-            <div className="sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Favori Fonlarım</h1>
-                    <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                        Favori olarak işaretlediğiniz fonları görüntüleyin ve takip edin
-                    </p>
-                </div>
-                <ExportButton storeName="favorites" />
-            </div>
+            {headerContent}
 
             <div className="mt-6 space-y-6">
                 {/* Search */}

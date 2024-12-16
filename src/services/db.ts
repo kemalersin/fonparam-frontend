@@ -8,7 +8,7 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 export async function getDB(): Promise<IDBPDatabase> {
     if (!dbPromise) {
         dbPromise = openDB(DB_NAME, DB_VERSION, {
-            upgrade(db, oldVersion, newVersion) {
+            upgrade(db) {
                 // Favorites store
                 if (!db.objectStoreNames.contains('favorites')) {
                     const favoritesStore = db.createObjectStore('favorites', { keyPath: 'code' });

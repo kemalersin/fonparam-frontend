@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useCompanies } from '../hooks/useApi';
 import { MagnifyingGlassIcon, ArrowTrendingUpIcon, ChartBarIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { Combobox } from '@headlessui/react';
-import { formatPercent, formatNumber } from '../utils/format';
+import { formatNumber } from '../utils/format';
 import { DEFAULT_PAGE_SIZE, DEBOUNCE_DELAY } from '../constants';
 import LoadingOverlay from '../components/LoadingOverlay';
 import EmptyState from '../components/EmptyState';
@@ -31,7 +31,7 @@ const formatPercentage = (value: number | null | undefined): string => {
 };
 
 export default function Companies() {
-    const { search: searchInput, setSearch: setSearchInput, min_total_funds: minFundsInput, setMinFunds: setMinFundsInput, sort, order, handleSort, page, setPage } = useUrlSort<string>({
+    const { search: searchInput, setSearch: setSearchInput, minFunds: minFundsInput, setMinFunds: setMinFundsInput, sort, order, handleSort, page, setPage } = useUrlSort<string>({
         defaultSort: 'code',
         defaultOrder: 'ASC'
     });
@@ -73,7 +73,7 @@ export default function Companies() {
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Portföy Yönetim Şirketleri</h1>
                     <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                        Tüm portföy yönetim şirketlerini görüntüleyin ve performanslarını karşılaştırın
+                        Tüm portföy yönetim şirketlerini görüntüleyin ve <span className="hidden sm:inline">performanslarını</span> karşılaştırın
                     </p>
                 </div>
             </div>

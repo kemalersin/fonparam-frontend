@@ -5,7 +5,7 @@ import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import type { Fund } from '../types/api';
 
 interface FavoriteButtonProps {
-    fund: Pick<Fund, 'code' | 'title' | 'management_company'>;
+    fund: Pick<Fund, 'code' | 'title' | 'management_company' | 'type'>;
     className?: string;
     onRemove?: () => void;
 }
@@ -32,7 +32,8 @@ export default function FavoriteButton({ fund, className = '', onRemove }: Favor
                 await addFavorite({
                     code: fund.code,
                     title: fund.title,
-                    management_company_id: fund.management_company.id,
+                    type: fund.type,
+                    management_company_id: fund.management_company.code,
                     management_company_title: fund.management_company?.title ?? '',
                     management_company_logo: fund.management_company?.logo
                 });

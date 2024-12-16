@@ -3,10 +3,8 @@ import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi';
 import { useSwipe } from '../hooks/useSwipe';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BanknotesIcon, InformationCircleIcon, StarIcon, ChevronUpDownIcon, CheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { BanknotesIcon, InformationCircleIcon, ChevronUpDownIcon, CheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
 import { Combobox } from '@headlessui/react';
-import { addFavorite, removeFavorite, isFavorite } from '../services/favorites';
 import ComparisonButton from '../components/ComparisonButton';
 import FavoriteButton from '../components/FavoriteButton';
 import { formatPercent, formatCurrency, formatNumber, formatDate } from '../utils/format';
@@ -81,10 +79,9 @@ export default function FundDetail() {
     
     const [showMonthlyDetails, setShowMonthlyDetails] = useState(() => {
         const stored = localStorage.getItem('showMonthlyDetails');
-        return stored ? JSON.parse(stored) : true;
+        return stored ? JSON.parse(stored) : false;
     });
-    const [isFavorited, setIsFavorited] = useState(false);
-    const [isCheckingFavorite, setIsCheckingFavorite] = useState(true);
+
     const [analysisParams, setAnalysisParams] = useState<AnalysisParams>(() => {
         const increaseType = searchParams.get('increaseType');
         return {
@@ -116,7 +113,7 @@ export default function FundDetail() {
         start_date: getStartDate(selectedPeriod)
     });
 
-    const [analysisData, setAnalysisData] = useState<typeof analysis>(null);
+    const [analysisData, setAnalysisData] = useState<typeof analysis>(undefined);
     const { data: analysis, isLoading: isAnalysisLoading, error: analysisError } = useAnalyzeFund(code ?? '', {
         ...debouncedAnalysisParams,
         includeMonthlyDetails: showMonthlyDetails
@@ -136,35 +133,6 @@ export default function FundDetail() {
             startDate: selectedPeriod
         }));
     }, [selectedPeriod]);
-
-    useEffect(() => {
-        if (code && currentFund) {
-            setIsCheckingFavorite(true);
-            isFavorite(code)
-                .then(setIsFavorited)
-                .finally(() => setIsCheckingFavorite(false));
-        }
-    }, [code, currentFund]);
-
-    const toggleFavorite = async (code: string) => {
-        try {
-            if (isFavorited) {
-                await removeFavorite(code);
-                setIsFavorited(false);
-            } else {
-                await addFavorite({
-                    code: currentFund.code,
-                    title: currentFund.title,
-                    management_company_id: currentFund.management_company_id,
-                    management_company_title: currentFund.management_company?.title ?? '',
-                    management_company_logo: currentFund.management_company?.logo
-                });
-                setIsFavorited(true);
-            }
-        } catch (error) {
-            console.error('Favori işlemi başarısız:', error);
-        }
-    };
 
     const handleMonthlyDetailsToggle = (checked: boolean) => {
         setShowMonthlyDetails(checked);
@@ -294,7 +262,7 @@ export default function FundDetail() {
                 <div className="space-y-6">
                     {/* Header */}
                     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-6">
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-start lg:items-center gap-4">
                                     <Link
@@ -318,7 +286,7 @@ export default function FundDetail() {
                                             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
                                                 {currentFund.title}
                                             </h1>
-                                            <div className="flex gap-1">
+                                            <div className="hidden sm:flex gap-1">
                                                 <FavoriteButton fund={currentFund} />
                                                 <ComparisonButton fund={currentFund} />
                                             </div>
@@ -364,13 +332,19 @@ export default function FundDetail() {
                                                     </span>
                                                 </div>
                                             </>
+                                            <>
+                                            <div className="flex w-full justify-end sm:hidden">
+                                                <FavoriteButton fund={currentFund} />
+                                                <ComparisonButton fund={currentFund} />
+                                            </div>
+                                            </>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div className="text-right">
                                 <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    {currentFund.yield_1y ? (
+                                    {currentFund.yield_1d ? (
                                         <span
                                             className={currentFund.yield_1d! >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}
                                         >
@@ -508,7 +482,7 @@ export default function FundDetail() {
                                             padding={{ top: 20, bottom: 20 }}
                                         />
                                         <Tooltip
-                                            formatter={(value: number, name: string, props: any) => {
+                                            formatter={(value: number, _: string, props: any) => {
                                                 const previousValue = props.payload.length > 1 ? props.payload[0].value : value;
                                                 const isProfit = value >= previousValue;
                                                 const textColor = isProfit ? 'var(--green-600)' : 'var(--red-600)';
@@ -727,7 +701,7 @@ export default function FundDetail() {
 
                             {analysisData && !analysisError && (
                                 <div className="lg:col-span-2">
-                                    <dl className={`grid grid-cols-2 gap-6 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
+                                    <dl className={`grid sm:grid-cols-2 gap-6 ${isAnalysisLoading ? 'opacity-50' : ''}`}>
                                         <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
                                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                                 Toplam Yatırım

@@ -66,9 +66,9 @@ export default function Static() {
     }
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div className="sm:bg-white dark:sm:bg-gray-800 sm:rounded-lg sm:shadow-sm">
             <div 
-                className="prose dark:prose-invert max-w-none p-8"
+                className="prose dark:prose-invert max-w-none px-1 sm:p-8"
                 dangerouslySetInnerHTML={{ __html: content }} 
             />
         </div>

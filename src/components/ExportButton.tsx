@@ -38,7 +38,7 @@ export default function ExportButton({ storeName, label = "Dışa Aktar" }: Prop
         <button
             type="button"
             onClick={handleExport}
-            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none"
+            className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none mt-4 sm:mt-0"
         >
             <ArrowDownTrayIcon className="h-4 w-4 mr-1.5" />
             {label}

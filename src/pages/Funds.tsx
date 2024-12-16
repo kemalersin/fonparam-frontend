@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { useFunds } from '../hooks/useApi';
 import { formatPercent } from '../utils/format';
@@ -16,14 +16,14 @@ type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 
 
 export default function Funds() {
     const navigate = useNavigate();
-    const { search: searchInput, setSearch: setSearchInput, sort, order, handleSort, type, setType, page, setPage } = useUrlSort<SortableFields>({
+    const { search: searchInput, setSearch: setSearchInput, sort, order, handleSort, type, setType, page, setPage, company } = useUrlSort<SortableFields>({
         defaultSort: 'code',
         defaultOrder: 'ASC',
         defaultPage: 1
     });
 
     const [debouncedSearch, setDebouncedSearch] = useState(searchInput);
-    const [currentData, setCurrentData] = useState<typeof data>(null);
+    const [currentData, setCurrentData] = useState<typeof data>(undefined);
     const [isFirstLoad, setIsFirstLoad] = useState(true);
 
     // Debounced search için useEffect
@@ -42,6 +42,7 @@ export default function Funds() {
         sort,
         order,
         type: type || undefined,
+        management_company: company || undefined,
     });
 
     // Yeni veriler geldiğinde mevcut verileri güncelle
@@ -66,7 +67,7 @@ export default function Funds() {
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Yatırım Fonları</h1>
                 <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-                    Tüm yatırım fonlarını görüntüleyin ve performanslarını karşılaştırın
+                    Tüm yatırım fonlarını görüntüleyin ve <span className="hidden sm:inline">performanslarını</span> karşılaştırın
                 </p>
             </div>
         </div>
