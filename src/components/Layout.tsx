@@ -5,6 +5,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import ThemeToggle from './ThemeToggle';
 import ScrollToTopButton from './ScrollToTopButton';
 import Footer from './Footer';
+import { GoogleAnalytics } from './GoogleAnalytics';
 
 const navigation = [
     { name: 'Fonlar', href: '/funds' },
@@ -25,6 +26,7 @@ export default function Layout() {
 
     return (
         <div className="min-h-screen flex flex-col">
+            <GoogleAnalytics />
             <Disclosure as="nav" className="bg-white dark:bg-gray-800 shadow-sm">
                 {({ open }) => (
                     <>
