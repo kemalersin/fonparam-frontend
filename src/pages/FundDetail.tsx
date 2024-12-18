@@ -84,12 +84,16 @@ export default function FundDetail() {
 
     const [analysisParams, setAnalysisParams] = useState<AnalysisParams>(() => {
         const increaseType = searchParams.get('increaseType');
+        const initial = searchParams.get('initial');
+        const monthly = searchParams.get('monthly');
+        const increaseValue = searchParams.get('increaseValue');
+
         return {
-            initialInvestment: Number(searchParams.get('initial')) || DEFAULT_INITIAL_INVESTMENT,
-            monthlyInvestment: Number(searchParams.get('monthly')) || DEFAULT_MONTHLY_INVESTMENT,
+            initialInvestment: initial ? Number(initial) : DEFAULT_INITIAL_INVESTMENT,
+            monthlyInvestment: monthly ? Number(monthly) : DEFAULT_MONTHLY_INVESTMENT,
             yearlyIncrease: {
                 type: (increaseType === 'percentage' || increaseType === 'amount') ? increaseType : DEFAULT_INCREASE_TYPE,
-                value: Number(searchParams.get('increaseValue')) || DEFAULT_INCREASE_VALUE
+                value: increaseValue ? Number(increaseValue) : DEFAULT_INCREASE_VALUE
             },
             startDate: selectedPeriod
         };
@@ -116,6 +120,12 @@ export default function FundDetail() {
     const [analysisData, setAnalysisData] = useState<typeof analysis>(undefined);
     const { data: analysis, isLoading: isAnalysisLoading, error: analysisError } = useAnalyzeFund(code ?? '', {
         ...debouncedAnalysisParams,
+        initialInvestment: debouncedAnalysisParams.initialInvestment ?? DEFAULT_INITIAL_INVESTMENT,
+        monthlyInvestment: debouncedAnalysisParams.monthlyInvestment ?? DEFAULT_MONTHLY_INVESTMENT,
+        yearlyIncrease: {
+            ...debouncedAnalysisParams.yearlyIncrease,
+            value: debouncedAnalysisParams.yearlyIncrease.value ?? DEFAULT_INCREASE_VALUE
+        },
         includeMonthlyDetails: showMonthlyDetails
     });
 
@@ -149,13 +159,13 @@ export default function FundDetail() {
             params.delete('period');
         }
         
-        if (analysisParams.initialInvestment !== DEFAULT_INITIAL_INVESTMENT) {
+        if (analysisParams.initialInvestment !== null && analysisParams.initialInvestment !== DEFAULT_INITIAL_INVESTMENT) {
             params.set('initial', analysisParams.initialInvestment.toString());
         } else {
             params.delete('initial');
         }
         
-        if (analysisParams.monthlyInvestment !== DEFAULT_MONTHLY_INVESTMENT) {
+        if (analysisParams.monthlyInvestment !== null && analysisParams.monthlyInvestment !== DEFAULT_MONTHLY_INVESTMENT) {
             params.set('monthly', analysisParams.monthlyInvestment.toString());
         } else {
             params.delete('monthly');
@@ -167,7 +177,7 @@ export default function FundDetail() {
             params.delete('increaseType');
         }
 
-        if (analysisParams.yearlyIncrease.value !== DEFAULT_INCREASE_VALUE) {
+        if (analysisParams.yearlyIncrease.value !== null && analysisParams.yearlyIncrease.value !== DEFAULT_INCREASE_VALUE) {
             params.set('increaseValue', analysisParams.yearlyIncrease.value.toString());
         } else {
             params.delete('increaseValue');
@@ -190,9 +200,12 @@ export default function FundDetail() {
                     management_company: currentFund.management_company
                 },
                 parameters: {
-                    initialInvestment: analysisParams.initialInvestment,
-                    monthlyInvestment: analysisParams.monthlyInvestment,
-                    yearlyIncrease: analysisParams.yearlyIncrease,
+                    initialInvestment: analysisParams.initialInvestment ?? DEFAULT_INITIAL_INVESTMENT,
+                    monthlyInvestment: analysisParams.monthlyInvestment ?? DEFAULT_MONTHLY_INVESTMENT,
+                    yearlyIncrease: {
+                        ...analysisParams.yearlyIncrease,
+                        value: analysisParams.yearlyIncrease.value ?? DEFAULT_INCREASE_VALUE
+                    },
                     startDate: analysisParams.startDate
                 },
                 summary: {
@@ -569,11 +582,11 @@ export default function FundDetail() {
                                         </div>
                                         <input
                                             type="number"
-                                            value={analysisParams.initialInvestment}
+                                            value={analysisParams.initialInvestment ?? ''}
                                             onChange={(e) =>
                                                 setAnalysisParams({
                                                     ...analysisParams,
-                                                    initialInvestment: Number(e.target.value),
+                                                    initialInvestment: e.target.value === '' ? null : Number(e.target.value),
                                                 })
                                             }
                                             placeholder={DEFAULT_INITIAL_INVESTMENT.toString()}
@@ -592,11 +605,11 @@ export default function FundDetail() {
                                         </div>
                                         <input
                                             type="number"
-                                            value={analysisParams.monthlyInvestment}
+                                            value={analysisParams.monthlyInvestment ?? ''}
                                             onChange={(e) =>
                                                 setAnalysisParams({
                                                     ...analysisParams,
-                                                    monthlyInvestment: Number(e.target.value),
+                                                    monthlyInvestment: e.target.value === '' ? null : Number(e.target.value),
                                                 })
                                             }
                                             placeholder={DEFAULT_MONTHLY_INVESTMENT.toString()}
@@ -681,13 +694,13 @@ export default function FundDetail() {
                                             </div>
                                             <input
                                                 type="number"
-                                                value={analysisParams.yearlyIncrease.value}
+                                                value={analysisParams.yearlyIncrease.value ?? ''}
                                                 onChange={(e) =>
                                                     setAnalysisParams({
                                                         ...analysisParams,
                                                         yearlyIncrease: {
                                                             ...analysisParams.yearlyIncrease,
-                                                            value: Number(e.target.value)
+                                                            value: e.target.value === '' ? null : Number(e.target.value)
                                                         }
                                                     })
                                                 }

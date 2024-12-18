@@ -120,10 +120,10 @@ export type YearlyIncreaseType = 'percentage' | 'amount';
 
 export interface AnalysisParams {
     startDate: string;
-    initialInvestment: number;
-    monthlyInvestment: number;
+    initialInvestment: number | null;
+    monthlyInvestment: number | null;
     yearlyIncrease: {
         type: YearlyIncreaseType;
-        value: number;
+        value: number | null;
     };
 } 
