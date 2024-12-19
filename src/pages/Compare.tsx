@@ -63,14 +63,20 @@ export default function Compare() {
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 5);
     
-    const fundHistories = selectedCodes.map(code => 
-        useFundHistory(code, {
-            interval: 'monthly',
-            sort: 'date',
-            order: 'ASC',
-            start_date: startDate.toISOString().split('T')[0]
-        })
-    );
+    const historyParams = {
+        interval: 'monthly' as const,
+        sort: 'date' as const,
+        order: 'ASC' as const,
+        start_date: startDate.toISOString().split('T')[0]
+    };
+
+    const fund1History = useFundHistory(selectedCodes[0] || '', historyParams);
+    const fund2History = useFundHistory(selectedCodes[1] || '', historyParams);
+    const fund3History = useFundHistory(selectedCodes[2] || '', historyParams);
+    const fund4History = useFundHistory(selectedCodes[3] || '', historyParams);
+    const fund5History = useFundHistory(selectedCodes[4] || '', historyParams);
+
+    const fundHistories = [fund1History, fund2History, fund3History, fund4History, fund5History];
 
     useEffect(() => {
         if (selectedCodes.length >= 2) {
