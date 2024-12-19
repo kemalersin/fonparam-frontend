@@ -24,7 +24,7 @@ export default function Favorites() {
     const [favorites, setFavorites] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [favoriteCodes, setFavoriteCodes] = useState<string[]>([]);
-    const { data: fundsData } = useFunds(
+    const { data: fundsData, isLoading: isFundsLoading } = useFunds(
         favoriteCodes.length > 0 
             ? { code: favoriteCodes.join(',') }
             : undefined
@@ -103,7 +103,7 @@ export default function Favorites() {
         </div>
     );
 
-    if (isFirstLoad) {
+    if (isFirstLoad || isLoading || isFundsLoading) {
         return (
             <div>
                 <LoadingOverlay isLoading={true} />
