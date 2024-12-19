@@ -1,7 +1,7 @@
 import { openDB, IDBPDatabase } from 'idb';
 
 export const DB_NAME = 'fonparam';
-export const DB_VERSION = 4;
+export const DB_VERSION = 5;
 
 let dbPromise: Promise<IDBPDatabase> | null = null;
 
@@ -23,8 +23,8 @@ export async function getDB(): Promise<IDBPDatabase> {
                 }
                 
                 // Analysis store
-                if (!db.objectStoreNames.contains('analysis')) {
-                    const store = db.createObjectStore('analysis', { keyPath: 'id', autoIncrement: true });
+                if (!db.objectStoreNames.contains('analyses')) {
+                    const store = db.createObjectStore('analyses', { keyPath: 'id', autoIncrement: true });
                     store.createIndex('date', 'date');
                     store.createIndex('fund_code', 'fund.code');
                 }

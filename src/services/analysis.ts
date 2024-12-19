@@ -26,7 +26,7 @@ export interface AnalysisRecord {
     };
 }
 
-const STORE_NAME = 'analysis';
+const STORE_NAME = 'analyses';
 
 export const getAnalyses = async (): Promise<AnalysisRecord[]> => {
     const db = await getDB();
