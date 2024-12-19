@@ -8,6 +8,7 @@ import { DEFAULT_PAGE_SIZE, DEBOUNCE_DELAY } from '../constants';
 import LoadingOverlay from '../components/LoadingOverlay';
 import EmptyState from '../components/EmptyState';
 import { useUrlSort } from '../hooks/useUrlSort';
+import { Helmet } from 'react-helmet-async';
 
 const SORT_OPTIONS = [
     { id: 'code', name: 'Şirket Kodu', order: 'ASC' },
@@ -66,6 +67,10 @@ export default function Companies() {
 
     return (
         <div>
+            <Helmet>
+                <title>Portföy Yönetim Şirketleri | FonParam</title>
+                <meta name="description" content="Türkiye'deki portföy yönetim şirketlerini inceleyin ve performanslarını karşılaştırın." />
+            </Helmet>
             <LoadingOverlay isLoading={isLoading} />
 
             {/* Header */}

@@ -20,6 +20,7 @@ import {
 } from '../constants';
 import { addToRecentlyViewed } from '../services/recentlyViewed';
 import LoadingOverlay from '../components/LoadingOverlay';
+import { Helmet } from 'react-helmet-async';
 
 const PERIODS = [
     { label: '1 Gün', value: 'last_1_day' },
@@ -256,6 +257,28 @@ export default function FundDetail() {
 
     return (
         <div>
+            {currentFund && (
+                <Helmet>
+                    <title>{currentFund.title} ({currentFund.code}) | FonParam</title>
+                    <meta name="description" content={`${currentFund.title} (${currentFund.code}) fonu hakkında detaylı bilgi, getiri oranları ve yatırım analizi.`} />
+                    
+                    {/* Open Graph / Facebook */}
+                    <meta property="og:type" content="website" />
+                    <meta property="og:title" content={`${currentFund.title} (${currentFund.code})`} />
+                    <meta property="og:description" content={`${currentFund.title} (${currentFund.code}) fonu hakkında detaylı bilgi, getiri oranları ve yatırım analizi.`} />
+                    {currentFund.management_company?.logo && (
+                        <meta property="og:image" content={currentFund.management_company.logo} />
+                    )}
+                    
+                    {/* Twitter */}
+                    <meta name="twitter:card" content="summary" />
+                    <meta name="twitter:title" content={`${currentFund.title} (${currentFund.code})`} />
+                    <meta name="twitter:description" content={`${currentFund.title} (${currentFund.code}) fonu hakkında detaylı bilgi, getiri oranları ve yatırım analizi.`} />
+                    {currentFund.management_company?.logo && (
+                        <meta name="twitter:image" content={currentFund.management_company.logo} />
+                    )}
+                </Helmet>
+            )}
             <LoadingOverlay isLoading={isLoadingFund} />
             
             {!isLoadingFund && !currentFund && (

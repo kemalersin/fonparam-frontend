@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Funds from './pages/Funds';
@@ -49,7 +50,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <ToastProvider>
-          <RouterProvider router={router} />
+          <HelmetProvider>
+            <Helmet defaultTitle="FonParam - Yatırım Fonu Karşılaştırma ve Analiz Platformu" titleTemplate="%s | FonParam">
+              <meta name="description" content="Türkiye'nin en kapsamlı yatırım fonu karşılaştırma ve analiz platformu. Tüm yatırım fonlarını detaylı inceleyin, karşılaştırın ve en iyi yatırım kararını verin." />
+            </Helmet>
+            <RouterProvider router={router} />
+          </HelmetProvider>
         </ToastProvider>
       </ThemeProvider>
     </QueryClientProvider>

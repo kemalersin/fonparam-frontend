@@ -5,6 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { addToComparison, removeFromComparison, getComparisonList } from '../services/comparison';
 import { useToast } from '../contexts/ToastContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import EmptyState from '../components/EmptyState';
 import { formatPercent, formatCurrency } from '../utils/format';
 import SortHeader from '../components/SortHeader';
@@ -230,6 +231,10 @@ export default function Compare() {
 
     return (
         <div>
+            <Helmet>
+                <title>Fon Karşılaştırma | FonParam</title>
+                <meta name="description" content="Yatırım fonlarını detaylı olarak karşılaştırın ve en iyi yatırım kararını verin." />
+            </Helmet>
             <LoadingOverlay isLoading={isLoading || isComparing} />
             
             {/* Header */}

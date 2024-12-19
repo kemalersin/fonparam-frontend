@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { MagnifyingGlassIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { useFunds } from '../hooks/useApi';
 import { formatPercent } from '../utils/format';
@@ -84,6 +85,10 @@ export default function Funds() {
 
     return (
         <div>
+            <Helmet>
+                <title>Yatırım Fonları | FonParam</title>
+                <meta name="description" content="Türkiye'deki tüm yatırım fonlarını inceleyin, filtreleyin ve detaylı analizler yapın." />
+            </Helmet>
             <LoadingOverlay isLoading={isLoading} />
 
             {/* Header */}

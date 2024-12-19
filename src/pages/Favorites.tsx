@@ -11,6 +11,7 @@ import SortHeader from '../components/SortHeader';
 import { StarIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import { useUrlSort } from '../hooks/useUrlSort';
 import ExportButton from '../components/ExportButton';
+import { Helmet } from 'react-helmet-async';
 
 type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
@@ -106,6 +107,10 @@ export default function Favorites() {
     if (isFirstLoad || isLoading || isFundsLoading) {
         return (
             <div>
+                <Helmet>
+                    <title>Favori Fonlarım | FonParam</title>
+                    <meta name="description" content="Favori yatırım fonlarınızı görüntüleyin ve takip edin." />
+                </Helmet>
                 <LoadingOverlay isLoading={true} />
                 {headerContent}
             </div>
@@ -114,6 +119,10 @@ export default function Favorites() {
 
     return (
         <div>
+            <Helmet>
+                <title>Favori Fonlarım | FonParam</title>
+                <meta name="description" content="Favori yatırım fonlarınızı görüntüleyin ve takip edin." />
+            </Helmet>
             <LoadingOverlay isLoading={isLoading} />
             {headerContent}
 

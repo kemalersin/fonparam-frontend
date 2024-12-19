@@ -16,6 +16,7 @@ import {
     DEFAULT_INCREASE_VALUE
 } from '../constants';
 import ExportButton from '../components/ExportButton';
+import { Helmet } from 'react-helmet-async';
 
 const PERIODS: Record<string, string> = {
     'last_1_day': '1 Gün',
@@ -196,6 +197,10 @@ export default function Analyses() {
 
     return (
         <div>
+            <Helmet>
+                <title>Fon Analizlerim | FonParam</title>
+                <meta name="description" content="Yatırım fonları için yaptığınız analizleri görüntüleyin ve takip edin." />
+            </Helmet>
             <LoadingOverlay isLoading={isLoading} />
             {headerContent}
 
