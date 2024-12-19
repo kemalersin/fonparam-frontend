@@ -63,95 +63,21 @@ export default function Compare() {
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 5);
     
-    const fund1History = useFundHistory(selectedCodes[0] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund2History = useFundHistory(selectedCodes[1] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund3History = useFundHistory(selectedCodes[2] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund4History = useFundHistory(selectedCodes[3] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund5History = useFundHistory(selectedCodes[4] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund6History = useFundHistory(selectedCodes[5] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund7History = useFundHistory(selectedCodes[6] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund8History = useFundHistory(selectedCodes[7] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund9History = useFundHistory(selectedCodes[8] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fund10History = useFundHistory(selectedCodes[9] || '', {
-        interval: 'monthly',
-        sort: 'date',
-        order: 'ASC',
-        start_date: startDate.toISOString().split('T')[0]
-    });
-
-    const fundHistories = [
-        fund1History,
-        fund2History,
-        fund3History,
-        fund4History,
-        fund5History,
-        fund6History,
-        fund7History,
-        fund8History,
-        fund9History,
-        fund10History
-    ];
+    const fundHistories = selectedCodes.map(code => 
+        useFundHistory(code, {
+            interval: 'monthly',
+            sort: 'date',
+            order: 'ASC',
+            start_date: startDate.toISOString().split('T')[0]
+        })
+    );
 
     useEffect(() => {
         if (selectedCodes.length >= 2) {
             const newHistoricalData: { [key: string]: any[] } = {};
             
             selectedCodes.forEach((code, index) => {
-                if (fundHistories[index].data) {
+                if (fundHistories[index]?.data) {
                     newHistoricalData[code] = fundHistories[index].data;
                 }
             });

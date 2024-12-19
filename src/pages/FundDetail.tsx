@@ -104,7 +104,7 @@ export default function FundDetail() {
     useEffect(() => {
         const timeoutId = setTimeout(() => {
             setDebouncedAnalysisParams(analysisParams);
-        }, 0);
+        }, 300);
 
         return () => clearTimeout(timeoutId);
     }, [analysisParams]);
