@@ -69,6 +69,7 @@ export default function FundDetail() {
     const { code } = useParams();
     const [searchParams, setSearchParams] = useSearchParams();
     const [performanceSlide, setPerformanceSlide] = useState(0);
+    const [showRealValues, setShowRealValues] = useState(false);
     const swipeHandlers = useSwipe({
         onSwipeLeft: () => performanceSlide < 1 && setPerformanceSlide(1),
         onSwipeRight: () => performanceSlide > 0 && setPerformanceSlide(0)
@@ -755,19 +756,41 @@ export default function FundDetail() {
                                             </dd>
                                         </div>
                                         <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                                 Toplam Kazanç
+                                                <div className="group relative">
+                                                    <InformationCircleIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400" />
+                                                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-28 rounded bg-gray-900 dark:bg-gray-700 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                                        {showRealValues ? 'Reel Değer' : 'Nominal Değer'}
+                                                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
+                                                    </div>
+                                                </div>
                                             </dt>
-                                            <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600 dark:text-green-400">
-                                                {formatCurrency(analysisData.summary.totalYield)}
+                                            <dd className={`mt-1 text-2xl sm:text-3xl font-semibold ${
+                                                showRealValues
+                                                    ? analysisData.summary.realTotalYield >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                    : analysisData.summary.totalYield >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {formatCurrency(showRealValues ? analysisData.summary.realTotalYield : analysisData.summary.totalYield)}
                                             </dd>
                                         </div>
                                         <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-5 sm:p-6 rounded-lg h-[115px] flex flex-col justify-center">
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-1">
                                                 Getiri Oranı
+                                                <div className="group relative">
+                                                    <InformationCircleIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400" />
+                                                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-28 rounded bg-gray-900 dark:bg-gray-700 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                                        {showRealValues ? 'Reel Değer' : 'Nominal Değer'}
+                                                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45"></div>
+                                                    </div>
+                                                </div>
                                             </dt>
-                                            <dd className="mt-1 text-2xl sm:text-3xl font-semibold text-green-600 dark:text-green-400">
-                                                {formatPercent(analysisData.summary.totalYieldPercentage)}
+                                            <dd className={`mt-1 text-2xl sm:text-3xl font-semibold ${
+                                                showRealValues
+                                                    ? analysisData.summary.realTotalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                    : analysisData.summary.totalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                            }`}>
+                                                {formatPercent(showRealValues ? analysisData.summary.realTotalYieldPercentage : analysisData.summary.totalYieldPercentage)}
                                             </dd>
                                         </div>
                                     </dl>
@@ -793,15 +816,51 @@ export default function FundDetail() {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">{getDetailsTitle(analysisParams.startDate)} Detaylar</h2>
-                                <button
-                                    onClick={handleSaveAnalysis}
-                                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                    </svg>
-                                    Kaydet
-                                </button>
+                                
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                                        <nav className="flex space-x-1" aria-label="Değer tipi">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowRealValues(false)}
+                                                className={`
+                                                    px-4 py-2 text-sm font-medium rounded-md
+                                                    ${!showRealValues 
+                                                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                                    }
+                                                    transition-colors duration-150 ease-in-out
+                                                `}
+                                            >
+                                                Nominal
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowRealValues(true)}
+                                                className={`
+                                                    px-4 py-2 text-sm font-medium rounded-md
+                                                    ${showRealValues 
+                                                        ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm' 
+                                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                                                    }
+                                                    transition-colors duration-150 ease-in-out
+                                                `}
+                                            >
+                                                Reel
+                                            </button>
+                                        </nav>
+                                    </div>
+
+                                    <button
+                                        onClick={handleSaveAnalysis}
+                                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                        </svg>
+                                        Kaydet
+                                    </button>
+                                </div>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
@@ -868,18 +927,30 @@ export default function FundDetail() {
                                                     {formatCurrency(detail.value)}
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
-                                                    <span className={detail.periodChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                                        {formatCurrency(detail.periodChange)}
+                                                    <span className={
+                                                        showRealValues
+                                                            ? detail.realPeriodChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                            : detail.periodChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                    }>
+                                                        {formatCurrency(showRealValues ? detail.realPeriodChange : detail.periodChange)}
                                                     </span>
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
-                                                    <span className={detail.periodChangePercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                                        {formatPercent(detail.periodChangePercentage)}
+                                                    <span className={
+                                                        showRealValues
+                                                            ? detail.realPeriodChangePercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                            : detail.periodChangePercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                    }>
+                                                        {formatPercent(showRealValues ? detail.realPeriodChangePercentage : detail.periodChangePercentage)}
                                                     </span>
                                                 </td>
                                                 <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
-                                                    <span className={detail.totalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                                                        {formatPercent(detail.totalYieldPercentage)}
+                                                    <span className={
+                                                        showRealValues
+                                                            ? detail.realTotalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                            : detail.totalYieldPercentage >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                                    }>
+                                                        {formatPercent(showRealValues ? detail.realTotalYieldPercentage : detail.totalYieldPercentage)}
                                                     </span>
                                                 </td>
                                             </tr>

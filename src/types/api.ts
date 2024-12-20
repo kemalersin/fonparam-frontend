@@ -93,9 +93,13 @@ export interface FundAnalysis {
         currentValue: number;
         totalYield: number;
         totalYieldPercentage: number;
+        realTotalYield: number;
+        realTotalYieldPercentage: number;
     };
     periodDetails?: {
         date: string;
+        cumulativeInflation: number;
+        monthlyInflation: number;
         investment: number;
         totalInvestment: number;
         unitPrice: number;
@@ -106,6 +110,10 @@ export interface FundAnalysis {
         periodChangePercentage: number;
         totalYield: number;
         totalYieldPercentage: number;
+        realPeriodChange: number;
+        realPeriodChangePercentage: number;
+        realTotalYield: number;
+        realTotalYieldPercentage: number;
     }[];
 }
 

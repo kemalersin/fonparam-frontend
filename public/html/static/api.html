@@ -193,6 +193,47 @@
                 </div>
 
                 <div>
+                    <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Enflasyon</h3>
+                    <div class="flex flex-col space-y-4">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /inflation</code>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mb-3">Tüm enflasyon verilerini listeler ve ay/yıl bazlı filtreleme imkanı sunar.</p>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
+                                <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /inflation?month=12&year=2023</code>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /inflation/latest</code>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mb-3">En son aya ait enflasyon verilerini getirir.</p>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
+                                <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /inflation/latest</code>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+                            <div class="flex items-center justify-between mb-4">
+                                <code class="text-sm font-mono bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-1 rounded">GET /inflation/{year}/{month}</code>
+                                <span class="hidden sm:inline px-3 py-1 text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">GET</span>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 mb-3">Belirtilen ay ve yıla ait enflasyon verilerini getirir (ayın son günü).</p>
+                            <div class="bg-gray-50 dark:bg-gray-900 rounded p-3">
+                                <p class="text-sm font-mono text-gray-600 dark:text-gray-400">Örnek:</p>
+                                <code class="text-sm font-mono text-gray-800 dark:text-gray-200 break-words">GET /inflation/2023/12</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
                     <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Fon Tipleri</h3>
                     <div class="flex flex-col space-y-4">
                         <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
