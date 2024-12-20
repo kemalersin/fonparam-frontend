@@ -373,7 +373,7 @@ export default function Compare() {
                                                 onSort={handleSort}
                                             />
                                             <SortHeader
-                                                label="1 Aylık"
+                                                label="1 Ay"
                                                 field="yield_1m"
                                                 currentSort={sortField}
                                                 currentOrder={sortDirection.toUpperCase() as 'ASC' | 'DESC'}
