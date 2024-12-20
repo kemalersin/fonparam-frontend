@@ -329,7 +329,7 @@ export default function Analyses() {
                                                         </div>
                                                     </td>
                                                     <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                        <div className="line-clamp-2">
+                                                        <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">
                                                             {analysis.fund.title}
                                                         </div>
                                                     </td>
