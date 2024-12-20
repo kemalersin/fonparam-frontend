@@ -815,7 +815,7 @@ export default function FundDetail() {
                             className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6 scroll-mt-32"
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">{getDetailsTitle(analysisParams.startDate)} Detaylar</h2>
+                                <h2 className="hidden sm:inline text-lg font-medium text-gray-900 dark:text-gray-100">{getDetailsTitle(analysisParams.startDate)} Detaylar</h2>
                                 
                                 <div className="flex items-center gap-4">
                                     <div className="bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
