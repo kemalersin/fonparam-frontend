@@ -238,9 +238,8 @@ export default function FundDetail() {
     const getDetailsTitle = (period: string) => {
         switch (period) {
             case 'last_1_day':
-                return 'Günlük';
             case 'last_1_week':
-                return 'Haftalık';
+                return 'Günlük';
             default:
                 return 'Aylık';
         }

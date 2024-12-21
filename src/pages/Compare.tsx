@@ -548,7 +548,7 @@ export default function Compare() {
                                             <Legend 
                                                 formatter={(value) => {
                                                     const fund = comparisonData.find(f => f.code === value);
-                                                    if (fund) {
+                                                    if (fund && fund.last_historical_value.aum! > 0) {
                                                         const percent = (fund.last_historical_value.aum / comparisonData.reduce((sum, f) => sum + f.last_historical_value.aum, 0) * 100);
                                                         return `${value} (${formatPercent(percent)})`;
                                                     }
