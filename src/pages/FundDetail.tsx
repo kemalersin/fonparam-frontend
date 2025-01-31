@@ -4,7 +4,7 @@ import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi'
 import { useSwipe } from '../hooks/useSwipe';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BanknotesIcon, InformationCircleIcon, ChevronUpDownIcon, CheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { Combobox, Popover, Transition } from '@headlessui/react';
+import { Combobox, Popover, Transition, Switch } from '@headlessui/react';
 import ComparisonButton from '../components/ComparisonButton';
 import FavoriteButton from '../components/FavoriteButton';
 import { formatPercent, formatCurrency, formatNumber, formatDate, formatShares } from '../utils/format';
@@ -649,80 +649,131 @@ export default function FundDetail() {
 
                     {/* Investment Analysis */}
                     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <div className="flex items-center gap-2">
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Yatırım Analizi</h2>
-                                <Popover className="relative">
-                                    {({ open, close }) => (
-                                        <>
-                                            <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
-                                                {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
-                                                <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
-                                            </Popover.Button>
-                                            <Transition
-                                                as={Fragment}
-                                                enter="transition ease-out duration-200"
-                                                enterFrom="opacity-0 translate-y-1"
-                                                enterTo="opacity-100 translate-y-0"
-                                                leave="transition ease-in duration-150"
-                                                leaveFrom="opacity-100 translate-y-0"
-                                                leaveTo="opacity-0 translate-y-1"
+                        <div className="mb-6">
+                            <div className="flex flex-col gap-4 sm:gap-0">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Yatırım Analizi</h2>
+                                        <div className="hidden sm:flex items-center gap-2">
+                                            <Popover className="relative">
+                                                {({ open, close }) => (
+                                                    <>
+                                                        <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
+                                                            {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
+                                                            <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                                        </Popover.Button>
+                                                        <Transition
+                                                            as={Fragment}
+                                                            enter="transition ease-out duration-200"
+                                                            enterFrom="opacity-0 translate-y-1"
+                                                            enterTo="opacity-100 translate-y-0"
+                                                            leave="transition ease-in duration-150"
+                                                            leaveFrom="opacity-100 translate-y-0"
+                                                            leaveTo="opacity-0 translate-y-1"
+                                                        >
+                                                            <Popover.Panel className="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                                <div className="py-1">
+                                                                    {PERIODS.map((period) => (
+                                                                        <button
+                                                                            key={period.value}
+                                                                            onClick={() => {
+                                                                                handlePeriodChange(period.value);
+                                                                                close();
+                                                                            }}
+                                                                            className={`block w-full px-4 py-2 text-sm text-left ${
+                                                                                selectedPeriod === period.value
+                                                                                    ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                                                                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                                                                            }`}
+                                                                        >
+                                                                            {period.label}
+                                                                        </button>
+                                                                    ))}
+                                                                </div>
+                                                            </Popover.Panel>
+                                                        </Transition>
+                                                    </>
+                                                )}
+                                            </Popover>
+                                            <button
+                                                onClick={() => setShowRealValues(!showRealValues)}
+                                                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                                                    showRealValues 
+                                                    ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
+                                                    : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
+                                                }`}
                                             >
-                                                <Popover.Panel className="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                    <div className="py-1">
-                                                        {PERIODS.map((period) => (
-                                                            <button
-                                                                key={period.value}
-                                                                onClick={() => {
-                                                                    handlePeriodChange(period.value);
-                                                                    close();
-                                                                }}
-                                                                className={`block w-full px-4 py-2 text-sm text-left ${
-                                                                    selectedPeriod === period.value
-                                                                        ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
-                                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
-                                                                }`}
-                                                            >
-                                                                {period.label}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </Popover.Panel>
-                                            </Transition>
-                                        </>
-                                    )}
-                                </Popover>
-                                <button
-                                    onClick={() => setShowRealValues(!showRealValues)}
-                                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
-                                        showRealValues 
-                                        ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
-                                        : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
-                                    }`}
-                                >
-                                    {showRealValues ? 'Reel' : 'Nominal'}
-                                </button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500 dark:text-gray-400">
-                                    {getDetailsTitle(analysisParams.startDate)} Detaylar
-                                </span>
-                                <button
-                                    type="button"
-                                    className={`${
-                                        showMonthlyDetails ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'
-                                    } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800`}
-                                    role="switch"
-                                    aria-checked={showMonthlyDetails}
-                                    onClick={() => handleMonthlyDetailsToggle(!showMonthlyDetails)}
-                                >
-                                    <span
-                                        aria-hidden="true"
-                                        className={`${
-                                            showMonthlyDetails ? 'translate-x-5' : 'translate-x-0'
-                                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                                    />
-                                </button>
+                                                {showRealValues ? 'Reel' : 'Nominal'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Switch
+                                            checked={showMonthlyDetails}
+                                            onChange={handleMonthlyDetailsToggle}
+                                            className={`${showMonthlyDetails ? 'bg-indigo-600 dark:bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'} relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-500 focus:ring-offset-2`}
+                                        >
+                                            <span className="sr-only">Aylık detayları göster</span>
+                                            <span
+                                                aria-hidden="true"
+                                                className={`${showMonthlyDetails ? 'translate-x-4' : 'translate-x-0'} pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                                            />
+                                        </Switch>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">Aylık Detaylar</span>
+                                    </div>
+                                </div>
+                                <div className="flex sm:hidden items-center gap-2">
+                                    <Popover className="relative">
+                                        {({ open, close }) => (
+                                            <>
+                                                <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
+                                                    {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
+                                                    <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                                </Popover.Button>
+                                                <Transition
+                                                    as={Fragment}
+                                                    enter="transition ease-out duration-200"
+                                                    enterFrom="opacity-0 translate-y-1"
+                                                    enterTo="opacity-100 translate-y-0"
+                                                    leave="transition ease-in duration-150"
+                                                    leaveFrom="opacity-100 translate-y-0"
+                                                    leaveTo="opacity-0 translate-y-1"
+                                                >
+                                                    <Popover.Panel className="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                        <div className="py-1">
+                                                            {PERIODS.map((period) => (
+                                                                <button
+                                                                    key={period.value}
+                                                                    onClick={() => {
+                                                                        handlePeriodChange(period.value);
+                                                                        close();
+                                                                    }}
+                                                                    className={`block w-full px-4 py-2 text-sm text-left ${
+                                                                        selectedPeriod === period.value
+                                                                            ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                                                                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                                                                    }`}
+                                                                >
+                                                                    {period.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </Popover.Panel>
+                                                </Transition>
+                                            </>
+                                        )}
+                                    </Popover>
+                                    <button
+                                        onClick={() => setShowRealValues(!showRealValues)}
+                                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                                            showRealValues 
+                                            ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
+                                            : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
+                                        }`}
+                                    >
+                                        {showRealValues ? 'Reel' : 'Nominal'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
