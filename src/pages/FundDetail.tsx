@@ -650,7 +650,7 @@ export default function FundDetail() {
                     {/* Investment Analysis */}
                     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6">
                         <div className="mb-6">
-                            <div className="flex flex-col gap-4 sm:gap-0">
+                            <div className="flex flex-col gap-4">
                                 <div className="flex items-center justify-between">
                                     <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                                         <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Yatırım Analizi</h2>
@@ -658,7 +658,7 @@ export default function FundDetail() {
                                             <Popover className="relative">
                                                 {({ open, close }) => (
                                                     <>
-                                                        <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
+                                                        <Popover.Button className="inline-flex items-center justify-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
                                                             {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
                                                             <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
                                                         </Popover.Button>
@@ -697,7 +697,7 @@ export default function FundDetail() {
                                             </Popover>
                                             <button
                                                 onClick={() => setShowRealValues(!showRealValues)}
-                                                className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                                                className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
                                                     showRealValues 
                                                     ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
                                                     : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
@@ -722,11 +722,11 @@ export default function FundDetail() {
                                         <span className="text-sm text-gray-500 dark:text-gray-400">Aylık Detaylar</span>
                                     </div>
                                 </div>
-                                <div className="flex sm:hidden items-center gap-2">
+                                <div className="flex sm:hidden items-center gap-2 justify-start">
                                     <Popover className="relative">
                                         {({ open, close }) => (
                                             <>
-                                                <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
+                                                <Popover.Button className="inline-flex items-center justify-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-3 py-1.5 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
                                                     {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
                                                     <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
                                                 </Popover.Button>
@@ -765,7 +765,7 @@ export default function FundDetail() {
                                     </Popover>
                                     <button
                                         onClick={() => setShowRealValues(!showRealValues)}
-                                        className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                                        className={`inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
                                             showRealValues 
                                             ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
                                             : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
