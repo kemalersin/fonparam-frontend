@@ -50,3 +50,29 @@ export const formatDate = (date: string | Date): string => {
         day: 'numeric'
     });
 };
+
+export const formatShares = (value: number | null | undefined): string => {
+    if (value === null || value === undefined) return '-';
+    
+    let result: number;
+    let suffix: string;
+    
+    if (value >= 1_000_000_000) {
+        result = value / 1_000_000_000;
+        suffix = ' milyar';
+    } else if (value >= 1_000_000) {
+        result = value / 1_000_000;
+        suffix = ' milyon';
+    } else if (value >= 1_000) {
+        result = value / 1_000;
+        suffix = ' bin';
+    } else {
+        return value.toLocaleString('tr-TR');
+    }
+    
+    // Ondalık kısım 0 ise tam sayı olarak göster
+    return (result % 1 === 0 ? Math.floor(result) : result.toLocaleString('tr-TR', { 
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1 
+    })) + suffix;
+};

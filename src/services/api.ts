@@ -51,6 +51,8 @@ export const getFunds = async (params?: {
     tefas?: boolean;
     sort?: string;
     order?: 'ASC' | 'DESC';
+    min_risk_value?: number;
+    max_risk_value?: number;
 }) => {
     const { data } = await api.get<PaginatedResponse<Fund>>('/funds', { params });
     return data;

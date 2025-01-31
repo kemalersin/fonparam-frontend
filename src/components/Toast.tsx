@@ -47,7 +47,7 @@ export default function Toast({ show, type = 'info', message, onClose }: ToastPr
         if (show) {
             const timer = setTimeout(() => {
                 onClose();
-            }, 5000);
+            }, 2000);
 
             return () => clearTimeout(timer);
         }

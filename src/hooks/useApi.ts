@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import * as api from '../services/api';
 import { STALE_TIME } from '../constants';
+import { Fund, PaginatedResponse } from '../types/api';
 
 // Portföy Yönetim Şirketleri
 export const useCompanies = (params?: Parameters<typeof api.getCompanies>[0]) => {
@@ -21,14 +22,28 @@ export const useCompanyDetails = (code: string, includeFunds: boolean = true) =>
 };
 
 // Fonlar
-export const useFunds = (params?: Parameters<typeof api.getFunds>[0]) => {
-    return useQuery({
+interface GetFundsParams {
+    page?: number;
+    limit?: number;
+    type?: string;
+    search?: string;
+    code?: string;
+    management_company?: string;
+    tefas?: boolean;
+    sort?: string;
+    order?: 'ASC' | 'DESC';
+    min_risk_value?: number;
+    max_risk_value?: number;
+}
+
+export function useFunds(params: GetFundsParams = {}) {
+    return useQuery<PaginatedResponse<Fund>>({
         queryKey: ['funds', params],
         queryFn: () => api.getFunds(params),
         staleTime: STALE_TIME,
-        enabled: !!params
+        enabled: Object.keys(params).length > 0
     });
-};
+}
 
 export const useTopPerformingFunds = (funds?: string) => {
     return useQuery({

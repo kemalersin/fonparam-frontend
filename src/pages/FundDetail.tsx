@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { useParams, Link, useSearchParams } from 'react-router-dom';
 import { useFundDetails, useFundHistory, useAnalyzeFund } from '../hooks/useApi';
 import { useSwipe } from '../hooks/useSwipe';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { BanknotesIcon, InformationCircleIcon, ChevronUpDownIcon, CheckIcon, UsersIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { Combobox } from '@headlessui/react';
+import { Combobox, Popover, Transition } from '@headlessui/react';
 import ComparisonButton from '../components/ComparisonButton';
 import FavoriteButton from '../components/FavoriteButton';
-import { formatPercent, formatCurrency, formatNumber, formatDate } from '../utils/format';
+import { formatPercent, formatCurrency, formatNumber, formatDate, formatShares } from '../utils/format';
 import { saveAnalysis } from '../services/analysis';
 import type { AnalysisParams, YearlyIncreaseType } from '../types/api';
 import { useToast } from '../contexts/ToastContext';
@@ -21,6 +21,7 @@ import {
 import { addToRecentlyViewed } from '../services/recentlyViewed';
 import LoadingOverlay from '../components/LoadingOverlay';
 import { Helmet } from 'react-helmet-async';
+import { ChevronDownIcon } from '@heroicons/react/20/solid';
 
 const PERIODS = [
     { label: '1 Gün', value: 'last_1_day' },
@@ -131,13 +132,21 @@ export default function FundDetail() {
         includeMonthlyDetails: showMonthlyDetails
     });
 
+    const searchRef = useRef<HTMLDivElement>(null);
+    const isFirstLoad = useRef(true);
+    const previousPeriod = useRef(selectedPeriod);
     const { showToast } = useToast();
 
     useEffect(() => {
         if (analysis && !analysisError) {
             setAnalysisData(analysis);
+            if (!isFirstLoad.current && selectedPeriod !== previousPeriod.current) {
+                showToast('Yatırım analizi güncellendi.', 'info');
+            }
+            isFirstLoad.current = false;
+            previousPeriod.current = selectedPeriod;
         }
-    }, [analysis, analysisError]);
+    }, [analysis, analysisError, selectedPeriod]);
 
     useEffect(() => {
         setAnalysisParams(prev => ({
@@ -149,6 +158,10 @@ export default function FundDetail() {
     const handleMonthlyDetailsToggle = (checked: boolean) => {
         setShowMonthlyDetails(checked);
         localStorage.setItem('showMonthlyDetails', JSON.stringify(checked));
+    };
+
+    const handlePeriodChange = (period: string) => {
+        setSelectedPeriod(period);
     };
 
     // URL'i güncelle
@@ -319,7 +332,7 @@ export default function FundDetail() {
                                     </Link>
                                     <div className="min-w-0">
                                         <div className="flex lg:items-center gap-4">
-                                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">
+                                            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100 break-words sm:truncate sm:max-w-[400px] lg:max-w-[600px] xl:max-w-[800px]">
                                                 {currentFund.title}
                                             </h1>
                                             <div className="hidden sm:flex gap-1">
@@ -391,6 +404,74 @@ export default function FundDetail() {
                                     )}
                                 </div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">Günlük Getiri</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Fund Details */}
+                    <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-4">
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Risk Seviyesi</dt>
+                                <dd className="mt-1 flex items-center justify-center gap-1">
+                                    <span className={`inline-flex items-center justify-center aspect-square w-7 text-base font-medium ${
+                                        (currentFund.risk_value || 0) <= 2 ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' :
+                                        (currentFund.risk_value || 0) <= 4 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300' :
+                                        'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+                                    } rounded-full`}>
+                                        {currentFund.risk_value || '-'}
+                                    </span>
+                                    <span className="text-base text-gray-500 dark:text-gray-400 font-medium">/ 7</span>
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Yönetim Ücreti</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {formatPercent(currentFund.last_historical_value?.management_fee)}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Alış Valör</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {currentFund.purchase_value_day != null ? `${currentFund.purchase_value_day} gün` : '-'}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Satış Valör</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {currentFund.sale_value_day != null ? `${currentFund.sale_value_day} gün` : '-'}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Aktif Pay</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {formatShares(currentFund.last_historical_value?.shares_active)}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Toplam Pay</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {formatShares(currentFund.last_historical_value?.shares_total)}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Doluluk Oranı</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {formatPercent(currentFund.last_historical_value?.occupancy_rate)}
+                                </dd>
+                            </div>
+
+                            <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 rounded-lg">
+                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 text-center">Pazar Payı</dt>
+                                <dd className="mt-1 text-base font-medium text-gray-900 dark:text-gray-100 text-center">
+                                    {formatPercent(currentFund.last_historical_value?.market_share)}
+                                </dd>
                             </div>
                         </div>
                     </div>
@@ -479,7 +560,7 @@ export default function FundDetail() {
                                 {PERIODS.map((period) => (
                                     <button
                                         key={period.value}
-                                        onClick={() => setSelectedPeriod(period.value)}
+                                        onClick={() => handlePeriodChange(period.value)}
                                         className={`px-3 py-1 text-sm rounded-full ${
                                             selectedPeriod === period.value
                                                 ? 'bg-indigo-600 dark:bg-indigo-500 text-white'
@@ -570,7 +651,59 @@ export default function FundDetail() {
                     {/* Investment Analysis */}
                     <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-4 sm:p-6">
                         <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Yatırım Analizi</h2>
+                            <div className="flex items-center gap-2">
+                                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Yatırım Analizi</h2>
+                                <Popover className="relative">
+                                    {({ open, close }) => (
+                                        <>
+                                            <Popover.Button className="inline-flex items-center gap-1 rounded-full bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/50 dark:hover:bg-blue-800/50 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 ring-1 ring-inset ring-blue-600/20 dark:ring-blue-500/30 cursor-pointer transition-colors">
+                                                {PERIODS.find(p => p.value === selectedPeriod)?.label || 'Tüm Zamanlar'}
+                                                <ChevronDownIcon className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                                            </Popover.Button>
+                                            <Transition
+                                                as={Fragment}
+                                                enter="transition ease-out duration-200"
+                                                enterFrom="opacity-0 translate-y-1"
+                                                enterTo="opacity-100 translate-y-0"
+                                                leave="transition ease-in duration-150"
+                                                leaveFrom="opacity-100 translate-y-0"
+                                                leaveTo="opacity-0 translate-y-1"
+                                            >
+                                                <Popover.Panel className="absolute left-0 z-10 mt-2 w-40 origin-top-left rounded-lg bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                                    <div className="py-1">
+                                                        {PERIODS.map((period) => (
+                                                            <button
+                                                                key={period.value}
+                                                                onClick={() => {
+                                                                    handlePeriodChange(period.value);
+                                                                    close();
+                                                                }}
+                                                                className={`block w-full px-4 py-2 text-sm text-left ${
+                                                                    selectedPeriod === period.value
+                                                                        ? 'bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                                                                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                                                                }`}
+                                                            >
+                                                                {period.label}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </Popover.Panel>
+                                            </Transition>
+                                        </>
+                                    )}
+                                </Popover>
+                                <button
+                                    onClick={() => setShowRealValues(!showRealValues)}
+                                    className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer transition-colors ${
+                                        showRealValues 
+                                        ? 'bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-900/50 dark:hover:bg-yellow-800/50 text-yellow-700 dark:text-yellow-300 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-500/30'
+                                        : 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-900/50 dark:hover:bg-emerald-800/50 text-emerald-700 dark:text-emerald-300 ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30'
+                                    }`}
+                                >
+                                    {showRealValues ? 'Reel' : 'Nominal'}
+                                </button>
+                            </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-500 dark:text-gray-400">
                                     {getDetailsTitle(analysisParams.startDate)} Detaylar

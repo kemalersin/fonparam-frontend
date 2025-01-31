@@ -13,7 +13,7 @@ import { useUrlSort } from '../hooks/useUrlSort';
 import ExportButton from '../components/ExportButton';
 import { Helmet } from 'react-helmet-async';
 
-type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
+type SortableFields = 'code' | 'title' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y' | 'risk_value';
 
 export default function Favorites() {
     const navigate = useNavigate();
@@ -176,6 +176,14 @@ export default function Favorites() {
                                                     currentOrder={order}
                                                     onSort={handleSort}
                                                 />
+                                                <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900 dark:text-gray-100" />
+                                                <SortHeader
+                                                    label="Risk"
+                                                    field="risk_value"
+                                                    currentSort={sort}
+                                                    currentOrder={order}
+                                                    onSort={handleSort}
+                                                />
                                                 <SortHeader
                                                     label="1 Ay"
                                                     field="yield_1m"
@@ -296,6 +304,28 @@ export default function Favorites() {
                                                             </td>
                                                             <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                                 <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                                                {currentFund?.tefas === true ? (
+                                                                    <span className="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300">
+                                                                        TEFAS
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="inline-flex items-center rounded-md bg-transparent px-2 py-1 text-xs font-medium" />
+                                                                )}
+                                                            </td>
+                                                            <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                                                {currentFund?.risk_value ? (
+                                                                    <span className={`inline-flex items-center justify-center aspect-square w-6 text-xs font-medium ${
+                                                                        currentFund.risk_value <= 2 ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' :
+                                                                        currentFund.risk_value <= 4 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300' :
+                                                                        'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+                                                                    } rounded-full`}>
+                                                                        {currentFund.risk_value}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                                )}
                                                             </td>
                                                             {[
                                                                 currentFund?.yield_1m,

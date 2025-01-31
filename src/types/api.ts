@@ -34,13 +34,21 @@ export interface FundTypeDetails {
 }
 
 export interface FundHistoricalValue {
-    code?: string;
+    code: string;
+    date: Date;
     value: number;
     aum: number;
     shares_active: number;
-    cumulative_cashflow: number;
-    date: string;
-    investor_count: number;
+    shares_total: number | null;
+    yield: number | null;
+    cumulative_cashflow: number | null;
+    investor_count: number | null;
+    risk_value: number | null;
+    purchase_value_day: number | null;
+    sale_value_day: number | null;
+    occupancy_rate: number | null;
+    market_share: number | null;
+    management_fee: number | null;
 }
 
 export interface FundManagementCompany {
@@ -70,6 +78,9 @@ export interface Fund {
     title: string;
     type: string;
     tefas: boolean;
+    risk_value?: number;
+    purchase_value_day: number;
+    sale_value_day: number;
     yield_1d?: number;    
     yield_1w?: number;    
     yield_1m?: number;

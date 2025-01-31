@@ -29,6 +29,7 @@ const COLORS = [
 export default function Compare() {
     const navigate = useNavigate();
     const [search, setSearch] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
     const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
     const [selectedFunds, setSelectedFunds] = useState<Pick<Fund, 'code' | 'title'>[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -50,8 +51,8 @@ export default function Compare() {
     }, []);
 
     const { data: searchResults } = useFunds(
-        search ? {
-            search,
+        searchQuery ? {
+            search: searchQuery,
             limit: 50,
             page: 1,
         } : undefined
@@ -195,8 +196,22 @@ export default function Compare() {
 
     const handleSearch = (value: string) => {
         setSearch(value);
-        setShowResults(true);
+        if (value.trim()) {
+            setSearchQuery(value);
+            setShowResults(!!searchResults?.data.length);
+        } else {
+            setSearchQuery('');
+            setShowResults(false);
+        }
     };
+
+    useEffect(() => {
+        if (searchResults?.data.length) {
+            setShowResults(true);
+        } else {
+            setShowResults(false);
+        }
+    }, [searchResults]);
 
     const handleSort = (field: string) => {
         if (sortField === field) {
@@ -222,6 +237,11 @@ export default function Compare() {
             // String sıralaması (code ve title için)
             if (sortField === 'code' || sortField === 'title') {
                 return multiplier * String(aValue).localeCompare(String(bValue));
+            }
+
+            // Risk değeri sıralaması
+            if (sortField === 'risk_value') {
+                return multiplier * (Number(aValue) - Number(bValue));
             }
 
             // Sayısal sıralama (getiriler için)
@@ -372,6 +392,14 @@ export default function Compare() {
                                                 currentOrder={sortDirection.toUpperCase() as 'ASC' | 'DESC'}
                                                 onSort={handleSort}
                                             />
+                                            <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-gray-900 dark:text-gray-100" />
+                                            <SortHeader
+                                                label="Risk"
+                                                field="risk_value"
+                                                currentSort={sortField}
+                                                currentOrder={sortDirection.toUpperCase() as 'ASC' | 'DESC'}
+                                                onSort={handleSort}
+                                            />
                                             <SortHeader
                                                 label="1 Ay"
                                                 field="yield_1m"
@@ -462,6 +490,28 @@ export default function Compare() {
                                                 </td>
                                                 <td className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
                                                     <div className="line-clamp-2 min-w-[200px] max-w-[400px] overflow-hidden text-ellipsis">{fund.title}</div>
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                                    {fund.tefas === true ? (
+                                                        <span className="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/50 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-300">
+                                                            TEFAS
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center rounded-md bg-transparent px-2 py-1 text-xs font-medium" />
+                                                    )}
+                                                </td>
+                                                <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                                    {fund.risk_value ? (
+                                                        <span className={`inline-flex items-center justify-center aspect-square w-6 text-xs font-medium ${
+                                                            fund.risk_value <= 2 ? 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300' :
+                                                            fund.risk_value <= 4 ? 'bg-yellow-100 dark:bg-yellow-900/50 text-yellow-700 dark:text-yellow-300' :
+                                                            'bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300'
+                                                        } rounded-full`}>
+                                                            {fund.risk_value}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-400 dark:text-gray-500">-</span>
+                                                    )}
                                                 </td>
                                                 {[
                                                     fund.yield_1m,
