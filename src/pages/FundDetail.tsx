@@ -132,7 +132,6 @@ export default function FundDetail() {
         includeMonthlyDetails: showMonthlyDetails
     });
 
-    const searchRef = useRef<HTMLDivElement>(null);
     const isFirstLoad = useRef(true);
     const previousPeriod = useRef(selectedPeriod);
     const { showToast } = useToast();
