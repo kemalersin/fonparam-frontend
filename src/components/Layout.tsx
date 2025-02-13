@@ -44,7 +44,7 @@ export default function Layout() {
                                             />
                                         </Link>
                                     </div>
-                                    <div className="hidden sm:ml-12 sm:flex sm:space-x-8">
+                                    <div className="hidden lg:ml-12 lg:flex lg:space-x-8">
                                         {navigation.map((item) => (
                                             <Link
                                                 key={item.href}
@@ -63,7 +63,7 @@ export default function Layout() {
                                 </div>
                                 <div className="flex items-center space-x-4 z-10">
                                     <ThemeToggle />
-                                    <div className="-mr-2 flex items-center sm:hidden">
+                                    <div className="-mr-2 flex items-center lg:hidden">
                                         <Disclosure.Button className="inline-flex items-center justify-center rounded-md bg-white dark:bg-gray-800 p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                             <span className="sr-only">Ana menüyü aç</span>
                                             {open ? (
@@ -77,7 +77,7 @@ export default function Layout() {
                             </div>
                         </div>
 
-                        <Disclosure.Panel className="sm:hidden">
+                        <Disclosure.Panel className="lg:hidden">
                             <div className="space-y-1 pb-3 pt-2">
                                 {navigation.map((item) => (
                                     <Disclosure.Button
