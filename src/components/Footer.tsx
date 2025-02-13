@@ -9,7 +9,7 @@ export default function Footer() {
     return (
         <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
             <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                     <div>
                         <h3 className="text-sm font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                             Rehber
