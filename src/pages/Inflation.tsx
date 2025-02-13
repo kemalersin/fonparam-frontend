@@ -122,18 +122,27 @@ export default function Inflation() {
         // Verileri ters çeviriyoruz (en eskiden yeniye)
         const sortedData = [...inflationData].reverse();
 
-        // Eğer seçilen ay bu aysa ve veri yoksa, önceki ayın oranını kullanarak tahmini değer hesapla
+        // İçinde bulunduğumuz ay için tahmini değer ekle
         const now = new Date();
-        const selectedDate = new Date(startDate);
-        const isCurrentMonth = selectedDate.getMonth() === now.getMonth() && selectedDate.getFullYear() === now.getFullYear();
-        
-        if (isCurrentMonth && sortedData.length > 0) {
-            const lastMonth = sortedData[sortedData.length - 1];
-            sortedData.push({
-                date: startDate,
-                monthly_rate: lastMonth.monthly_rate,
-                yearly_rate: lastMonth.yearly_rate
-            });
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+
+        // Eğer veri varsa ve son veri içinde bulunduğumuz aydan önceki aya aitse
+        if (sortedData.length > 0) {
+            const lastDataDate = new Date(sortedData[sortedData.length - 1].date);
+            const lastDataYear = lastDataDate.getFullYear();
+            const lastDataMonth = lastDataDate.getMonth() + 1;
+
+            // Son verinin ayı ile şu anki ay arasındaki farkı hesapla
+            const monthDiff = (currentYear - lastDataYear) * 12 + (currentMonth - lastDataMonth);
+
+            // Eğer fark 1 ay ise (yani son veri önceki aya aitse), bu ay için boş değerlerle ekle
+            if (monthDiff === 1) {
+                const currentMonthDate = new Date(currentYear, currentMonth - 1, 1);
+                sortedData.push({
+                    date: currentMonthDate.toISOString()
+                });
+            }
         }
 
         const result = [];
@@ -144,15 +153,10 @@ export default function Inflation() {
 
         for (let i = 0; i < sortedData.length; i++) {
             const item = sortedData[i];
-            
-            // Değerleri güncelle
-            if (i > 0) {
-                const prevItem = sortedData[i - 1];
-                currentValue = currentValue * (1 - prevItem.monthly_rate / 100);
-                nominalValue = nominalValue * (1 + prevItem.monthly_rate / 100);
-                cumulativeLossRate = ((nominalValue - currentValue) / nominalValue) * 100;
-                cumulativeInflationRate += prevItem.monthly_rate;
-            }
+            const itemDate = new Date(item.date);
+            const isEstimate = itemDate.getFullYear() === currentYear && 
+                             itemDate.getMonth() + 1 === currentMonth && 
+                             (!item.monthly_rate || !item.yearly_rate);
             
             // Her ay için veriyi hazırla
             result.push({
@@ -163,8 +167,19 @@ export default function Inflation() {
                 yearlyRate: item.yearly_rate,
                 cumulativeLossRate: cumulativeLossRate,
                 cumulativeInflationRate: cumulativeInflationRate,
-                isEstimate: isCurrentMonth && i === sortedData.length - 1
+                isEstimate: isEstimate
             });
+
+            // Bir sonraki ay için değerleri güncelle (eğer son ay değilse)
+            if (i < sortedData.length - 1) {
+                const nextItem = sortedData[i];
+                if (nextItem.monthly_rate !== undefined) {
+                    currentValue = currentValue * (1 - nextItem.monthly_rate / 100);
+                    nominalValue = nominalValue * (1 + nextItem.monthly_rate / 100);
+                    cumulativeLossRate = ((nominalValue - currentValue) / nominalValue) * 100;
+                    cumulativeInflationRate += nextItem.monthly_rate;
+                }
+            }
         }
 
         return result;
@@ -523,16 +538,15 @@ export default function Inflation() {
                                                             year: 'numeric',
                                                             month: 'long'
                                                         })}
-                                                        {item.isEstimate && ' (Tahmini)'}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
                                                         {formatCurrency(showNominal ? item.nominalValue : item.realValue)}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
-                                                        {formatPercent(item.monthlyRate)}
+                                                        {item.isEstimate ? '-' : formatPercent(item.monthlyRate)}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
-                                                        {formatPercent(item.yearlyRate)}
+                                                        {item.isEstimate ? '-' : formatPercent(item.yearlyRate)}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
                                                         {formatPercent(item.cumulativeInflationRate)}

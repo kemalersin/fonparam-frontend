@@ -148,7 +148,7 @@ export interface AnalysisParams {
 }
 
 export interface InflationData {
-    monthly_rate: number;
-    yearly_rate: number;
+    monthly_rate?: number;
+    yearly_rate?: number;
     date: string;
 } 
