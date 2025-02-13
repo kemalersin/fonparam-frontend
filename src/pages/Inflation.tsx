@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { useInflation } from '../hooks/useApi';
 import { formatCurrency, formatPercent } from '../utils/format';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Combobox, Switch } from '@headlessui/react';
+import { Combobox } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import LoadingOverlay from '../components/LoadingOverlay';
