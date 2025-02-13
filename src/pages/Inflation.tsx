@@ -145,6 +145,15 @@ export default function Inflation() {
         for (let i = 0; i < sortedData.length; i++) {
             const item = sortedData[i];
             
+            // Değerleri güncelle
+            if (i > 0) {
+                const prevItem = sortedData[i - 1];
+                currentValue = currentValue * (1 - prevItem.monthly_rate / 100);
+                nominalValue = nominalValue * (1 + prevItem.monthly_rate / 100);
+                cumulativeLossRate = ((nominalValue - currentValue) / nominalValue) * 100;
+                cumulativeInflationRate += prevItem.monthly_rate;
+            }
+            
             // Her ay için veriyi hazırla
             result.push({
                 date: item.date,
@@ -156,14 +165,6 @@ export default function Inflation() {
                 cumulativeInflationRate: cumulativeInflationRate,
                 isEstimate: isCurrentMonth && i === sortedData.length - 1
             });
-
-            // Bir sonraki ay için değerleri güncelle (eğer son ay değilse)
-            if (i < sortedData.length - 1) {
-                currentValue = currentValue * (1 - sortedData[i].monthly_rate / 100);
-                nominalValue = nominalValue * (1 + sortedData[i].monthly_rate / 100);
-                cumulativeLossRate = ((nominalValue - currentValue) / nominalValue) * 100;
-                cumulativeInflationRate += item.monthly_rate;
-            }
         }
 
         return result;
