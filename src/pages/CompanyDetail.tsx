@@ -45,7 +45,7 @@ export default function CompanyDetail() {
         <div>
             {data && (
                 <Helmet>
-                    <title>{data.title} | FonParam</title>
+                    <title>{data.title}</title>
                     <meta name="description" content={`${data.title} portföy yönetim şirketi hakkında detaylı bilgi, yönetilen fonlar ve performans analizi.`} />
                     
                     {/* Open Graph / Facebook */}

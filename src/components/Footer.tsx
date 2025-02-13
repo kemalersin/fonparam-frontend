@@ -54,17 +54,17 @@ export default function Footer() {
                             </li>
                             <li>
                                 <Link to="/companies" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                    Portföy Yönetim Şirketleri
+                                    Şirket Analizi
                                 </Link>
                             </li>
                             <li>
                                 <Link to="/compare" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                    Fon Karşılaştırma
+                                    Karşılaştırma
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/analyses" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                                    Analizler
+                                <Link to="/inflation" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                                    Enflasyon
                                 </Link>
                             </li>
                         </ul>

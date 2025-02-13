@@ -7,7 +7,8 @@ import type {
     PaginatedResponse,
     CompanyListItem,
     DailyStatistics,
-    FundTypeDetails
+    FundTypeDetails,
+    InflationData
 } from '../types/api';
 
 const api = axios.create({
@@ -145,6 +146,13 @@ export const getFundTypes = async (params?: {
 
 export const getFundTypeDetails = async (type: string) => {
     const { data } = await api.get<FundTypeDetails>(`/fund-types/${type}`);
+    return data;
+};
+
+export const getInflation = async (startDate?: string) => {
+    const { data } = await api.get<InflationData[]>('/inflation', {
+        params: { start_date: startDate }
+    });
     return data;
 };
  

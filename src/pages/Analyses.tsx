@@ -198,7 +198,7 @@ export default function Analyses() {
     return (
         <div>
             <Helmet>
-                <title>Fon Analizlerim | FonParam</title>
+                <title>Fon Analizlerim</title>
                 <meta name="description" content="Yatırım fonları için yaptığınız analizleri görüntüleyin ve takip edin." />
             </Helmet>
             <LoadingOverlay isLoading={isLoading} />

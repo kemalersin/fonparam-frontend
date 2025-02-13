@@ -108,7 +108,7 @@ export default function Favorites() {
         return (
             <div>
                 <Helmet>
-                    <title>Favori Fonlarım | FonParam</title>
+                    <title>Favori Fonlarım</title>
                     <meta name="description" content="Favori yatırım fonlarınızı görüntüleyin ve takip edin." />
                 </Helmet>
                 <LoadingOverlay isLoading={true} />
@@ -120,7 +120,7 @@ export default function Favorites() {
     return (
         <div>
             <Helmet>
-                <title>Favori Fonlarım | FonParam</title>
+                <title>Favori Fonlarım</title>
                 <meta name="description" content="Favori yatırım fonlarınızı görüntüleyin ve takip edin." />
             </Helmet>
             <LoadingOverlay isLoading={isLoading} />

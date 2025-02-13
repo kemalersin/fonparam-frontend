@@ -145,4 +145,10 @@ export interface AnalysisParams {
         type: YearlyIncreaseType;
         value: number | null;
     };
+}
+
+export interface InflationData {
+    monthly_rate: number;
+    yearly_rate: number;
+    date: string;
 } 

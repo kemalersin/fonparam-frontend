@@ -13,6 +13,7 @@ const navigation = [
     { name: 'Karşılaştır', href: '/compare' },
     { name: 'Favoriler', href: '/favorites' },
     { name: 'Analizler', href: '/analyses' },
+    { name: 'Enflasyon', href: '/inflation' },
 ];
 
 function classNames(...classes: string[]) {

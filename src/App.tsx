@@ -13,6 +13,7 @@ import Analyses from './pages/Analyses';
 import CompanyDetail from './pages/CompanyDetail';
 import Static from './pages/Static';
 import FundDetail from './pages/FundDetail';
+import Inflation from './pages/Inflation';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       { path: '/compare', element: <Compare /> },
       { path: '/favorites', element: <Favorites /> },
       { path: '/analyses', element: <Analyses /> },
+      { path: '/inflation', element: <Inflation /> },
       { path: '/guides/:slug', element: <Static /> },
       { path: '/privacy', element: <Static /> },
       { path: '/terms', element: <Static /> },

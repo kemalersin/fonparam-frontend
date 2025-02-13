@@ -252,7 +252,7 @@ export default function Compare() {
     return (
         <div>
             <Helmet>
-                <title>Fon Karşılaştırma | FonParam</title>
+                <title>Fon Karşılaştırma</title>
                 <meta name="description" content="Yatırım fonlarını detaylı olarak karşılaştırın ve en iyi yatırım kararını verin." />
             </Helmet>
             <LoadingOverlay isLoading={isLoading || isComparing} />

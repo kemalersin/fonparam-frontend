@@ -37,7 +37,7 @@ export const formatCurrency = (value: number | null | undefined, maxFractionDigi
     if (value == null) return '-';
     return value.toLocaleString('tr-TR', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: maxFractionDigits ?? 2,
+        maximumFractionDigits: maxFractionDigits !== undefined ? Math.min(Math.max(maxFractionDigits, 0), 20) : 2,
         style: 'currency',
         currency: 'TRY'
     });

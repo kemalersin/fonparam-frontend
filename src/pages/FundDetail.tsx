@@ -271,7 +271,7 @@ export default function FundDetail() {
         <div>
             {currentFund && (
                 <Helmet>
-                    <title>{currentFund.title} ({currentFund.code}) | FonParam</title>
+                    <title>{currentFund.title} ({currentFund.code})</title>
                     <meta name="description" content={`${currentFund.title} (${currentFund.code}) fonu hakkında detaylı bilgi, getiri oranları ve yatırım analizi.`} />
                     
                     {/* Open Graph / Facebook */}
@@ -998,7 +998,7 @@ export default function FundDetail() {
                         >
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="hidden sm:inline text-lg font-medium text-gray-900 dark:text-gray-100">{getDetailsTitle(analysisParams.startDate)} Detaylar</h2>
-                                
+                                                     
                                 <div className="flex items-center gap-4">
                                     <div className="bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
                                         <nav className="flex space-x-1" aria-label="Değer tipi">

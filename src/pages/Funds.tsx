@@ -16,6 +16,11 @@ import { Fund, PaginatedResponse } from '../types/api';
 
 type SortableFields = 'code' | 'title' | 'risk_value' | 'yield_1m' | 'yield_3m' | 'yield_6m' | 'yield_ytd' | 'yield_1y' | 'yield_3y' | 'yield_5y';
 
+type RiskOption = {
+    label: string;
+    value: number;
+};
+
 const TEFAS_OPTIONS = [
     { label: 'TEFAS\'ta Var', value: true },
     { label: 'TEFAS\'ta Yok', value: false }
@@ -95,7 +100,7 @@ export default function Funds() {
     return (
         <div>
             <Helmet>
-                <title>Yatırım Fonları | FonParam</title>
+                <title>Yatırım Fonları</title>
                 <meta name="description" content="Türkiye'deki tüm yatırım fonlarını inceleyin, filtreleyin ve detaylı analizler yapın." />
             </Helmet>
             <LoadingOverlay isLoading={isLoading} />
@@ -233,8 +238,7 @@ export default function Funds() {
 
                     {/* Risk Filter */}
                     <div className="sm:col-span-2">
-                        <Combobox
-                            as="div"
+                        <Combobox<RiskOption | null>
                             value={minRiskValue !== undefined ? { label: `Risk: ${minRiskValue}-${maxRiskValue || 7}`, value: minRiskValue } : null}
                             onChange={(option) => {
                                 if (!option) {
@@ -247,7 +251,7 @@ export default function Funds() {
                                     setRiskRange(5, 7);
                                 }
                             }}
-                            nullable
+                            by={(a, b) => a?.value === b?.value}
                         >
                             <div className="relative">
                                 <Combobox.Button className="relative w-full cursor-default rounded-md bg-white dark:bg-gray-800 py-2 pl-3 pr-10 text-left text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6">

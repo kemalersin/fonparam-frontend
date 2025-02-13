@@ -68,7 +68,7 @@ export default function Companies() {
     return (
         <div>
             <Helmet>
-                <title>Portföy Yönetim Şirketleri | FonParam</title>
+                <title>Portföy Yönetim Şirketleri</title>
                 <meta name="description" content="Türkiye'deki portföy yönetim şirketlerini inceleyin ve performanslarını karşılaştırın." />
             </Helmet>
             <LoadingOverlay isLoading={isLoading} />

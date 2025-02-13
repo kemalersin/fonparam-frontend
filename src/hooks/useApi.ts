@@ -137,4 +137,12 @@ export const useFundTypeDetails = (type: string) => {
         staleTime: STALE_TIME,
         enabled: !!type,
     });
+};
+
+export const useInflation = (startDate?: string) => {
+    return useQuery({
+        queryKey: ['inflation', startDate],
+        queryFn: () => api.getInflation(startDate),
+        staleTime: STALE_TIME
+    });
 }; 
