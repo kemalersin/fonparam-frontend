@@ -136,9 +136,9 @@ export default function Funds() {
                                 <Combobox.Button className="relative w-full cursor-default rounded-md bg-white dark:bg-gray-800 py-2 pl-3 pr-10 text-left text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6">
                                     <div className="flex items-center gap-2">
                                         <WalletIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                                        <span className="block truncate">
-                                            {FUND_TYPES.find(t => t.value === type)?.label || 'Tüm Fonlar'}
-                                        </span>
+                                    <span className="block truncate">
+                                        {FUND_TYPES.find(t => t.value === type)?.label || 'Tüm Fonlar'}
+                                    </span>
                                     </div>
                                     <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
                                         <ChevronUpDownIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />

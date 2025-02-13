@@ -121,6 +121,21 @@ export default function Inflation() {
 
         // Verileri ters çeviriyoruz (en eskiden yeniye)
         const sortedData = [...inflationData].reverse();
+
+        // Eğer seçilen ay bu aysa ve veri yoksa, önceki ayın oranını kullanarak tahmini değer hesapla
+        const now = new Date();
+        const selectedDate = new Date(startDate);
+        const isCurrentMonth = selectedDate.getMonth() === now.getMonth() && selectedDate.getFullYear() === now.getFullYear();
+        
+        if (isCurrentMonth && sortedData.length > 0) {
+            const lastMonth = sortedData[sortedData.length - 1];
+            sortedData.push({
+                date: startDate,
+                monthly_rate: lastMonth.monthly_rate,
+                yearly_rate: lastMonth.yearly_rate
+            });
+        }
+
         const result = [];
         let currentValue = amount;
         let nominalValue = amount;
@@ -138,7 +153,8 @@ export default function Inflation() {
                 monthlyRate: item.monthly_rate,
                 yearlyRate: item.yearly_rate,
                 cumulativeLossRate: cumulativeLossRate,
-                cumulativeInflationRate: cumulativeInflationRate
+                cumulativeInflationRate: cumulativeInflationRate,
+                isEstimate: isCurrentMonth && i === sortedData.length - 1
             });
 
             // Bir sonraki ay için değerleri güncelle (eğer son ay değilse)
@@ -427,13 +443,15 @@ export default function Inflation() {
                                             />
                                             <YAxis
                                                 className="text-gray-600 dark:text-gray-300"
+                                                domain={['auto', 'auto']}
+                                                width={80}
                                                 tickFormatter={(value) => {
                                                     if (value >= 1_000_000) {
-                                                        return (value / 1_000_000).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + 'M ₺';
+                                                        return (value / 1_000_000).toLocaleString('tr-TR') + 'M';
                                                     } else if (value >= 1_000) {
-                                                        return (value / 1_000).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + 'B ₺';
+                                                        return (value / 1_000).toLocaleString('tr-TR') + 'B';
                                                     }
-                                                    return value.toLocaleString('tr-TR', { maximumFractionDigits: 0 }) + ' ₺';
+                                                    return value.toLocaleString('tr-TR');
                                                 }}
                                             />
                                             <Tooltip
@@ -504,6 +522,7 @@ export default function Inflation() {
                                                             year: 'numeric',
                                                             month: 'long'
                                                         })}
+                                                        {item.isEstimate && ' (Tahmini)'}
                                                     </td>
                                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right text-gray-900 dark:text-gray-100">
                                                         {formatCurrency(showNominal ? item.nominalValue : item.realValue)}
