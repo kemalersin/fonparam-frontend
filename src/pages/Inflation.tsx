@@ -49,7 +49,7 @@ export default function Inflation() {
 
     // State
     const [amount, setAmount] = useState(initialAmount);
-    const [debouncedAmount, setDebouncedAmount] = useState(initialAmount);
+    const [debouncedAmount, setDebouncedAmount] = useState<number | null>(initialAmount);
     const [selectedYear, setSelectedYear] = useState(initialYear);
     const [selectedMonth, setSelectedMonth] = useState<Month>(initialMonth);
     const [showNominal, setShowNominal] = useState(initialShowNominal);
@@ -72,8 +72,14 @@ export default function Inflation() {
 
     // Amount değişikliğini yönet
     const handleAmountChange = (value: string) => {
+        // Input boş ise sadece görüntüyü güncelle
+        if (value === '') {
+            setDebouncedAmount(null);
+            return;
+        }
+
         const newAmount = Number(value);
-        if (!isNaN(newAmount) && newAmount > 0) {
+        if (!isNaN(newAmount) && newAmount >= 0) {
             setDebouncedAmount(newAmount);
         }
     };
@@ -81,7 +87,10 @@ export default function Inflation() {
     // Debounced amount için useEffect
     useEffect(() => {
         const timer = setTimeout(() => {
-            setAmount(debouncedAmount);
+            // Sadece geçerli bir değer varsa amount'u güncelle
+            if (debouncedAmount !== null) {
+                setAmount(debouncedAmount);
+            }
         }, DEBOUNCE_DELAY);
 
         return () => clearTimeout(timer);
@@ -92,7 +101,8 @@ export default function Inflation() {
         const newParams = new URLSearchParams();
         
         // Sadece varsayılan değerlerden farklı olan parametreleri ekle
-        if (amount !== defaultAmount) {
+        // Amount 0'dan büyükse ve varsayılan değerden farklıysa ekle
+        if (amount > 0 && amount !== defaultAmount) {
             newParams.set('amount', amount.toString());
         }
         if (selectedYear !== defaultDate.getFullYear()) {
@@ -113,11 +123,12 @@ export default function Inflation() {
     const startDate = `${selectedYear}-${String(selectedMonth?.value).padStart(2, '0')}-01`;
 
     // API'den enflasyon verilerini çek
-    const { data: inflationData, isLoading } = useInflation(startDate);
+    const { data: inflationData, isLoading } = useInflation(amount > 0 ? startDate : null);
 
     // Enflasyon etkisini hesapla
     const calculateRealValue = () => {
-        if (!inflationData) return [];
+        // Amount 0 veya boş ise boş array dön
+        if (!amount || !inflationData) return [];
 
         // Verileri ters çeviriyoruz (en eskiden yeniye)
         const sortedData = [...inflationData].reverse();
@@ -223,7 +234,7 @@ export default function Inflation() {
                                     type="number"
                                     name="amount"
                                     id="amount"
-                                    value={debouncedAmount}
+                                    value={debouncedAmount ?? ''}
                                     onChange={(e) => handleAmountChange(e.target.value)}
                                     placeholder={defaultAmount.toString()}
                                     className="block w-full rounded-md border-0 py-2.5 pl-7 pr-3 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:focus:ring-indigo-500 sm:text-sm sm:leading-6"
@@ -415,10 +426,10 @@ export default function Inflation() {
                         {/* Chart */}
                         {chartData.length > 0 && (
                             <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg p-6">
-                                <div className="flex items-center justify-between mb-6">
+                                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Değer Değişimi</h2>
                                     {chartData.length > 0 && (
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <div className="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium bg-gray-50 dark:bg-gray-900/50 text-gray-700 dark:text-gray-300">
                                                 {formatCurrency(showNominal ? chartData[0].nominalValue : chartData[0].realValue)}
                                             </div>
@@ -445,7 +456,10 @@ export default function Inflation() {
                                 </div>
                                 <div className="h-96">
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={chartData}>
+                                        <LineChart 
+                                            data={chartData}
+                                            margin={{ left: -8, right: 8, top: 8, bottom: 8 }}
+                                        >
                                             <CartesianGrid strokeDasharray="3 3" className="text-gray-200 dark:text-gray-700" />
                                             <XAxis 
                                                 dataKey="date" 
@@ -460,7 +474,7 @@ export default function Inflation() {
                                             <YAxis
                                                 className="text-gray-600 dark:text-gray-300"
                                                 domain={['auto', 'auto']}
-                                                width={80}
+                                                width={62}
                                                 tickFormatter={(value) => {
                                                     if (value >= 1_000_000) {
                                                         return (value / 1_000_000).toLocaleString('tr-TR') + 'M';
