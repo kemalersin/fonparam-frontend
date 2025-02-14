@@ -123,7 +123,7 @@ export default function Inflation() {
     const startDate = `${selectedYear}-${String(selectedMonth?.value).padStart(2, '0')}-01`;
 
     // API'den enflasyon verilerini çek
-    const { data: inflationData, isLoading } = useInflation(amount > 0 ? startDate : null);
+    const { data: inflationData, isLoading } = useInflation(amount > 0 ? startDate : undefined);
 
     // Enflasyon etkisini hesapla
     const calculateRealValue = () => {
